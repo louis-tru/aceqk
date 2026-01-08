@@ -3,11 +3,13 @@
 import type { VirtualRenderer } from "./virtual_renderer";
 import {EventEmitter} from "./lib/event_emitter";
 import {View,Box, Scroll} from 'quark';
+import {UIEvent} from 'quark/event';
 
 // on ie maximal element height is smaller than what we get from 4-5K line document
 // so scrollbar doesn't work, as a workaround we do not set height higher than MAX_SCROLL_H
 // and rescale scrolltop
-var MAX_SCROLL_H = 0x8000;
+const MAX_SCROLL_H = 0x8000;
+const SCROLLBAR_SIZE = 15;
 
 export interface ScrollbarEvents {
 	"scroll": (e: { data: number }, emitter: Scrollbar) => void;
@@ -15,8 +17,6 @@ export interface ScrollbarEvents {
 
 export interface Scrollbar {
 	setVisible(visible: boolean): void;
-
-	[key: string]: any;
 }
 
 export interface HScrollbar extends Scrollbar {
@@ -30,9 +30,13 @@ export interface VScrollbar extends Scrollbar {
 /**
  * An abstract class representing a native scrollbar control.
  **/
-export class Scrollbar extends EventEmitter<ScrollbarEvents> {
+export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
 	public element: Scroll;
 	protected inner: Box;
+	protected skipEvent: boolean;
+	public isVisible: boolean;
+	protected coeff: number;
+
 	/**
 	 * Creates a new `ScrollBar`. `parent` is the owner of the scroll bar.
 	 * @param {Element} parent A DOM element
@@ -44,33 +48,38 @@ export class Scrollbar extends EventEmitter<ScrollbarEvents> {
 		this.element = new Scroll(parent.window);
 		this.element.class = ["ace_scrollbar", "ace_scrollbar" + classSuffix];
 
-		this.inner = dom.createElement("div");
-		this.inner.className = "ace_scrollbar-inner";
-		// on safari scrollbar is not shown for empty elements
-		// this.inner.textContent = "\xa0";
-		this.element.appendChild(this.inner);
+		// this.inner = dom.createElement("div");
+		this.inner = new Box(parent.window);
+		this.inner.class = ["ace_scrollbar-inner"];
+		this.element.append(this.inner);
 
-		parent.appendChild(this.element);
+		parent.append(this.element);
 
 		this.setVisible(false);
 		this.skipEvent = false;
 
-		// @ts-expect-error
-		event.addListener(this.element, "scroll", this.onScroll.bind(this));
-		event.addListener(this.element, "mousedown", event.preventDefault);
+		this.element.onScroll.on(this.onScroll.bind(this));
+		this.element.onMouseDown.on(e => e.cancelDefault());
 	}
 
 	setVisible(isVisible: boolean) {
-		this.element.style.display = isVisible ? "" : "none";
+		this.element.style.visible = isVisible;
 		this.isVisible = isVisible;
 		this.coeff = 1;
 	}
+
+	protected abstract onScroll(e: UIEvent): void;
 }
 
 /**
  * Represents a vertical scroll bar.
  **/
 export class VScrollBar extends Scrollbar {
+	private scrollTop: number;
+	private scrollHeight: number;
+	private width: number;
+	private $minWidth: number;
+
 	/**
 	 * Creates a new `VScrollBar`. `parent` is the owner of the scroll bar.
 	 * @param {Element} parent A DOM element
@@ -80,17 +89,9 @@ export class VScrollBar extends Scrollbar {
 		super(parent, '-v');
 		this.scrollTop = 0;
 		this.scrollHeight = 0;
-
-		// in OSX lion the scrollbars appear to have no width. In this case resize the
-		// element to show the scrollbar but still pretend that the scrollbar has a width
-		// of 0px
-		// in Firefox 6+ scrollbar is hidden if element has the same width as scrollbar
-		// make element a little bit wider to retain scrollbar when page is zoomed
-		renderer.$scrollbarWidth =
-			this.width = dom.scrollbarWidth(parent.ownerDocument);
-		this.inner.style.width =
-			this.element.style.width = (this.width || 15) + 5;
-		this.$minWidth = 0;
+		this.width = SCROLLBAR_SIZE;
+		this.element.style.width = SCROLLBAR_SIZE;
+		this.inner.style.width = SCROLLBAR_SIZE;
 	}
 
 	/**
@@ -99,11 +100,11 @@ export class VScrollBar extends Scrollbar {
 	 * @internal
 	 **/
 
-	onScroll() {
+	protected onScroll() {
 		if (!this.skipEvent) {
-			this.scrollTop = this.element.scrollTop;
+			this.scrollTop = this.element.scrollY;
 			if (this.coeff != 1) {
-				var h = this.element.clientHeight / this.scrollHeight;
+				var h = this.element.clientSize.y / this.scrollHeight;
 				this.scrollTop = this.scrollTop * (1 - h) / (this.coeff - h);
 			}
 			this._emit("scroll", {data: this.scrollTop}, this);
@@ -116,7 +117,7 @@ export class VScrollBar extends Scrollbar {
 	 * @returns {Number}
 	 **/
 	getWidth() {
-		return Math.max(this.isVisible ? this.width : 0, this.$minWidth || 0);
+		return this.isVisible ? this.width : 0;
 	}
 
 	/**
@@ -159,16 +160,17 @@ export class VScrollBar extends Scrollbar {
 		if (this.scrollTop != scrollTop) {
 			this.skipEvent = true;
 			this.scrollTop = scrollTop;
-			this.element.scrollTop = scrollTop * this.coeff;
+			this.element.scrollY = scrollTop * this.coeff;
 		}
 	}
-
 }
 
 /**
  * Represents a horisontal scroll bar.
  **/
 export class HScrollBar extends Scrollbar {
+	private scrollLeft: number;
+	private height: number;
 	/**
 	 * Creates a new `HScrollBar`. `parent` is the owner of the scroll bar.
 	 * @param {Element} parent A DOM element
@@ -177,15 +179,9 @@ export class HScrollBar extends Scrollbar {
 	constructor(parent: View, renderer: VirtualRenderer) {
 		super(parent, '-h');
 		this.scrollLeft = 0;
-
-		// in OSX lion the scrollbars appear to have no width. In this case resize the
-		// element to show the scrollbar but still pretend that the scrollbar has a width
-		// of 0px
-		// in Firefox 6+ scrollbar is hidden if element has the same width as scrollbar
-		// make element a little bit wider to retain scrollbar when page is zoomed
-		this.height = renderer.$scrollbarWidth;
-		this.inner.style.height =
-			this.element.style.height = (this.height || 15) + 5;
+		this.height = SCROLLBAR_SIZE;
+		this.inner.style.height = SCROLLBAR_SIZE;
+		this.element.style.height = SCROLLBAR_SIZE;
 	}
 
 	/**
@@ -193,9 +189,9 @@ export class HScrollBar extends Scrollbar {
 	 * @event scroll
 	 * @internal
 	 **/
-	onScroll() {
+	protected onScroll() {
 		if (!this.skipEvent) {
-			this.scrollLeft = this.element.scrollLeft;
+			this.scrollLeft = this.element.scrollY;
 			this._emit("scroll", {data: this.scrollLeft}, this);
 		}
 		this.skipEvent = false;
@@ -243,8 +239,7 @@ export class HScrollBar extends Scrollbar {
 		// this.element.scrollTop != scrollTop which makes page to scroll up.
 		if (this.scrollLeft != scrollLeft) {
 			this.skipEvent = true;
-			this.scrollLeft = this.element.scrollLeft = scrollLeft;
+			this.scrollLeft = this.element.scrollY = scrollLeft;
 		}
 	}
-
 }
