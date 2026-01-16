@@ -32,7 +32,7 @@ export interface VScrollbar extends Scrollbar {
  **/
 export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
 	public element: Scroll;
-	protected inner: Box;
+	public inner: Box;
 	protected skipEvent: boolean;
 	public isVisible: boolean;
 	protected coeff: number;
@@ -76,8 +76,8 @@ export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
  **/
 export class VScrollBar extends Scrollbar {
 	public scrollTop: number;
-	private scrollHeight: number;
-	private width: number;
+	public scrollHeight: number;
+	public width: number;
 	private $minWidth: number;
 
 	/**
@@ -172,7 +172,7 @@ export class VScrollBar extends Scrollbar {
  **/
 export class HScrollBar extends Scrollbar {
 	public scrollLeft: number;
-	private height: number;
+	public height: number;
 	/**
 	 * Creates a new `HScrollBar`. `parent` is the owner of the scroll bar.
 	 * @param {Element} parent A DOM element

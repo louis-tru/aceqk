@@ -76,6 +76,8 @@ export interface SyntaxMode {
 	completionKeywords: string[];
 	transformAction: BehaviorAction;
 	path?: string;
+	inlinePhp?: boolean;
+	emmetConfig?: any;
 
 	getMatching?: (session: EditSession, row?: number, column?: number, tokenRange?: Range) => any;
 

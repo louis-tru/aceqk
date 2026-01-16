@@ -9,6 +9,8 @@ import {View,Textarea} from "quark";
 import type {Editor} from "../editor";
 import {StyleSheets} from 'quark/css';
 import {UIEvent, KeyEvent} from 'quark/event';
+import * as event from "../lib/event";
+
 const BROKEN_SETDATA = false;//useragent.isChrome < 18;
 const USE_IE_MIME_TYPE = false;// useragent.isIE;
 const HAS_FOCUS_ARGS = false;//useragent.isChrome > 63;
@@ -33,9 +35,10 @@ export class TextInput {
 	private text: Textarea;
 	private copied = false;
 	private pasted = false;
-	private inComposition: (boolean|Object) & {
+	//private inComposition: (boolean|Object) & {
+	private inComposition?: {
 		context?: any, useTextareaForIME?: boolean, selectionStart?: number, markerRange?: any
-	} = false;
+	};
 	private sendingText = false;
 	private tempStyle?: StyleSheets;
 	private commandMode = false;
@@ -49,6 +52,9 @@ export class TextInput {
 	private numberOfExtraLines = 0;
 	private $isFocused = false;
 	private $focusScroll: boolean | string = false;
+	private resetSelection: (value?: string) => void;
+	private inputHandler: ((value: string) => void) | null = null;
+	private afterContextMenu = false;
 
 	/**
 	 * @param {View} parentNode
@@ -56,18 +62,16 @@ export class TextInput {
 	 */
 	constructor(parentNode: View, host: Editor) {
 		this.host = host;
-		/**@type {HTMLTextAreaElement & {msGetInputContext?: () => {compositionStartOffset: number}, getInputContext?: () => {compositionStartOffset: number}}}*/
 		// this.text = dom.createElement("textarea");
 		this.text = new Textarea(parentNode.window);
 		this.text.class = ["ace_text-input"];
 		this.text.data = {};
 
-		this.text.data["wrap"] = "off";
-		this.text.data["autocomplete"] = "off";
-		this.text.data["autocorrect"] = "off";
-		this.text.data["autocapitalize"] = "off";
-		this.text.data["spellcheck"] = "false";
-
+		this.text.setAttribute("wrap", "off");
+		this.text.setAttribute("autocomplete", "off");
+		this.text.setAttribute("autocorrect", "off");
+		this.text.setAttribute("autocapitalize", "off");
+		this.text.setAttribute("spellcheck", "false");
 		this.text.style.opacity = 0;
 		parentNode.prepend(this.text);
 
@@ -102,8 +106,9 @@ export class TextInput {
 		host.on("beforeEndOperation", () => {
 			var curOp = host.curOp;
 			var commandName = curOp && curOp.command && curOp.command.name;
-			if (commandName == "insertstring") return;
-			var isUserAction = commandName && (curOp.docChanged || curOp.selectionChanged);
+			if (commandName == "insertstring")
+				return;
+			var isUserAction = commandName && (curOp && (curOp.docChanged || curOp.selectionChanged));
 			if (this.inComposition && isUserAction) {
 				// exit composition from commands other than insertstring
 				this.lastValue = this.text.value = "";
@@ -131,20 +136,18 @@ export class TextInput {
 		}, host);
 
 		event.addListener(this.text, "select", this.onSelect.bind(this), host);
-		event.addListener(this.text, "input", this.onInput.bind(this), host);
+		event.addListener(this.text, "Change", this.onInput.bind(this), host);
 
-		event.addListener(this.text, "cut", this.onCut.bind(this), host);
-		event.addListener(this.text, "copy", this.onCopy.bind(this), host);
-		event.addListener(this.text, "paste", this.onPaste.bind(this), host);
-
+		// event.addListener(this.text, "cut", this.onCut.bind(this), host);
+		// event.addListener(this.text, "copy", this.onCopy.bind(this), host);
+		// event.addListener(this.text, "paste", this.onPaste.bind(this), host);
 
 		// Opera has no clipboard events
-		if (!('oncut' in this.text) || !('oncopy' in this.text) || !('onpaste' in this.text)) {
+		if (!('onCut' in this.text) || !('onCopy' in this.text) || !('onPaste' in this.text)) {
 			// event.addListener(parentNode, "keydown", (e) => {
 			parentNode.onKeyDown.on((e) => {
 				if ((useragent.macOS && !e.command) || !e.ctrl)
 					return;
-
 				switch (e.keycode) {
 					case 67:
 						this.onCopy(e);
@@ -156,7 +159,7 @@ export class TextInput {
 						this.onCut(e);
 						break;
 				}
-			}, host);
+			});
 		}
 
 		this.syncComposition = lang.delayedCall(this.onCompositionUpdate.bind(this), 50).schedule.bind(null, null); //TODO: check this
@@ -174,15 +177,15 @@ export class TextInput {
 			e.preventDefault();
 			this.onContextMenuClose();
 		}, host);
-		event.addListener(host.renderer.scroller, "contextmenu", this.$onContextMenu.bind(this), host);
-		event.addListener(this.text, "contextmenu", this.$onContextMenu.bind(this), host);
+		// event.addListener(host.renderer.scroller, "contextmenu", this.$onContextMenu.bind(this), host);
+		// event.addListener(this.text, "contextmenu", this.$onContextMenu.bind(this), host);
 
 		if (isIOS) this.addIosSelectionHandler(parentNode, host, this.text);
 	}
 
 	/**
 	 * @internal
-	 * @param {HTMLElement} parentNode
+	 * @param {View} parentNode
 	 * @param {import("../editor").Editor} host
 	 * @param {HTMLTextAreaElement} text
 	 */
@@ -374,7 +377,7 @@ export class TextInput {
 	/**
 	 * @internal
 	 */
-	onCompositionEnd(e: UIEvent) {
+	onCompositionEnd(e?: UIEvent) {
 		if (!this.host.onCompositionEnd || this.host.$readOnly) return;
 		this.inComposition = false;
 		this.host.onCompositionEnd();

@@ -6,7 +6,7 @@ import config from "./config";
 import {EventEmitter} from "./lib/event_emitter";
 import {Selection} from "./selection";
 import {TextMode} from "./mode";
-import {Range,Delta,Point} from "./range";
+import {Range,Delta,Point, IRange} from "./range";
 import {LineWidget, LineWidgets} from "./line_widgets";
 import {Document, NewLineMode} from "./document";
 import {BackgroundTokenizer} from "./background_tokenizer";
@@ -23,9 +23,16 @@ import type {OptionsProvider} from "./lib/app_config";
 import type { MarkerLike, MarkerRenderer } from "./layer/marker";
 import type { Editor } from "./editor";
 import type { RangeList } from "./range_list";
+import type { Occur } from "./occur";
+import type {Command} from "./keyboard/hash_handler";
+import type{ ISearchEditSessionExtension } from "./incremental_search";
+import type {Annotation} from "./layer/gutter";
+import type {Fold} from "./edit_session/fold";
+
+type Worker = /*unresolved*/ any;
 
 export interface Operation {
-	command?: Ace.Command;
+	command?: Command;
 	args?: any;
 	selectionBefore?: Range | Range[];
 	selectionAfter?: Range | Range[];
@@ -43,7 +50,7 @@ export interface EditSessionEvents {
 	/**
 	 * Emitted when the tab size changes, via [[EditSession.setTabSize]].
 	 */
-	"changeTabSize": (e: undefined, emitter: EditSession) => void;
+	"changeTabSize": (e: void, emitter: EditSession) => void;
 	/**
 	 * Emitted when the ability to overwrite text changes, via [[EditSession.setOverwrite]].
 	 * @param overwrite
@@ -57,11 +64,11 @@ export interface EditSessionEvents {
 	/**
 	 * Emitted when a front marker changes.
 	 */
-	"changeFrontMarker": (e: undefined, emitter: EditSession) => void;
+	"changeFrontMarker": (e: void, emitter: EditSession) => void;
 	/**
 	 * Emitted when a back marker changes.
 	 */
-	"changeBackMarker": (e: undefined, emitter: EditSession) => void;
+	"changeBackMarker": (e: void, emitter: EditSession) => void;
 	/**
 	 * Emitted when an annotation changes, like through [[EditSession.setAnnotations]].
 	 */
@@ -89,7 +96,7 @@ export interface EditSessionEvents {
 	 * Emitted when a code fold is added or removed.
 	 * @param e
 	 */
-	"changeFold": (e: any, emitter: EditSession) => void;
+	"changeFold": (e: {data: {start:{row: number}, end?: {row: number}} | Fold, action?: string}, emitter: EditSession) => void;
 	/**
 	 * Emitted when the scroll top changes.
 	 * @param scrollTop The new scroll top value
@@ -101,10 +108,10 @@ export interface EditSessionEvents {
 	 **/
 	"changeScrollLeft": (scrollLeft: number, emitter: EditSession) => void;
 	"changeEditor": (e: { editor?: Editor, oldEditor?: Editor }, emitter: EditSession) => void;
-	"changeSelection": (e: undefined, emitter: EditSession) => void;
+	"changeSelection": (e: void, emitter: EditSession) => void;
 	"startOperation": (op: { command?: { name?: string }, args?: any }, emitter: EditSession) => void;
 	"endOperation": (op: any, emitter: EditSession) => void;
-	"beforeEndOperation": (e: undefined, emitter: EditSession) => void;
+	"beforeEndOperation": (e: void, emitter: EditSession) => void;
 }
 
 export interface EditSessionOptions {
@@ -123,12 +130,13 @@ export interface EditSessionOptions {
 }
 
 export interface EditSession extends EventEmitter<EditSessionEvents>,
-	OptionsProvider<EditSessionOptions>, Folding, BracketMatch, TextMarkers
+	OptionsProvider<EditSessionOptions>, Folding, BracketMatch, TextMarkers,
+	ISearchEditSessionExtension
 {
 	doc: Document,
 	$highlightLineMarker?: {
-		start: Ace.Point,
-		end: Ace.Point,
+		start: Point,
+		end: Point,
 		id?: number
 	}
 	$useSoftTabs?: boolean,
@@ -152,30 +160,30 @@ export interface EditSession extends EventEmitter<EditSessionEvents>,
 	$selectionMarkers?: any[],
 	gutterRenderer?: any,
 	$firstLineNumber?: number,
-	$emacsMark?: any,
+	$emacsMark?: Point,
+	$emacsMarkRing?: (Point|undefined)[],
 	selectionMarkerCount?: number,
 	multiSelect?: Selection & {	ranges: Range[]; rangeList: RangeList;},
 	$occurHighlight?: any,
-	$occur?: Ace.Occur,
+	$occur?: Occur,
 	$occurMatchingLines?: any,
 	$useEmacsStyleLineStart?: boolean,
 	$selectLongWords?: boolean,
 	curOp?: Operation;
-
 	getSelectionMarkers(): any[],
 }
 
-const $defaultUndoManager = {
+const $defaultUndoManager: Ace.UndoManager = {
 	undo: function() {},
 	redo: function() {},
-	hasUndo: function() {},
-	hasRedo: function() {},
+	hasUndo: function() { return false },
+	hasRedo: function() {return false },
 	reset: function() {},
 	add: function() {},
 	addSelection: function() {},
 	startNewGroup: function() {},
 	addSession: function() {}
-};
+} as any as Ace.UndoManager;
 
 /**
  * Stores all the data about [[Editor `Editor`]] state providing easy way to change editors state.
@@ -213,23 +221,23 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	public $wrapData: (Array<number>&{indent?: number})[] = [];
 	private $rowLengthCache: number[] = [];
 
-	private $fromUndo: boolean = false;
-	private $undoManager?: Ace.UndoManager;
+	public $fromUndo: boolean = false;
+	public $undoManager?: UndoManager;
 	public mergeUndoDeltas: boolean = false;
 	private $informUndoManager?: ReturnType<typeof lang.delayedCall>;
 
-	private $annotations: Ace.Annotation[] = [];
+	private $annotations: Annotation[] = [];
 	public $mode: Ace.SyntaxMode;
-	private $modeId: string = "";
-	private $scrollLeft: number = 0;
+	public $modeId: string = "";
+	public $scrollLeft: number = 0;
 	public $scrollTop: number = 0;
 
 	private $modes = config.$modes;
 
 	private $overwrite: boolean = false;
-	private $wrapLimit = 80; // WRAPMODE
-	/*private*/$useWrapMode = false;
-	private $wrapLimitRange = { min : 0, max : 0 };
+	public $wrapLimit = 80; // WRAPMODE
+	public $useWrapMode = false;
+	public $wrapLimitRange = { min : 0, max : 0 };
 
 	/**
 	 * Sets up a new `EditSession` and associates it with the given `Document` and `Mode`.
@@ -270,7 +278,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	}
 
 	$initOperationListeners() {
-		/**@type {import("../ace-internal").Ace.Operation | null}*/
+		/**@type {Operation | null}*/
 		this.curOp = void 0;
 		this.on("change", () => {
 			if (!this.curOp) {
@@ -453,7 +461,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	 * @param e
 	 * @internal
 	 */
-	onChangeFold(e: {data: Ace.Fold}) {
+	onChangeFold(e: {data: {start: {row: number}}}) {
 		var fold = e.data;
 		this.$resetRowCache(fold.start.row);
 	}
@@ -602,7 +610,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	/**
 	 * Starts tokenizing at the row indicated. Returns a list of objects of the tokenized rows.
 	 * @param {Number} row The row to start at
-	 * @returns {import("../ace-internal").Ace.Token[]}
+	 * @returns {Token[]}
 	 **/
 	getTokens(row: number) {
 		return this.bgTokenizer.getTokens(row);
@@ -612,7 +620,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	 * Returns an object indicating the token at the current row. The object has two properties: `index` and `start`.
 	 * @param {Number} row The row number to retrieve from
 	 * @param {Number} column The column number to retrieve from
-	 * @returns {import("../ace-internal").Ace.Token}
+	 * @returns {Token}
 	 *
 	 **/
 	getTokenAt(row: number, column: number) {
@@ -674,7 +682,6 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	 * @returns {UndoManager}
 	 **/
 	getUndoManager() {
-		// @ts-ignore
 		return this.$undoManager || $defaultUndoManager;
 	}
 
@@ -959,16 +966,17 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 		return inFront ? this.$frontMarkers : this.$backMarkers;
 	}
 
-	private $searchHighlight?: MarkerLike;
+	public $searchHighlight?: MarkerLike;
+
 	/**
 	 * @param {RegExp} re
 	 */
 	highlight(re?: RegExp) {
 		if (!this.$searchHighlight) {
-			var highlight = new SearchHighlight(null, "ace_selected-word", "text");
+			var highlight = new SearchHighlight(void 0, "ace_selected-word", "text");
 			this.$searchHighlight = this.addDynamicMarker(highlight);
 		}
-		this.$searchHighlight!.setRegexp(re);
+		this.$searchHighlight!.setRegexp!(re);
 	}
 
 	/**
@@ -1003,16 +1011,16 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	 */
 	/**
 	 * Sets annotations for the `EditSession`. This functions emits the `'changeAnnotation'` event.
-	 * @param {import("../ace-internal").Ace.Annotation[]} annotations A list of annotations
+	 * @param {Annotation[]} annotations A list of annotations
 	 **/
-	setAnnotations(annotations: Ace.Annotation[]) {
+	setAnnotations(annotations: Annotation[]) {
 		this.$annotations = annotations;
 		this._signal("changeAnnotation", {}, this);
 	}
 
 	/**
 	 * Returns the annotations for the `EditSession`.
-	 * @returns {import("../ace-internal").Ace.Annotation[]}
+	 * @returns {Annotation[]}
 	 **/
 	getAnnotations() {
 		return this.$annotations || [];
@@ -1090,6 +1098,15 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	}
 
 	/**
+	 * Returns the range of the word at the cursor position.
+	 * @return {Range}
+	 **/
+	getWordRangeAtCursor(): Range {
+		const pos = this.selection.getCursor();
+		return this.getWordRange(pos.row, pos.column);
+	}
+
+	/**
 	 * Gets the range of a word, including its right whitespace.
 	 * @param {Number} row The row number to start from
 	 * @param {Number} column The column number to start from
@@ -1108,7 +1125,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 
 	/**
 	 * {:Document.setNewLineMode.desc}
-	 * @param {import("../ace-internal").Ace.NewLineMode} newLineMode {:Document.setNewLineMode.param}
+	 * @param {NewLineMode} newLineMode {:Document.setNewLineMode.param}
 	 *
 	 *
 	 * @related Document.setNewLineMode
@@ -1119,7 +1136,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 
 	/**
 	 * Returns the current new line mode.
-	 * @returns {import("../ace-internal").Ace.NewLineMode}
+	 * @returns {NewLineMode}
 	 * @related Document.getNewLineMode
 	 **/
 	getNewLineMode() {
@@ -1135,7 +1152,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	/**
 	 * Returns `true` if workers are being used.
 	 **/
-	getUseWorker() { return this.$useWorker; }
+	getUseWorker() { return this.$useWorker as boolean; }
 
 	/**
 	 * Reloads all the tokens on the current session. This function calls [[BackgroundTokenizer.start `BackgroundTokenizer.start ()`]] to all the rows; it also emits the `'tokenizerUpdate'` event.
@@ -1311,7 +1328,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 		return this.$scrollLeft;
 	}
 
-	private screenWidth: number = 0;
+	public screenWidth: number = 0;
 
 	/**
 	 * Returns the width of the screen.
@@ -1569,7 +1586,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	 *
 	 * @related Document.replace
 	 **/
-	replace(range: Ace.IRange, text: string) {
+	replace(range: IRange, text: string) {
 		return this.doc.replace(range, text);
 	}
 

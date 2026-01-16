@@ -17,12 +17,11 @@ import {preventParentScroll} from "./lib/scroll";
 import {Ace} from "../ace-internal";
 import type {Anchor} from "./anchor";
 import {Window,View,Text} from 'quark';
-import {UIEvent,MouseEvent} from 'quark/event';
+import {UIEvent} from 'quark/event';
+import {MouseEvent} from './mouse/mouse_event';
 import type {EditSession} from "./edit_session";
 import type {Point} from "./range";
-
-// var dom = require("./lib/dom");
-// import * as event from "./lib/event";
+import type { Editor } from "./editor";
 
 /**
  * @typedef BaseCompletion
@@ -53,7 +52,7 @@ export interface Completer {
 	identifierRegexps?: Array<RegExp>,
 
 	/** Main completion method that provides suggestions for the given context */
-	getCompletions(editor: Ace.Editor,
+	getCompletions(editor: Editor,
 						session: EditSession,
 						position: Point,
 						prefix: string,
@@ -63,9 +62,9 @@ export interface Completer {
 	getDocTooltip?(item: Completion): void | string | Completion;
 
 	/** Called when a completion item becomes visible */
-	onSeen?: (editor: Ace.Editor, completion: Completion) => void;
+	onSeen?: (editor: Editor, completion: Completion) => void;
 	/** Called when a completion item is inserted */
-	onInsert?: (editor: Ace.Editor, completion: Completion) => void;
+	onInsert?: (editor: Editor, completion: Completion) => void;
 
 	/** Cleanup method called when completion is cancelled */
 	cancel?(): void;
@@ -77,7 +76,7 @@ export interface Completer {
 	/** Whether to hide inline preview text */
 	hideInlinePreview?: boolean;
 	/** Custom insertion handler for completion items */
-	insertMatch?: (editor: Ace.Editor, data: Completion) => void;
+	insertMatch?: (editor: Editor, data: Completion) => void;
 }
 
 export interface BaseCompletion {
@@ -154,7 +153,7 @@ export type AcePopupNavigation = "up" | "down" | "start" | "end";
 
 export type InlineAutocompleteAction = "prev" | "next" | "first" | "last";
 
-var destroyCompleter = function(e: any, editor: Ace.Editor) {
+var destroyCompleter = function(e: any, editor: Editor) {
 	editor.completer && editor.completer.destroy();
 };
 
@@ -163,19 +162,17 @@ var destroyCompleter = function(e: any, editor: Ace.Editor) {
  * There is an autocompletion popup, an optional inline ghost text renderer and a docuent tooltip popup inside.
  */
 export class Autocomplete {
-	/**@type {Editor} */
-	editor: Ace.Editor;
+	editor: Editor;
 	base: Anchor;
-	window: Window; // TODO ... initialize properly ?
+	window: Window;
 	autoInsert = false;
 	autoSelect = true;
 	autoShown = false;
 	exactMatch = false;
 	inlineEnabled = false;
 	keyboardHandler = new HashHandler();
-	parentNode = null;
+	parentNode?: View;
 	setSelectOnHover = false;
-	/**@private*/
 	private hasSeen = new Set();
 
 	/**
@@ -200,7 +197,7 @@ export class Autocomplete {
 	stickySelectionTimer: ReturnType<typeof lang.delayedCall>;
 	$firstOpenTimer: ReturnType<typeof lang.delayedCall>;
 	stickySelection: boolean = false;
-	popup: Ace.AcePopup;
+	popup: AcePopup;
 	changeTimer: ReturnType<typeof lang.delayedCall>;
 
 	activated: boolean = false;
@@ -244,19 +241,17 @@ export class Autocomplete {
 	}
 
 	private $init() {
-		/**@type {AcePopup}**/
-		this.popup = new AcePopup(this.window, this.parentNode || document.body || document.documentElement);
+		this.popup = new AcePopup(this.window, this.parentNode || this.window.root);
 		this.popup.on("click", (e: any) => {
 			this.insertMatch();
 			e.stop();
 		});
-		// "show": (e: undefined, emitter: AcePopup) => void;
 		this.popup.focus = this.editor.focus.bind(this.editor);
 		this.popup.on("show", this.$onPopupShow.bind(this));
 		this.popup.on("hide", this.$onHidePopup.bind(this));
 		this.popup.on("select", this.$onPopupChange.bind(this));
-		// TODO ...
 		// event.addListener(this.popup.container, "mouseout", this.mouseOutListener.bind(this));
+		this.popup.container.onMouseLeave.on(this.mouseOutListener, this);
 		this.popup.on("changeHoverMarker", this.tooltipTimer);
 		this.popup.renderer.on("afterRender", this.$onPopupRender.bind(this));
 		return this.popup;
@@ -355,26 +350,22 @@ export class Autocomplete {
 
 	observeLayoutChanges() {
 		if (this.$elements || !this.editor) return;
-		// TODO ...
 		this.window.onChange.on(this.onLayoutChange, this);
 		this.window.root.onMouseWheel.on(this.mousewheelListener, this);
 
-		var el = this.editor.container.parentNode;
+		var el = this.editor.container.parent;
 		var elements: View[] = [];
 		while (el) {
 			elements.push(el);
-			// TODO ... use quark version
-			el.addEventListener("scroll", this.onLayoutChange, {passive: true});
-			el = el.parentNode;
+			// el.addEventListener("scroll", this.onLayoutChange, {passive: true});
+			el = el.parent;
 		}
 		this.$elements = elements;
 	}
 	unObserveLayoutChanges() {
-		// TODO ...
 		this.window.onChange.off(this.onLayoutChange, this);
 		this.window.root.onMouseWheel.off(this.mousewheelListener, this);
 		this.$elements && this.$elements.forEach((el) => {
-			// TODO ...
 			// el.removeEventListener("scroll", this.onLayoutChange, {passive: true});
 		});
 		this.$elements = null;
@@ -397,9 +388,9 @@ export class Autocomplete {
 		var pos = renderer.$cursorLayer.getPixelPosition(this.base, true);
 		pos.left -= this.popup.getTextLeftOffset();
 
-		var rect = editor.container.getBoundingClientRect();
-		pos.top += rect.top - renderer.layerConfig.offset;
-		pos.left += rect.left - editor.renderer.scrollLeft;
+		var rect = editor.container.position;
+		pos.top += rect.y - renderer.layerConfig.offset;
+		pos.left += rect.x - editor.renderer.scrollLeft;
 		pos.left += renderer.gutterWidth;
 
 		var posGhostText = {
@@ -409,13 +400,13 @@ export class Autocomplete {
 
 		if (renderer.$ghostText && renderer.$ghostTextWidget) {
 			if (this.base.row === renderer.$ghostText.position.row) {
-				posGhostText.top += renderer.$ghostTextWidget.el.offsetHeight;
+				posGhostText.top += renderer.$ghostTextWidget.el!.clientSize.height;
 			}
 		}
 
 		// posGhostText can be below the editor rendering the popup away from the editor.
 		// In this case, we want to render the popup such that the top aligns with the bottom of the editor.
-		var editorContainerBottom = editor.container.getBoundingClientRect().bottom - lineHeight;
+		var editorContainerBottom = editor.container.position.y + editor.container.clientSize.height - lineHeight;
 		var lowestPosition = editorContainerBottom < posGhostText.top ?
 			{top: editorContainerBottom, left: posGhostText.left} :
 			posGhostText;
@@ -437,7 +428,7 @@ export class Autocomplete {
 	 * @param {string} prefix
 	 * @param {boolean} [keepPopupPosition]
 	 */
-	openPopup(editor: Ace.Editor, prefix: string, keepPopupPosition?: boolean) {
+	openPopup(editor: Editor, prefix: string, keepPopupPosition?: boolean) {
 		this.$firstOpenTimer.cancel();
 
 		if (!this.popup)
@@ -542,27 +533,26 @@ export class Autocomplete {
 	}
 
 	blurListener(e: UIEvent) {
-		// TODO ...
 		// we have to check if activeElement is a child of popup because
 		// on IE preventDefault doesn't stop scrollbar from being focussed
 		// var el = document.activeElement;
-		var el = this.window.focusView;
+		var el = this.window.activeView;
 		var text = this.editor.textInput.getElement();
 		// var fromTooltip = e.relatedTarget && this.tooltipNode && this.tooltipNode.contains(e.relatedTarget);
-		var fromTooltip = e.origin && this.tooltipNode && this.tooltipNode.contains(e.relatedTarget);
+		var fromTooltip = this.tooltipNode && this.tooltipNode.isChild(el);
 		var container = this.popup && this.popup.container;
-		// if (el != text && el.parentNode != container && !fromTooltip
-		// 	&& el != this.tooltipNode && e.relatedTarget != text
-		// ) {
-		this.detach();
-		// }
+		if (el != text && el.parent != container && !fromTooltip
+			&& el != this.tooltipNode && el != text
+		) {
+			this.detach();
+		}
 	}
 
-	mousedownListener(e: MouseEvent) {
+	mousedownListener() {
 		this.detach();
 	}
 
-	mousewheelListener(e: MouseEvent) {
+	mousewheelListener() {
 		if (this.popup && !this.popup.isMouseOver)
 			this.detach();
 	}
@@ -604,7 +594,7 @@ export class Autocomplete {
 	 * @param {Editor} editor
 	 * @param {CompletionOptions} [options]
 	 */
-	showPopup(editor: Ace.Editor, options?: CompletionOptions) {
+	showPopup(editor: Editor, options?: CompletionOptions) {
 		if (this.editor)
 			this.detach();
 
@@ -641,7 +631,7 @@ export class Autocomplete {
 	 * Use the same method include CompletionProvider instead for the same functionality.
 	 * @deprecated
 	 */
-	gatherCompletions(editor: Ace.Editor, callback: CompletionCallbackFunction) {
+	gatherCompletions(editor: Editor, callback: CompletionCallbackFunction) {
 		return this.getCompletionProvider().gatherCompletions(editor, callback);
 	}
 
@@ -778,24 +768,20 @@ export class Autocomplete {
 		this.showDocTooltip(doc);
 	}
 
-	tooltipNode: Text | null = null;
+	private tooltipNode?: Text;
 
 	showDocTooltip(item: {docHTML?: string, docText?: string}) {
 		if (!this.tooltipNode) {
-			// TODO ... use quark version
-			this.tooltipNode = new Text(this.window);// dom.createElement("div");
+			// dom.createElement("div");
+			this.tooltipNode = new Text(this.window);
 			this.tooltipNode.style.margin = 0;
-			// this.tooltipNode.style.pointerEvents = "auto";
+			this.tooltipNode.style.receive = true;
 			// this.tooltipNode.style.overscrollBehavior = "contain";
-			// this.tooltipNode.tabIndex = -1;
-			// TODO ...
-			// this.tooltipNode.onblur = this.blurListener.bind(this);
-			// this.tooltipNode.onclick = this.onTooltipClick.bind(this);
+			this.tooltipNode.setAttribute("tabIndex", -1);
 			this.tooltipNode.onBlur.on(this.blurListener, this);
 			this.tooltipNode.onClick.on(this.onTooltipClick, this);
-			// this.tooltipNode.id = "doc-tooltip";
-			// this.tooltipNode.setAttribute("role", "tooltip");
-			this.tooltipNode.data = {"role": "tooltip"};
+			this.tooltipNode.setAttribute("id", "doc-tooltip");
+			this.tooltipNode.setAttribute("role", "tooltip");
 			// prevent editor scroll if tooltip is inside an editor
 			// this.tooltipNode.addEventListener("wheel", preventParentScroll);
 			this.tooltipNode.onMouseWheel.on(preventParentScroll, this);
@@ -814,20 +800,21 @@ export class Autocomplete {
 		}
 
 		if (!tooltipNode.parent)
-			// TODO ... use quark version
-			// this.popup.container.appendChild(this.tooltipNode);
 			this.popup.container.append(this.tooltipNode);
 
 		var popup = this.popup;
-		var rect = popup.container.getBoundingClientRect();
+		var rect = popup.container.position;
+		var size = popup.container.clientSize;
 
 		var targetWidth = 400;
 		var targetHeight = 300;
 		var scrollBarSize = popup.renderer.scrollBar.width || 10;
+		var window = this.window;
+		var winSize = window.size;
 
-		var leftSize = rect.left;
-		var rightSize = window.innerWidth - rect.right - scrollBarSize;
-		var topSize = popup.isTopdown ?  window.innerHeight - scrollBarSize - rect.bottom : rect.top;
+		var leftSize = rect.x;
+		var rightSize = winSize.width - rect.x + size.width - scrollBarSize;
+		var topSize = popup.isTopdown ?  winSize.height - scrollBarSize - rect.y + size.height : rect.y;
 		var scores = [
 			Math.min(rightSize / targetWidth, 1),
 			Math.min(leftSize / targetWidth, 1),
@@ -835,35 +822,38 @@ export class Autocomplete {
 		];
 		var max = Math.max.apply(Math, scores);
 		var tooltipStyle = tooltipNode.style;
-		// tooltipStyle.display = "block";
+		tooltipStyle.visible = true;
 
 		if (max == scores[0] || scores[0] >= 1) {
-			// tooltipStyle.left = (rect.right + 1) + "px";
-			// tooltipStyle.right = "";
+			tooltipStyle.marginLeft = (size.width + 1);
+			tooltipStyle.marginRight = 0;
 			tooltipStyle.maxWidth = targetWidth * max;
-			// tooltipStyle.top = rect.top + "px";
-			// tooltipStyle.bottom = "";
-			tooltipStyle.maxHeight = Math.min(window.innerHeight - scrollBarSize - rect.top, targetHeight);
+			tooltipStyle.marginTop = rect.y;
+			tooltipStyle.marginBottom = 0;
+			tooltipStyle.maxHeight = Math.min(winSize.height - scrollBarSize - rect.y, targetHeight);
+			tooltipStyle.align = "start"; // left alignment
 		} else if (max == scores[1] || scores[1] >= 1) {
-			// tooltipStyle.right = window.innerWidth - rect.left + "px";
-			// tooltipStyle.left = "";
+			tooltipStyle.marginRight = winSize.width - rect.x;
+			tooltipStyle.marginLeft = 0;
 			tooltipStyle.maxWidth = targetWidth * max;
-			// tooltipStyle.top = rect.top + "px";
-			// tooltipStyle.bottom = "";
-			tooltipStyle.maxHeight = Math.min(window.innerHeight - scrollBarSize - rect.top, targetHeight);
+			tooltipStyle.align = "end"; // right alignment
+			tooltipStyle.marginTop = rect.y;
+			tooltipStyle.marginBottom = 0;
+			tooltipStyle.maxHeight = Math.min(winSize.height - scrollBarSize - rect.y, targetHeight);
 		} else if (max == scores[2]) {
-			// tooltipStyle.left = rect.left + "px";
-			// tooltipStyle.right = "";
-			tooltipStyle.maxWidth = Math.min(targetWidth, window.innerWidth - rect.left);
-
+			tooltipStyle.marginLeft = rect.x;
+			tooltipStyle.marginRight = 0;
+			tooltipStyle.maxWidth = Math.min(targetWidth, winSize.width - rect.x);
 			if (popup.isTopdown) {
-				// tooltipStyle.top = rect.bottom + "px";
-				// tooltipStyle.bottom = "";
-				tooltipStyle.maxHeight = Math.min(window.innerHeight - scrollBarSize - rect.bottom, targetHeight);
+				tooltipStyle.marginTop = rect.y + size.height;
+				tooltipStyle.marginBottom = 0;
+				tooltipStyle.maxHeight = Math.min(winSize.height - scrollBarSize - rect.y + size.height, targetHeight);
+				tooltipStyle.align = "leftTop"; // top alignment
 			} else {
-				// tooltipStyle.top = "";
-				// tooltipStyle.bottom = (window.innerHeight  - rect.top) + "px";
-				tooltipStyle.maxHeight = Math.min(rect.top, targetHeight);
+				tooltipStyle.marginTop = 0;
+				tooltipStyle.marginBottom = (winSize.height  - rect.y);
+				tooltipStyle.maxHeight = Math.min(rect.y, targetHeight);
+				tooltipStyle.align = "leftBottom"; // bottom alignment
 			}
 		}
 		// dom.$fixPositionBug(tooltipNode);
@@ -871,18 +861,13 @@ export class Autocomplete {
 
 	hideDocTooltip() {
 		this.tooltipTimer.cancel();
-		if (!this.tooltipNode) return;
+		if (!this.tooltipNode)
+			return;
 		var el = this.tooltipNode;
-		// TODO ...
-		// if (!this.editor.isFocused() && document.activeElement == el)
-		if (!this.editor.isFocused() && this.window.focusView == el)
+		if (!this.editor.isFocused() && this.window.activeView == el)
 			this.editor.focus();
-		this.tooltipNode = null;
-		// TODO ...
-		// if (el.parentNode)
-		// 	el.parentNode.removeChild(el);
-		if (el.parent)
-			el.remove();
+		this.tooltipNode = void 0;
+		el.remove();
 	}
 
 	/**
@@ -890,8 +875,6 @@ export class Autocomplete {
 	 * @internal
 	 */
 	onTooltipClick(e: UIEvent) {
-		// var a = e.target;
-		// TODO ...
 		var a: View | null = e.origin;
 		while (a && a != this.tooltipNode) {
 			// if (a.nodeName == "A" && a.href) {
@@ -899,8 +882,6 @@ export class Autocomplete {
 			// 	a.target = "_blank";
 			// 	break;
 			// }
-			// TODO ...
-			// a = a.parentNode;
 			a = a.parent;
 		}
 	}
@@ -910,8 +891,8 @@ export class Autocomplete {
 		if (this.popup) {
 			this.popup.destroy();
 			var el = this.popup.container;
-			if (el && el.parentNode)
-				el.parentNode.removeChild(el);
+			if (el)
+				el.remove();
 		}
 		const _this = this as any;
 		if (this.editor && this.editor.completer == this) {
@@ -927,7 +908,7 @@ export class Autocomplete {
 	 * @param {Editor} editor
 	 * @return {Autocomplete}
 	 */
-	static for(editor: Ace.Editor) {
+	static for(editor: Editor) {
 		if (editor.completer instanceof Autocomplete) {
 			return editor.completer;
 		}
@@ -943,40 +924,45 @@ export class Autocomplete {
 			editor.completer = new Autocomplete();
 			editor.once("destroy", destroyCompleter);
 		}
-		// @ts-expect-error
 		return editor.completer;
 	}
 
 	commands = {
-		"Up": function(editor: Ace.Editor) { editor.completer!.goTo("up"); },
-		"Down": function(editor: Ace.Editor) { editor.completer!.goTo("down"); },
-		"Ctrl-Up|Ctrl-Home": function(editor: Ace.Editor) { editor.completer!.goTo("start"); },
-		"Ctrl-Down|Ctrl-End": function(editor: Ace.Editor) { editor.completer!.goTo("end"); },
+		"Up": function(editor: Editor) { (editor.completer as Autocomplete).goTo("up"); },
+		"Down": function(editor: Editor) { (editor.completer as Autocomplete).goTo("down"); },
+		"Ctrl-Up|Ctrl-Home": function(editor: Editor) { (editor.completer as Autocomplete).goTo("start"); },
+		"Ctrl-Down|Ctrl-End": function(editor: Editor) { (editor.completer as Autocomplete).goTo("end"); },
 
-		"Esc": function(editor: Ace.Editor) { editor.completer!.detach(); },
-		"Return": function(editor: Ace.Editor) { return editor.completer!.insertMatch(); },
-		"Shift-Return": function(editor: Ace.Editor) { editor.completer!.insertMatch(null, {deleteSuffix: true}); },
-		"Tab": function(editor: Ace.Editor) {
+		"Esc": function(editor: Editor) { editor.completer!.detach(); },
+		"Return": function(editor: Editor) { return editor.completer!.insertMatch(); },
+		"Shift-Return": function(editor: Editor) { editor.completer!.insertMatch(null, {deleteSuffix: true}); },
+		"Tab": function(editor: Editor) {
 			var result = editor.completer!.insertMatch();
 			if (!result && !editor.tabstopManager)
-				editor.completer!.goTo("down");
+				(editor.completer as Autocomplete).goTo("down");
 			else
 				return result;
 		},
-		"Backspace": function(editor: Ace.Editor) {
+		"Backspace": function(editor: Editor) {
 			editor.execCommand("backspace");
 			var prefix = util.getCompletionPrefix(editor);
 			if (!prefix && editor.completer)
 				editor.completer.detach();
 		},
 
-		"PageUp": function(editor: Ace.Editor) { editor.completer!.popup.gotoPageUp(); },
-		"PageDown": function(editor: Ace.Editor) { editor.completer!.popup.gotoPageDown(); }
+		"PageUp": function(editor: Editor) {
+			const completer = editor.completer as Autocomplete;
+			completer.popup && completer.popup.gotoPageUp();
+		},
+		"PageDown": function(editor: Editor) {
+			const completer = editor.completer as Autocomplete;
+			completer.popup && completer.popup.gotoPageDown();
+		}
 	};
 
 	static startCommand = {
 		name: "startAutocomplete",
-		exec: function(editor: Ace.Editor, options: CompletionOptions) {
+		exec: function(editor: Editor, options: CompletionOptions) {
 			var completer = Autocomplete.for(editor);
 			completer.autoInsert = false;
 			completer.autoSelect = true;
@@ -1012,7 +998,7 @@ export class CompletionProvider {
 	 * @param {CompletionProviderOptions} [options]
 	 * @returns {boolean}
 	 */
-	insertByIndex(editor: Ace.Editor, index: number, options?: CompletionProviderOptions) {
+	insertByIndex(editor: Editor, index: number, options?: CompletionProviderOptions) {
 		if (!this.completions || !this.completions.filtered) {
 			return false;
 		}
@@ -1025,7 +1011,7 @@ export class CompletionProvider {
 	 * @param {CompletionProviderOptions} [options]
 	 * @returns {boolean}
 	 */
-	insertMatch(editor: Ace.Editor, data: Completion | null, options?: CompletionProviderOptions) {
+	insertMatch(editor: Editor, data: Completion | null, options?: CompletionProviderOptions) {
 		if (!data)
 			return false;
 
@@ -1082,7 +1068,7 @@ export class CompletionProvider {
 	 * @param {Editor} editor
 	 * @param {Completion} data
 	 */
-	$insertString(editor: Ace.Editor, data: Completion) {
+	$insertString(editor: Editor, data: Completion) {
 		var text = data.value || data;
 		editor.execCommand("insertstring", text);
 	}
@@ -1093,7 +1079,7 @@ export class CompletionProvider {
 	 * @param {Editor} editor
 	 * @param {import("../ace-internal").Ace.CompletionCallbackFunction} callback
 	 */
-	gatherCompletions(editor: Ace.Editor, callback: CompletionCallbackFunction) {
+	gatherCompletions(editor: Editor, callback: CompletionCallbackFunction) {
 		var session = editor.getSession();
 		var pos = editor.getCursorPosition();
 
@@ -1129,7 +1115,7 @@ export class CompletionProvider {
 	 * @param {CompletionProviderOptions} options
 	 * @param {(err: Error | undefined, completions: FilteredList | [], finished: boolean) => void} callback
 	 */
-	provideCompletions(editor: Ace.Editor, options: CompletionProviderOptions,
+	provideCompletions(editor: Editor, options: CompletionProviderOptions,
 			callback: (err: Error | undefined, completions: FilteredList, finished: boolean)=>void) 
 	{
 		var processResults = (results: GatherCompletionRecord)=>{

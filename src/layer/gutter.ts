@@ -1,17 +1,4 @@
 "use strict";
-/**
- * @typedef {import("../edit_session").EditSession} EditSession
- * @typedef {import("../editor").Editor} Editor
- * @typedef {import("../layer/lines").LayerConfig} LayerConfig
- */
-/**
- * @typedef {Object} GutterRenderer
- * @property {(session: EditSession, row: number) => string} getText - Gets the text to display for a given row
- * @property {(session: EditSession, lastLineNumber: number, config: Object) => number} getWidth - Calculates the width needed for the gutter
- * @property {(e: undefined, editor: Editor) => void} [update] - Updates the gutter display
- * @property {(editor: Editor) => void} [attach] - Attaches the renderer to an editor
- * @property {(editor: Editor) => void} [detach] - Detaches the renderer from an editor
- */
 
 import * as lang from "../lib/lang";
 import {EventEmitter} from "../lib/event_emitter";
@@ -59,7 +46,13 @@ export interface Gutter extends EventEmitter<GutterEvents> {
 }
 
 export type Annotation = {
-	className: string, text: string[], type: string[], displayText: string[]
+	row: number,
+	column: number,
+	text: string[],
+	type: string[],
+	className: string,
+	displayText?: string[],
+	html?: string,
 }
 
 export class Gutter extends EventEmitter<GutterEvents> {
@@ -69,16 +62,16 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	private $showLineNumbers = true;
 	private $showFoldWidgets = true;
 	public $showCursorMarker: boolean | null | string;
-	private element: Morph;
-	private $annotations: (Annotation | null)[] = [];
-	private $lines: Lines;
+	public element: Morph;
+	public $annotations: (Annotation | null)[] = [];
+	public $lines: Lines;
 	private gutterWidth = 0;
 	readonly session: EditSession;
 	private config: LayerConfig;
 	private oldLastRow: number;
 	public $padding?: {left: number, right: number};
 	private $cursorRow: number;
-	private $cursorCell?: Cell;
+	public $cursorCell?: Cell;
 	private $highlightElement?: Box;
 
 	/**
@@ -116,8 +109,8 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	 * @param {string} className
 	 */
 	addGutterDecoration(row: number, className: string) {
-		if (window.console)
-			console.warn && console.warn("deprecated use session.addGutterDecoration");
+		// if (window.console)
+		console.warn && console.warn("deprecated use session.addGutterDecoration");
 		this.session.addGutterDecoration(row, className);
 	}
 
@@ -126,15 +119,15 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	 * @param {string} className
 	 */
 	removeGutterDecoration(row: number, className: string) {
-		if (window.console)
-			console.warn && console.warn("deprecated use session.removeGutterDecoration");
+		// if (window.console)
+		console.warn && console.warn("deprecated use session.removeGutterDecoration");
 		this.session.removeGutterDecoration(row, className);
 	}
 
 	/**
 	 * @param {any[]} annotations
 	 */
-	setAnnotations(annotations: {row: number, className?: string, text?: string, html?: string, type: string}[]) {
+	setAnnotations(annotations: Annotation[]) {
 		// iterate over sparse array
 		this.$annotations = [];
 		for (var i = 0; i < annotations.length; i++) {
@@ -142,18 +135,18 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			var row = annotation.row;
 			var rowInfo = this.$annotations[row];
 			if (!rowInfo)
-				rowInfo = this.$annotations[row] = {className: '', text: [], type: [], displayText: []};
-			
-			var annoText = annotation.text;
-			var displayAnnoText = annotation.text;
-			var annoType = annotation.type;
+				rowInfo = this.$annotations[row] = {row:0, column:0, className: '', text: [], type: [], displayText: []};
+
+			var annoText = annotation.text[0];
+			var displayAnnoText = annotation.displayText?.[0] || annoText;
+			var annoType = annotation.type[0];
 			annoText = annoText ? lang.escapeHTML(annoText) : annotation.html || "";
 			displayAnnoText = displayAnnoText ? displayAnnoText : annotation.html || "";
 
 			if (rowInfo.text.indexOf(annoText) === -1){
 				rowInfo.text.push(annoText);
 				rowInfo.type.push(annoType);
-				rowInfo.displayText.push(displayAnnoText);
+				rowInfo.displayText!.push(displayAnnoText);
 			}
 
 			var className = annotation.className;
@@ -538,37 +531,37 @@ export class Gutter extends EventEmitter<GutterEvents> {
 
 			// getFoldWidgetRange is optional to be implemented by fold modes, if not available we fall-back.
 			if (foldRange)
-				foldWidget.data["aria-label"] =
+				foldWidget.setAttribute("aria-label",
 					nls("gutter.code-folding.range.aria-label", "Toggle code folding, rows $0 through $1", [
 						foldRange.start.row + 1,
 						foldRange.end.row + 1
-					]);
+					]));
 			else {
 				if (fold)
-					foldWidget.data["aria-label"] =
+					foldWidget.setAttribute("aria-label",
 						nls("gutter.code-folding.closed.aria-label", "Toggle code folding, rows $0 through $1", [
 							fold.start.row + 1,
 							fold.end.row + 1
-						]);
+						]));
 				else
-					foldWidget.data["aria-label"] =
-						nls("gutter.code-folding.open.aria-label", "Toggle code folding, row $0", [row + 1]);
+					foldWidget.setAttribute("aria-label",
+						nls("gutter.code-folding.open.aria-label", "Toggle code folding, row $0", [row + 1]));
 			}
 
 			if (isClosedFold) {
-				foldWidget.data["aria-expanded"] = "false";
-				foldWidget.data["title"] = nls("gutter.code-folding.closed.title", "Unfold code");
+				foldWidget.setAttribute("aria-expanded", "false");
+				foldWidget.setAttribute("title", nls("gutter.code-folding.closed.title", "Unfold code"));
 			} else {
-				foldWidget.data["aria-expanded"] = "true";
-				foldWidget.data["title"] = nls("gutter.code-folding.open.title", "Fold code");
+				foldWidget.setAttribute("aria-expanded", "true");
+				foldWidget.setAttribute("title", nls("gutter.code-folding.open.title", "Fold code"));
 			}
 		} else {
 			if (foldWidget) {
 				// dom.setStyle(foldWidget.style, "display", "none");
 				foldWidget.visible = false;
-				foldWidget.data.tabindex = "0";
-				delete foldWidget.data.role;
-				delete foldWidget.data["aria-label"];
+				foldWidget.setAttribute("tabindex", "0");
+				foldWidget.removeAttribute("role");
+				foldWidget.removeAttribute("aria-label");
 			}
 		}
 		// fold logic ends here 
@@ -605,9 +598,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 					ariaLabel = nls("gutter.annotation.aria-label.warning", "Warning, read annotations row $0", [rowText]);
 					break;
 			}
-			annotationNode.data['aria-label'] = ariaLabel;
-			annotationNode.data['tabindex'] = -1;
-			annotationNode.data['role'] = "button";
+			annotationNode.setAttribute("aria-label", ariaLabel);
+			annotationNode.setAttribute("tabindex", -1);
+			annotationNode.setAttribute("role", "button");
 		}
 		else if (this.$annotations[row]){
 			annotationNode.class = ["ace_gutter_annotation"];
@@ -646,16 +639,16 @@ export class Gutter extends EventEmitter<GutterEvents> {
 					ariaLabel = nls("gutter.annotation.aria-label.hint", "Suggestion, read annotations row $0", [rowText]);
 					break;
 			}
-			annotationNode.data['aria-label'] = ariaLabel;
-			annotationNode.data['tabindex'] = -1;
-			annotationNode.data['role'] = "button";
+			annotationNode.setAttribute("aria-label", ariaLabel);
+			annotationNode.setAttribute("tabindex", -1);
+			annotationNode.setAttribute("role", "button");
 		}
 		else {
 			// dom.setStyle(annotationNode.style, "display", "none");
 			annotationNode.style.visible = false;
-			delete annotationNode.data['aria-label'];
-			delete annotationNode.data['role'];
-			annotationNode.data['tabindex'] = 0;
+			annotationNode.removeAttribute("aria-label");
+			annotationNode.removeAttribute("role");
+			annotationNode.setAttribute("tabindex", 0);
 		}
 		if (rowText !== textNode.data) {
 			textNode.data = rowText;
@@ -670,9 +663,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 
 		// If there are no annotations or fold widgets in the gutter cell, hide it from assistive tech.
 		if (annotationNode.visible === false && foldWidget.visible === false && !customWidgetAttributes)
-			cell.element.data["aria-hidden"] = true;
+			cell.element.setAttribute("aria-hidden", true);
 		else
-			cell.element.data["aria-hidden"] = false;
+			cell.element.setAttribute("aria-hidden", false);
 
 		return cell;
 	}
@@ -816,10 +809,10 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			customWidget.data = {};
 			rowCell.element.customWidget = customWidget; // storing reference to the custom widget in the cell element
 			customWidget.class = [`ace_custom-widget`, className];
-			customWidget.data["tabindex"] = -1;
-			customWidget.data["role"] = 'button';
-			customWidget.data["aria-label"] = label;
-			customWidget.data["title"] = title;
+			customWidget.setAttribute("tabindex", -1);
+			customWidget.setAttribute("role", 'button');
+			customWidget.setAttribute("aria-label", label);
+			customWidget.setAttribute("title", title);
 			// dom.setStyle(customWidget.style, "display", "inline-block");
 			customWidget.visible = true;
 			// dom.setStyle(customWidget.style, "height", "inherit");

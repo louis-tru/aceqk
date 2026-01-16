@@ -5,17 +5,20 @@
  * @typedef {import("../ace-internal").Ace.SearchOptions} SearchOptions
  */
 
-var oop = require("./lib/oop");
-var Search = require("./search").Search;
-var EditSession = require("./edit_session").EditSession;
-var SearchHighlight = require("./search_highlight").SearchHighlight;
+import * as oop from "./lib/oop";
+import {Search, SearchOptions} from "./search";
+import {SearchHighlight} from "./search_highlight";
+import {EditSession} from "./edit_session";
+import type {Editor} from "./editor";
+import type {Point} from "./range";
+import {createCss} from 'quark';
 
 /**
  * Finds all lines matching a search term in the current [[Document
  * `Document`]] and displays them instead of the original `Document`. Keeps
  * track of the mapping between the occur doc and the original doc.
  **/
-class Occur extends Search {
+export class Occur extends Search {
 
 	/**
 	 * Enables occur mode. expects that `options.needle` is a search term.
@@ -28,7 +31,7 @@ class Occur extends Search {
 	 * @return {Boolean} Whether occur activation was successful
 	 *
 	 **/
-	enter(editor, options) {
+	enter(editor: Editor, options: Partial<SearchOptions>) {
 		if (!options.needle) return false;
 		var pos = editor.getCursorPosition();
 		this.displayOccurContent(editor, options);
@@ -46,7 +49,7 @@ class Occur extends Search {
 	 * @return {Boolean} Whether occur deactivation was successful
 	 *
 	 **/
-	exit(editor, options) {
+	exit(editor: Editor, options: Partial<SearchOptions>) {
 		var pos = options.translatePosition && editor.getCursorPosition();
 		var translatedPos = pos && this.occurToOriginalPosition(editor.session, pos);
 		this.displayOriginalContent(editor);
@@ -59,18 +62,22 @@ class Occur extends Search {
 	 * @param {EditSession} sess
 	 * @param {RegExp} regexp
 	 */
-	highlight(sess, regexp) {
+	highlight(sess: EditSession, regexp: RegExp) {
 		var hl = sess.$occurHighlight = sess.$occurHighlight || sess.addDynamicMarker(
-				new SearchHighlight(null, "ace_occur-highlight", "text"));
+				new SearchHighlight(void 0, "ace_occur-highlight", "text"));
 		hl.setRegexp(regexp);
-		sess._emit("changeBackMarker"); // force highlight layer redraw
+		sess._emit("changeBackMarker", void 0, sess); // force highlight layer redraw
 	}
+
+	private $originalSession?: EditSession;
+	private $useEmacsStyleLineStart?: boolean;
+
 
 	/**
 	 * @param {Editor} editor
 	 * @param {Partial<SearchOptions>} options
 	 */
-	displayOccurContent(editor, options) {
+	displayOccurContent(editor: Editor, options: Partial<SearchOptions>) {
 		// this.setSession(session || new EditSession(""))
 		this.$originalSession = editor.session;
 		var found = this.matchingLines(editor.session, options);
@@ -83,15 +90,15 @@ class Occur extends Search {
 		this.$useEmacsStyleLineStart = this.$originalSession.$useEmacsStyleLineStart;
 		occurSession.$useEmacsStyleLineStart = this.$useEmacsStyleLineStart;
 		this.highlight(occurSession, options.re);
-		occurSession._emit('changeBackMarker');
+		occurSession._emit('changeBackMarker', void 0, occurSession); // force highlight layer redraw
 	}
 
 	/**
 	 * @param {Editor} editor
 	 */
-	displayOriginalContent(editor) {
-		editor.setSession(this.$originalSession);
-		this.$originalSession.$useEmacsStyleLineStart = this.$useEmacsStyleLineStart;
+	displayOriginalContent(editor: Editor) {
+		editor.setSession(this.$originalSession!);
+		this.$originalSession!.$useEmacsStyleLineStart = this.$useEmacsStyleLineStart;
 	}
 
 	/**
@@ -102,7 +109,7 @@ class Occur extends Search {
 	* @param {Point} pos The position in the original document
 	* @return {Point} position in occur doc
 	**/
-	originalToOccurPosition(session, pos) {
+	originalToOccurPosition(session: EditSession, pos: Point) {
 		var lines = session.$occurMatchingLines;
 		var nullPos = {row: 0, column: 0};
 		if (!lines) return nullPos;
@@ -120,7 +127,7 @@ class Occur extends Search {
 	* @param {Point} pos The position in the occur session document
 	* @return {Point} position
 	**/
-	occurToOriginalPosition(session, pos) {
+	occurToOriginalPosition(session: EditSession, pos: Point) {
 		var lines = session.$occurMatchingLines;
 		if (!lines || !lines[pos.row])
 			return pos;
@@ -131,7 +138,7 @@ class Occur extends Search {
 	 * @param {EditSession} session
 	 * @param {Partial<SearchOptions>} options
 	 */
-	matchingLines(session, options) {
+	matchingLines(session: EditSession, options: Partial<SearchOptions>) {
 		options = oop.mixin({}, options);
 		if (!session || !options.needle) return [];
 		var search = new Search();
@@ -142,23 +149,22 @@ class Occur extends Search {
 			return last && last.row === row ?
 				lines :
 				lines.concat({row: row, content: session.getLine(row)});
-		}, []);
+		}, [] as {row: number, content: string}[]);
 	}
-
 }
 
-var dom = require('./lib/dom');
-dom.importCssString(".ace_occur-highlight {\n\
-	border-radius: 4px;\n\
-	background-color: rgba(87, 255, 8, 0.25);\n\
-	position: absolute;\n\
-	z-index: 4;\n\
-	box-sizing: border-box;\n\
-	box-shadow: 0 0 4px rgb(91, 255, 50);\n\
-}\n\
-.ace_dark .ace_occur-highlight {\n\
-	background-color: rgb(80, 140, 85);\n\
-	box-shadow: 0 0 4px rgb(60, 120, 70);\n\
-}\n", "incremental-occur-highlighting", false);
-
-exports.Occur = Occur;
+createCss({
+	".ace_occur-highlight": {
+		borderRadius: 4,
+		backgroundColor: "rgba(87, 255, 8, 0.25)",
+		// position: "absolute",
+		zIndex: 4,
+		// boxSizing: "border-box",
+		boxShadow: "0 0 4 rgb(91, 255, 50)",
+	},
+	".ace_dark .ace_occur-highlight": {
+		backgroundColor: "rgb(80, 140, 85)",
+		boxShadow: "0 0 4 rgb(60, 120, 70)",
+	}
+});
+// "incremental-occur-highlighting", false);

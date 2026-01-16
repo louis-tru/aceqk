@@ -5,7 +5,7 @@ import type { Fold } from "./edit_session/fold";
 import type {Editor} from "./editor";
 import type { CodeLenseCommand } from "./ext/code_lens";
 import {Box,Text} from 'quark';
-import type { Delta } from "./range";
+import type { Delta, Point } from "./range";
 import type {VirtualRenderer} from "./virtual_renderer";
 
 export interface LineWidget {
@@ -38,7 +38,7 @@ export interface LineWidget {
 
 export class LineWidgets {
 	readonly session: EditSession;
-	private lineWidgets: LineWidget[] = [];
+	public lineWidgets: LineWidget[] = [];
 	private editor?: Editor;
 
 	/**
@@ -142,13 +142,13 @@ export class LineWidgets {
 	 * @param e
 	 * @param {EditSession} session
 	 */
-	updateOnFold(e: {data: Fold, action?: string}, session: EditSession) {
+	updateOnFold(e: {data: {start:{row: number}, end?: {row: number}} | Fold, action?: string}, session: EditSession) {
 		var lineWidgets = session.lineWidgets;
 		if (!lineWidgets || !e.action)
 			return;
 		var fold = e.data;
 		var start = fold.start.row;
-		var end = fold.end.row;
+		var end = fold.end?.row || 0;
 		var hide = e.action == "add";
 		for (var i = start + 1; i < end; i++) {
 			if (lineWidgets[i])

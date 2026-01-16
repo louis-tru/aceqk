@@ -1,12 +1,11 @@
 "use strict";
-/**@type {any}*/
 
-type AnyFn = (...args: any[]) => any;
+export type AnyFn = (...args: any[]) => any;
 
 export type EmitParameters<F> =
 	F extends (...args: infer P) => any ? P : never;
 
-interface InternalEvent {
+export interface InternalEvent {
 	type?: string;
 	propagationStopped?: boolean;
 	defaultPrevented?: boolean;

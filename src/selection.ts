@@ -27,6 +27,7 @@ export interface MultiSelectionEvents extends SelectionEvents {
 }
 
 export interface Selection extends EventEmitter<MultiSelectionEvents>, MultiSelectProperties {
+	_eventRegistry?: any;
 }
 
 export class Selection extends EventEmitter<MultiSelectionEvents> {
@@ -381,7 +382,7 @@ export class Selection extends EventEmitter<MultiSelectionEvents> {
 		this.setSelectionRange(range);
 	}
 
-	getLineRange(row?: number, excludeLastChar?: boolean) {
+	getLineRange(row?: number | Anchor, excludeLastChar?: boolean | number): Range {
 		var rowStart = typeof row == "number" ? row : this.lead.row;
 		var rowEnd;
 
@@ -856,7 +857,7 @@ export class Selection extends EventEmitter<MultiSelectionEvents> {
 	/**
 	 * @param {Range & {desiredColumn?: number}} range
 	 */
-	fromOrientedRange(range: Range & {desiredColumn?: number}) {
+	fromOrientedRange(range: IRange & {desiredColumn?: number}) {
 		this.setSelectionRange(range, range.cursor == range.start);
 		this.$desiredColumn = range.desiredColumn || this.$desiredColumn;
 	}
@@ -906,7 +907,6 @@ export class Selection extends EventEmitter<MultiSelectionEvents> {
 	toJSON() {
 		let data: Range | Range[];
 		if (this.rangeCount) {
-			/**@type{Range|Range[]}*/
 			data = this.ranges!.map(function(r) {
 				var r1 = r.clone();
 				r1.isBackwards = r.cursor == r.start;

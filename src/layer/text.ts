@@ -50,6 +50,7 @@ export class Text extends EventEmitter<TextEvents> {
 	private $pollSizeChangesTimer?: TimeoutResult;
 	private tabSize?: number;
 	private $indentGuideRe?: RegExp;
+	public $lenses?: TextView[]; // @ext/code_lens
 
 	/**
 	 * @param {View} parentEl
@@ -60,6 +61,7 @@ export class Text extends EventEmitter<TextEvents> {
 		this.element = new Morph(parentEl.window);
 		this.element.class = ["ace_layer", "ace_text-layer"];
 		this.element.style.layout = "free";
+		this.element.data = {};
 		parentEl.append(this.element);
 		this.$updateEolChar = this.$updateEolChar.bind(this);
 		this.$lines = new Lines(this.element);

@@ -27,6 +27,9 @@ export interface Command {
 	action?: string,
 	returnValue?: number;
 	isDefault?: boolean;
+	isYank?: boolean;
+	handlesCount?: boolean;
+	args?: any;
 }
 
 // export type CommandLike = Command | ((editor: Editor) => void) | ((sb: SearchBox) => void);
@@ -34,12 +37,14 @@ export type CommandLike = Command | Command["exec"];
 export type CommandLikes = Dict<CommandLike> | Command[];
 export type BindingCmd = string|Command|(string|Command)[];
 
-export type KeyboardHandler = Partial<HashHandler> & {
-	attach?: (editor: Editor) => void;
-	detach?: (editor: Editor) => void;
-	getStatusText?: (editor?: any, data?: any) => string;
-	$getDirectionForHighlight?: (editor: Editor) => boolean;
+export interface HashHandlerExtensions {
+	attach: (editor: Editor) => void;
+	detach: (editor: Editor) => void;
+	getStatusText: (editor?: Editor, data?: any) => string;
+	$getDirectionForHighlight: (editor: Editor) => boolean;
 }
+
+export type KeyboardHandler = Partial<HashHandler & HashHandlerExtensions>
 
 export class MultiHashHandler {
 	public platform: Platform;
@@ -319,6 +324,9 @@ function getPosition(command: Command | string): number {
 }
 
 export class HashHandler extends MultiHashHandler {
+	isEmacs = false;
+	$id = "ace/keyboard/hash_handler";
+
 	/**
 	 * @param {CommandLikes} [config]
 	 * @param {Platform} [platform]

@@ -1,0 +1,255 @@
+/**
+ * ## Whitespace management and indentation utilities extension
+ *
+ * Provides whitespace handling capabilities including automatic indentation detection, trailing whitespace trimming,
+ * and indentation format conversion. Analyzes code patterns to determine optimal tab settings and offers commands for
+ * maintaining consistent code formatting across different indentation styles (spaces vs. tabs) and sizes.
+ *
+ * @module
+ */
+
+"use strict";
+
+/**
+ *
+ * @typedef {import("../edit_session").EditSession} EditSession
+ */
+
+import * as lang from "../lib/lang";
+import type { Ace } from "../../ace-internal";
+
+// based on http://www.freehackers.org/Indent_Finder
+/**
+ * 
+ * @param {string[]} lines
+ * @param [fallback]
+ * @returns {{ch?: string, length?: number}}
+ */
+export function $detectIndentation(lines: string[], fallback?: any) {
+	var stats: number[] = [];
+	var changes: number[] = [];
+	var tabIndents = 0;
+	var prevSpaces = 0;
+	var max = Math.min(lines.length, 1000);
+	for (var i = 0; i < max; i++) {
+		var line = lines[i];
+		// ignore empty and comment lines
+		if (!/^\s*[^*+\-\s]/.test(line))
+			continue;
+
+		if (line[0] == "\t") {
+			tabIndents++;
+			prevSpaces = -Number.MAX_VALUE;
+		} else {
+			var spaces = line.match(/^ */)[0].length;
+			if (spaces && line[spaces] != "\t") {
+				var diff = spaces - prevSpaces;
+				if (diff > 0 && !(prevSpaces%diff) && !(spaces%diff))
+					changes[diff] = (changes[diff] || 0) + 1;
+	
+				stats[spaces] = (stats[spaces] || 0) + 1;
+			}
+			prevSpaces = spaces;
+		}
+		// ignore lines ending with backslash
+		while (i < max && line[line.length - 1] == "\\")
+			line = lines[i++];
+	}
+	
+	function getScore(indent: number) {
+		var score = 0;
+		for (var i = indent; i < stats.length; i += indent)
+			score += stats[i] || 0;
+		return score;
+	}
+
+	var changesTotal = changes.reduce(function(a,b){return a+b;}, 0);
+
+	var first = {score: 0, length: 0};
+	var spaceIndents = 0;
+	for (var i = 1; i < 12; i++) {
+		var score = getScore(i);
+		if (i == 1) {
+			spaceIndents = score;
+			score = stats[1] ? 0.9 : 0.8;
+			if (!stats.length)
+				score = 0;
+		} else
+			score /= spaceIndents;
+
+		if (changes[i])
+			score += changes[i] / changesTotal;
+
+		if (score > first.score)
+			first = {score: score, length: i};
+	}
+
+	if (first.score && first.score > 1.4)
+		var tabLength = first.length;
+
+	if (tabIndents > spaceIndents + 1) {
+		if (tabLength == 1 || spaceIndents < tabIndents / 4 || first.score < 1.8)
+			tabLength = undefined;
+		return {ch: "\t", length: tabLength};
+	}
+	if (spaceIndents > tabIndents + 1)
+		return {ch: " ", length: tabLength};
+};
+
+/**
+ * Detects the indentation style of a document and configures the session accordingly.
+ *
+ * @param {EditSession} session The editing session to analyze and configure
+ * @returns {{ch?: string, length?: number}|{}} An object containing detected indentation details (character and length)
+ */
+export function detectIndentation(session: Ace.EditSession) {
+	var lines = session.getLines(0, 1000);
+	var indent = $detectIndentation(lines) || {};
+
+	if (indent.ch)
+		session.setUseSoftTabs(indent.ch == " ");
+
+	if (indent.length)
+		session.setTabSize(indent.length);
+	return indent;
+};
+
+/**
+ * Removes trailing whitespace from all lines in the session.
+ * @param {EditSession} session
+ * @param {Object} options
+ * @param {boolean} [options.trimEmpty] trim empty lines too
+ * @param {boolean} [options.keepCursorPosition] do not trim whitespace before the cursor
+ */
+export function trimTrailingSpace(session: Ace.EditSession, options?: {trimEmpty?: boolean, keepCursorPosition?: boolean}) {
+	var doc = session.getDocument();
+	var lines = doc.getAllLines();
+	
+	var min = options && options.trimEmpty ? -1 : 0;
+	var cursors = [], ci = -1;
+	if (options && options.keepCursorPosition) {
+		if (session.selection.rangeCount) {
+			session.selection.rangeList.ranges.forEach(function(x, i, ranges) {
+			   var next = ranges[i + 1];
+			   if (next && next.cursor.row == x.cursor.row)
+				  return;
+			  cursors.push(x.cursor);
+			});
+		} else {
+			cursors.push(session.selection.getCursor());
+		}
+		ci = 0;
+	}
+	var cursorRow = cursors[ci] && cursors[ci].row;
+
+	for (var i = 0, l=lines.length; i < l; i++) {
+		var line = lines[i];
+		var index = line.search(/\s+$/);
+
+		if (i == cursorRow) {
+			if (index < cursors[ci].column && index > min)
+			   index = cursors[ci].column;
+			ci++;
+			cursorRow = cursors[ci] ? cursors[ci].row : -1;
+		}
+
+		if (index > min)
+			doc.removeInLine(i, index, line.length);
+	}
+};
+
+/**
+ * Converts indentation format throughout the session to use specified character and size.
+ * @param {EditSession} session
+ * @param {string} ch
+ * @param {number} len
+ */
+export function convertIndentation(session: Ace.EditSession, ch: string, len: number) {
+	var oldCh = session.getTabString()[0];
+	var oldLen = session.getTabSize();
+	if (!len) len = oldLen;
+	if (!ch) ch = oldCh;
+
+	var tab = ch == "\t" ? ch: lang.stringRepeat(ch, len);
+
+	var doc = session.doc;
+	var lines = doc.getAllLines();
+
+	var cache = {};
+	var spaceCache = {};
+	for (var i = 0, l=lines.length; i < l; i++) {
+		var line = lines[i];
+		var match = line.match(/^\s*/)[0];
+		if (match) {
+			var w = session.$getStringScreenWidth(match)[0];
+			var tabCount = Math.floor(w/oldLen);
+			var reminder = w%oldLen;
+			var toInsert = cache[tabCount] || (cache[tabCount] = lang.stringRepeat(tab, tabCount));
+			toInsert += spaceCache[reminder] || (spaceCache[reminder] = lang.stringRepeat(" ", reminder));
+
+			if (toInsert != match) {
+				doc.removeInLine(i, 0, match.length);
+				doc.insertInLine({row: i, column: 0}, toInsert);
+			}
+		}
+	}
+	session.setTabSize(len);
+	session.setUseSoftTabs(ch == " ");
+};
+
+/**
+ * 
+ * @param {string} text
+ * @returns {{}}
+ */
+export function $parseStringArg(text: string) {
+	var indent = {};
+	if (/t/.test(text))
+		indent.ch = "\t";
+	else if (/s/.test(text))
+		indent.ch = " ";
+	var m = text.match(/\d+/);
+	if (m)
+		indent.length = parseInt(m[0], 10);
+	return indent;
+};
+
+export function $parseArg(arg: any) {
+	if (!arg)
+		return {};
+	if (typeof arg == "string")
+		return $parseStringArg(arg);
+	if (typeof arg.text == "string")
+		return $parseStringArg(arg.text);
+	return arg;
+};
+
+export const commands: Ace.Command[] = [{
+	name: "detectIndentation",
+	description: "Detect indentation from content",
+	exec: function(editor: Ace.Editor) {
+		detectIndentation(editor.session);
+		// todo show message?
+	}
+}, {
+	name: "trimTrailingSpace",
+	description: "Trim trailing whitespace",
+	exec: function(editor: Ace.Editor, args?: {trimEmpty?: boolean, keepCursorPosition?: boolean}) {
+		trimTrailingSpace(editor.session, args);
+	}
+}, {
+	name: "convertIndentation",
+	description: "Convert indentation to ...",
+	exec: function(editor: Ace.Editor, arg?: any) {
+		var indent = $parseArg(arg);
+		convertIndentation(editor.session, indent.ch, indent.length);
+	}
+}, {
+	name: "setIndentation",
+	description: "Set indentation",
+	exec: function(editor: Ace.Editor, arg?: any) {
+		var indent = $parseArg(arg);
+		indent.length && editor.session.setTabSize(indent.length);
+		indent.ch && editor.session.setUseSoftTabs(indent.ch == " ");
+	}
+}];

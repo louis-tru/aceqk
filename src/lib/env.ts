@@ -5,6 +5,7 @@ export const name = os.name();
 export const model = os.model();
 export const android = name == 'Android';
 export const macOS = name == 'MacOSX';
+export const isMac = macOS;
 export const iOS = name == 'iOS';
 export const mobile = iOS || android;
 export const iPod = model == 'iPod touch';
@@ -20,6 +21,7 @@ declare global {
 			readonly model: string;
 			readonly android: boolean;
 			readonly macOS: boolean;
+			readonly isMac: boolean;
 			readonly iOS: boolean;
 			readonly iPod: boolean;
 			readonly iPhone: boolean;
@@ -42,6 +44,7 @@ Object.defineProperty(ace, 'env', {
 		model,
 		android,
 		macOS,
+		isMac: macOS,
 		iOS,
 		iPod,
 		iPhone,

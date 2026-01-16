@@ -11,6 +11,8 @@ function vec2(arr: number[]): Vec2 {
 	return Vec2.new(arr[0], arr[1]);
 }
 
+type ResizeObserver = any;
+
 export interface FontMetricsEvents {
 	"changeCharacterSize": (e: { data: { height: number, width: number } }, emitter: FontMetrics) => void;
 }

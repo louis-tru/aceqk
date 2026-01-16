@@ -3,6 +3,7 @@
 import {RangeList} from "../range_list";
 import type {Point, Range, IRange} from "../range";
 import type { FoldLine } from "./fold_line";
+import type {LineWidget} from "../line_widgets";
 
 /*
  * Simple fold-data struct.
@@ -16,6 +17,8 @@ export class Fold { //extends RangeList {
 	public sameRow: boolean
 	public subFolds: Fold[]
 	public collapseChildren?: number
+	public other?: Fold;
+	public lineWidget?: LineWidget;
 
 	/**
 	 * @param {Range} range

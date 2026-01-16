@@ -173,7 +173,7 @@ export class FoldLine {
 			{
 				//throwing here breaks whole editor
 				//TODO: properly handle this
-				window.console && window.console.log(row, column, fold);
+				globalThis.console && globalThis.console.log(row, column, fold);
 			} else if (fold.start.row == row) {
 				folds = this.folds;
 				var i = folds.indexOf(fold);

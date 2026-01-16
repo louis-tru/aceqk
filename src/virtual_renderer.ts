@@ -20,6 +20,7 @@ import type { OptionsProvider } from "./lib/app_config";
 import { Vec2, CursorStyle } from "quark/types";
 import type { LineWidget } from './line_widgets';
 import './css/editor-css';
+import type {Annotation} from "./layer/gutter";
 
 export type Composition = {
 	markerRange: Range; cssStyle?: StyleSheets; useTextareaForIME?: boolean; markerId?: number;
@@ -105,7 +106,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public scroller: Text;
 	public content: Morph;
 	public $gutterLayer: GutterLayer;
-	private $markerBack: MarkerLayer;
+	public $markerBack: MarkerLayer;
 	public $textLayer: TextLayer;
 	private $markerFront: MarkerLayer;
 	public $cursorLayer: CursorLayer;
@@ -119,7 +120,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public cursorPos = { row : 0, column : 0 };
 	private $fontMetrics: FontMetrics;
 
-	private $size = {
+	public $size = {
 		width: 0,
 		height: 0,
 		scrollerHeight: 0,
@@ -163,7 +164,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public $keepTextAreaAtCursor: boolean = !ace.env.iOS;
 	public $loop: RenderLoop;
 	public $scrollAnimation?: {from: number, to: number, steps: number[]} | null;
-	private $padding: number = 0;
+	public $padding: number = 0;
 	public gutterWidth: number = 0;
 
 	readonly window: Window;
@@ -173,7 +174,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 * @param {Text | null} [container] The root element of the editor
 	 * @param {String} [theme] The starting theme
 	 **/
-	constructor(container?: Text | null, theme?: string) {
+	constructor(container?: Text | null, theme?: string | Ace.Theme) {
 		super();
 		var _self = this;
 		if (container) {
@@ -1378,10 +1379,10 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 
 	/**
 	 * Sets annotations for the gutter.
-	 * @param {import("../ace-internal").Ace.Annotation[]} annotations An array containing annotations
+	 * @param {Annotation[]} annotations An array containing annotations
 	 *
 	 **/
-	setAnnotations(annotations: Ace.Annotation[]) {
+	setAnnotations(annotations: Annotation[]) {
 		this.$gutterLayer.setAnnotations(annotations);
 		this.$loop.schedule(this.CHANGE_GUTTER);
 	}
@@ -1715,7 +1716,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 *
 	 * @param {number} x
 	 * @param {number} y
-	 * @returns {import("../ace-internal").Ace.ScreenCoordinates}
+	 * @returns {ScreenCoordinates}
 
 	 */
 	pixelToScreenCoordinates(x: number, y: number) {
@@ -1868,8 +1869,8 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.$cursorLayer.element.visible = true;
 	}
 
-	private $ghostText?: { text: string; position: { row: number; column: number } } | null;
-	private $ghostTextWidget?: LineWidget | null;
+	public $ghostText?: { text: string; position: { row: number; column: number } };
+	public $ghostTextWidget?: LineWidget;
 
 	/**
 	 * @param {string} text
@@ -2013,9 +2014,9 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.removeExtraToken(position.row, position.column);
 		if (this.$ghostTextWidget) {
 			this.session.widgetManager.removeLineWidget(this.$ghostTextWidget);
-			this.$ghostTextWidget = null;
+			this.$ghostTextWidget = void 0;
 		}
-		this.$ghostText = null;
+		this.$ghostText = void 0;
 	}
 
 	/**
@@ -2398,7 +2399,7 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
 	},
 	fontSize: {
 		set: function(this: VirtualRenderer, size: number) {
-			(this.container as Text).style.textSize = size;
+			(this.container as Text).style.textSize = size || 12;
 			this.updateFontSize();
 		},
 		initialValue: 12

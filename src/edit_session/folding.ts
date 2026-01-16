@@ -8,7 +8,8 @@ import type {EditSession} from "../edit_session";
 import type { Delta, IRange } from "../range";
 import type { FoldMode } from "../mode/folding/fold_mode";
 import {MouseEvent} from "../mouse/mouse_event";
-import type { UIEvent, MouseEvent as UIMouseEvent } from "quark/event";
+import type { UIEvent, KeyEvent } from "quark/event";
+import type { Token } from "src/background_tokenizer";
 
 /**
  * @typedef {import("../edit_session").EditSession & import("../../ace-internal").Folding} IFolding
@@ -137,7 +138,7 @@ export interface Folding {
 		firstRange?: Range;
 	};
 
-	onFoldWidgetClick(row: number, e: MouseEvent | UIMouseEvent): void;
+	onFoldWidgetClick(row: number, e: MouseEvent | KeyEvent): void;
 
 	$toggleFoldWidget(row: number, options: any): Fold | any;
 
@@ -737,7 +738,6 @@ export function Folding(this: EditSession) {
 	};
 
 	/**
-	 * 
 	 * @param {number} row
 	 * @param {number | null} endColumn
 	 * @param {number | null} startRow
@@ -852,18 +852,18 @@ export function Folding(this: EditSession) {
 		var token = iterator.getCurrentToken();
 		var type = token && token.type;
 		if (token && /^comment|string/.test(type)) {
-			type = type.match(/comment|string/)[0];
+			type = type.match(/comment|string/)![0];
 			if (type == "comment")
 				type += "|doc-start|\\.doc";
 			var re = new RegExp(type);
 			var range = new Range(0,0,0,0);
 			if (dir != 1) {
 				do {
-					token = iterator.stepBackward();
+					token = iterator.stepBackward()!;
 				} while (token && re.test(token.type));
-				token = iterator.stepForward();
+				token = iterator.stepForward()!;
 			}
-			
+
 			range.start.row = iterator.getCurrentTokenRow();
 			range.start.column = iterator.getCurrentTokenColumn() + token.value.length;
 
@@ -873,7 +873,7 @@ export function Folding(this: EditSession) {
 			if (dir != -1) {
 				var lastRow = -1;
 				do {
-					token = iterator.stepForward();
+					token = iterator.stepForward()!;
 					if (lastRow == -1) {
 						var state = this.getState(iterator.$row);
 						if (initState.toString() !== state.toString())
@@ -882,7 +882,7 @@ export function Folding(this: EditSession) {
 						break;
 					}
 				} while (token && re.test(token.type));
-				token = iterator.stepBackward();
+				token = iterator.stepBackward()!;
 			} else
 				token = iterator.getCurrentToken();
 
@@ -1052,7 +1052,7 @@ export function Folding(this: EditSession) {
 	 * @param {number} row
 	 * @param {any} e
 	 */
-	this.onFoldWidgetClick = function(row, e: MouseEvent | UIMouseEvent) {
+	this.onFoldWidgetClick = function(row, e: MouseEvent | KeyEvent) {
 		if (e instanceof MouseEvent)
 			e = e.domEvent;
 

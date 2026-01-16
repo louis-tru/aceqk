@@ -1,5 +1,5 @@
 
-import type {Command} from ".";
+import type {Command} from "../keyboard/hash_handler";
 import type { Editor } from "../editor";
 
 export const defaultCommands: Command[] = [{
@@ -62,17 +62,17 @@ export const defaultCommands: Command[] = [{
 	name: "toggleSplitSelectionIntoLines",
 	description: "Split selection into lines",
 	exec: function(editor) {
-		if (editor.multiSelect.rangeCount > 1)
-			editor.multiSelect.joinSelections();
+		if (editor.multiSelect!.rangeCount > 1)
+			editor.multiSelect!.joinSelections();
 		else
-			editor.multiSelect.splitIntoLines();
+			editor.multiSelect!.splitIntoLines();
 	},
 	bindKey: {win: "Ctrl-Alt-L", mac: "Ctrl-Alt-L"},
 	readOnly: true
 }, {
 	name: "splitSelectionIntoLines",
 	description: "Split into lines",
-	exec: function(editor) { editor.multiSelect.splitIntoLines(); },
+	exec: function(editor) { editor.multiSelect!.splitIntoLines(); },
 	readOnly: true
 }, {
 	name: "alignCursors",
@@ -91,7 +91,7 @@ export const defaultCommands: Command[] = [{
 
 /**
  * commands active only in multiselect mode
- * @type {import("../../ace-internal").Ace.Command[]}
+ * @type {Command[]}
  */
 export const multiSelectCommands: Command[] = [{
 	name: "singleSelection",

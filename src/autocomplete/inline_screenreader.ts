@@ -1,32 +1,31 @@
 "use strict";
 
-import {Box} from "quark";
-import { Ace } from "../../ace-internal";
-
+import {Box, Text, Label} from "quark";
+import type {Editor} from "../editor";
+import type { AcePopup } from "./popup";
+import { getChildren } from "../lib/dom";
+ 
 /**
  * This object is used to communicate inline code completions rendered into an editor with ghost text to screen reader users.
  */
 export class AceInlineScreenReader {
-
-	editor: Ace.Editor;
+	editor: Editor;
 	screenReaderDiv: Box
 
 	/**
 	 * Creates the off-screen div in which the ghost text content in redered and which the screen reader reads.
-	 * @param {import("../editor").Editor} editor
+	 * @param {Editor} editor
 	 */
-	constructor(editor: Ace.Editor) {
+	constructor(editor: Editor) {
 		this.editor = editor;
-		// TODO ... use Box from quark
 		// this.screenReaderDiv = document.createElement("div");
 		this.screenReaderDiv = new Box(editor.window);
-		// this.screenReaderDiv.classList.add("ace_screenreader-only");
 		this.screenReaderDiv.class = ["ace_screenreader-only"];
-		// this.editor.container.appendChild(this.screenReaderDiv);
 		this.editor.container.append(this.screenReaderDiv);
 	}
 
-	popup: Ace.AcePopup | null = null;
+	private popup?: AcePopup;
+	private _lines: string[] = [];
 
 	/**
 	 * Set the ghost text content to the screen reader div
@@ -34,13 +33,14 @@ export class AceInlineScreenReader {
 	 */
 	setScreenReaderContent(content: string) {
 		// Path for when inline preview is used with 'normal' completion popup.
-		if (!this.popup && this.editor.completer && /**@type{import("../autocomplete").Autocomplete}*/(this.editor.completer).popup) {
-			this.popup = /**@type{import("../autocomplete").Autocomplete}*/(this.editor.completer).popup;
+		if (!this.popup && this.editor.completer && this.editor.completer.popup) {
+			this.popup = this.editor.completer.popup;
 
-			this.popup.renderer.on("afterRender", function() {
-				let row = this.popup.getRow();
-				let t = this.popup.renderer.$textLayer;
-				let selected = t.element.childNodes[row - t.config.firstRow];
+			this.popup.renderer.on("afterRender", ()=>{
+				let row = this.popup!.getRow();
+				let t = this.popup!.renderer.$textLayer;
+				let childNodes = getChildren(t.element);
+				let selected = childNodes[row - t.config.firstRow];
 				if (selected) {
 					let idString = "doc-tooltip ";
 					for (let lineIndex = 0; lineIndex < this._lines.length; lineIndex++) {
@@ -48,19 +48,19 @@ export class AceInlineScreenReader {
 					}
 					selected.setAttribute("aria-describedby", idString);      
 				}
-			}.bind(this));
+			});
 		}
 
 		// TODO: Path for when special inline completion popup is used.
 		// https://github.com/ajaxorg/ace/issues/5348
 
 		// Remove all children of the div
-		while (this.screenReaderDiv.firstChild) {
-			this.screenReaderDiv.removeChild(this.screenReaderDiv.firstChild);
+		while (this.screenReaderDiv.first) {
+			this.screenReaderDiv.first.remove();
 		}
 		this._lines = content.split(/\r\n|\r|\n/);
 		const codeElement = this.createCodeBlock();
-		this.screenReaderDiv.appendChild(codeElement);
+		this.screenReaderDiv.append(codeElement);
 	}
 
 	destroy() {
@@ -71,16 +71,21 @@ export class AceInlineScreenReader {
 	 * Take this._lines, render it as <code> blocks and add those to the screen reader div.
 	 */
 	createCodeBlock() {
-		const container = document.createElement("pre");
+		// const container = document.createElement("pre");
+		const window = this.editor.window;
+		const container = new Box(window);
 		container.setAttribute("id", "ace-inline-screenreader");
 
 		for (let lineIndex = 0; lineIndex < this._lines.length; lineIndex++) {
-			const codeElement = document.createElement("code");
+			// const codeElement = document.createElement("code");
+			const codeElement = new Text(window);
 			codeElement.setAttribute("id", `ace-inline-screenreader-line-${lineIndex}`);
-			const line = document.createTextNode(this._lines[lineIndex]);
+			// const line = document.createTextNode(this._lines[lineIndex]);
+			const line = new Label(window);
+			line.value = this._lines[lineIndex];
 
-			codeElement.appendChild(line);
-			container.appendChild(codeElement);
+			codeElement.append(line);
+			container.append(codeElement);
 		}
 
 		return container;

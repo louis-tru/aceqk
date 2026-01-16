@@ -2,7 +2,7 @@
 import * as lang from "./lib/lang";
 import * as ms_commands from "./commands/multi_select_commands";
 import {RangeList} from "./range_list";
-import {Point, Range} from "./range";
+import {IRange, Point, Range} from "./range";
 import {Selection} from "./selection";
 import {onMouseDown} from "./mouse/multi_select_handler";
 import {EditSession} from "./edit_session";
@@ -10,7 +10,6 @@ import {Editor} from "./editor";
 import {CursorStyle} from "quark/types";
 import type {Command} from "./keyboard/hash_handler";
 import type {Anchor} from "./anchor";
-import type {Ace} from "../ace-internal";
 
 export const commands = ms_commands.defaultCommands.concat(ms_commands.multiSelectCommands);
 
@@ -41,7 +40,7 @@ export interface EditorMultiSelectProperties {
 	 * @param cmd The command to execute
 	 * @param [args] Any arguments for the command
 	 **/
-	forEachSelection: (cmd: Command | NonNullable<Command["exec"]>, args?: string, options?: Object) => void,
+	forEachSelection: (cmd: Command | NonNullable<Command["exec"]>, args?: string, options?: Object) => any,
 	/**
 	 * Removes all the selections except the last added one.
 	 **/
@@ -79,7 +78,7 @@ export interface EditorMultiSelectProperties {
 	 **/
 	alignCursors: () => void,
 	$reAlignText: (lines: string[], forceLeft: boolean) => string[],
-	multiSelect?: any,
+	multiSelect?: Selection,
 	$multiselectOnSessionChange?: any,
 	$blockSelectEnabled?: boolean,
 }
@@ -106,9 +105,9 @@ export interface MultiSelectProperties {
 	inMultiSelectMode: boolean;
 
 	/**
-	 * @param {Range} [range]
+	 * @param {IRange} [range]
 	 **/
-	toSingleRange(range?: Range): void;
+	toSingleRange(range?: IRange): void;
 
 	/**
 	 * Removes a Range containing pos (if it exists).
@@ -240,7 +239,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 	};
 
 	/**
-	 * @param {Range} [range]
+	 * @param {IRange} [range]
 	 * @this {Selection}
 	 **/
 	this.toSingleRange = function(range) {
@@ -684,7 +683,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 	this.exitMultiSelectMode = function() {
 		if (!this.inMultiSelectMode || this.inVirtualSelectionMode)
 			return;
-		this.multiSelect.toSingleRange();
+		this.multiSelect!.toSingleRange();
 	};
 
 	/**
@@ -694,7 +693,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 	this.getSelectedText = function() {
 		var text = "";
 		if (this.inMultiSelectMode && !this.inVirtualSelectionMode) {
-			var ranges = this.multiSelect.rangeList.ranges;
+			var ranges = this.multiSelect!.rangeList!.ranges;
 			var buf = [];
 			for (var i = 0; i < ranges.length; i++) {
 				buf.push(this.session.getTextRange(ranges[i]));
@@ -716,17 +715,17 @@ EditSession.prototype.getSelectionMarkers = function() {
 	 */
 	this.$checkMultiselectChange = function(e, anchor) {
 		if (this.inMultiSelectMode && !this.inVirtualSelectionMode) {
-			var range = this.multiSelect.ranges[0];
-			if (this.multiSelect.isEmpty() && anchor == this.multiSelect.anchor)
+			var range = this.multiSelect!.ranges![0];
+			if (this.multiSelect!.isEmpty() && anchor == this.multiSelect!.anchor)
 				return;
-			var pos = anchor == this.multiSelect.anchor
+			var pos = anchor == this.multiSelect!.anchor
 				? range.cursor == range.start ? range.end : range.start
-				: range.cursor;
+				: range.cursor!;
 			if (pos.row != anchor.row
 				|| this.session.$clipPositionToDocument(pos.row, pos.column).column != anchor.column)
-				this.multiSelect.toSingleRange(this.multiSelect.toOrientedRange());
+				this.multiSelect!.toSingleRange(this.multiSelect!.toOrientedRange());
 			else
-				this.multiSelect.mergeOverlappingRanges();
+				this.multiSelect!.mergeOverlappingRanges();
 		}
 	};
 
@@ -755,7 +754,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 		if (!ranges.length)
 			return 0;
 
-		var selection = this.multiSelect;
+		var selection = this.multiSelect!;
 
 		if (!additive)
 			selection.toSingleRange(ranges[0]);
@@ -764,7 +763,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 			selection.addRange(ranges[i], true);
 
 		// keep old selection as primary if possible
-		if (range && selection.rangeList.rangeAtPoint(range.start))
+		if (range && selection.rangeList!.rangeAtPoint(range.start))
 			selection.addRange(range, true);
 
 		return ranges.length;
@@ -876,7 +875,7 @@ EditSession.prototype.getSelectionMarkers = function() {
 		if (range.isEmpty()) {
 			range = session.getWordRange(range.start.row, range.start.column);
 			range.cursor = dir == -1 ? range.start : range.end;
-			this.multiSelect.addRange(range);
+			this.multiSelect!.addRange(range);
 			if (stopAtFirst)
 				return;
 		}
@@ -886,11 +885,11 @@ EditSession.prototype.getSelectionMarkers = function() {
 		if (newRange) {
 			newRange.cursor = dir == -1 ? newRange.start : newRange.end;
 			this.session.unfold(newRange);
-			this.multiSelect.addRange(newRange);
+			this.multiSelect!.addRange(newRange);
 			this.renderer.scrollCursorIntoView(void 0, 0.5);
 		}
 		if (skip)
-			this.multiSelect.substractPoint(range.cursor);
+			this.multiSelect!.substractPoint(range.cursor!);
 	};
 
 	/**

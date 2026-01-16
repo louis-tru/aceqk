@@ -47,6 +47,10 @@ function objectToRegExp(obj: {expression: string, flags: string}) {
 
 export type NeedleUpdateFunc = (this: IncrementalSearch, needle: string | RegExp) => string | RegExp | void;
 
+export interface ISearchEditSessionExtension {
+	$isearchHighlight?: SearchHighlight;
+}
+
 /**
  * Implements immediate searching while the user is typing. When incremental
  * search is activated, keystrokes into the editor will be used for composing
@@ -124,7 +128,7 @@ export class IncrementalSearch extends Search {
 	highlight(regexp: RegExp | null) {
 		var sess = this.$editor.session as EditSession & { $isearchHighlight: any },
 			hl = sess.$isearchHighlight = sess.$isearchHighlight || sess.addDynamicMarker(
-				new SearchHighlight(null, "ace_isearch-result", "text"));
+				new SearchHighlight(void 0, "ace_isearch-result", "text"));
 		hl.setRegexp(regexp);
 		sess._emit("changeBackMarker", void 0, sess); // force highlight layer redraw
 	}

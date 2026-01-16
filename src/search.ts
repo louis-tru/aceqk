@@ -35,6 +35,8 @@ export interface SearchOptions {
 	 * @private
 	 * */
 	$supportsUnicodeFlag: boolean;
+	/** only for Occur */
+	translatePosition?: boolean;
 }
 
 /**
@@ -85,8 +87,8 @@ export class Search {
 		var firstRange: Range | null = null;
 		iterator.forEach(function(sr, sc, er, ec) {
 			firstRange = new Range(sr, sc, er, ec);
-			if (sc == ec && options.start && /**@type{Range}*/(options.start).start
-				&& options.skipCurrent != false && firstRange.isEqual(/**@type{Range}*/(options.start))
+			if (sc == ec && options.start && options.start.start
+				&& options.skipCurrent != false && firstRange.isEqual(options.start)
 			) {
 				firstRange = null;
 				return false;

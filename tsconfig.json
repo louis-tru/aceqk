@@ -1,41 +1,42 @@
 {
-  "compileOnSave": true,
-  "compilerOptions": {
-    "noEmitHelpers": true,
-    "module": "commonjs",
-    "target": "ES2018",
-    "moduleResolution": "node",
-    "sourceMap": false,
-    "outDir": "out/build",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "declaration": true,
-    "alwaysStrict": true,
-    "allowJs": true,
-    "checkJs": false,
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": false,
-    "emitDecoratorMetadata": false,
-    "experimentalDecorators": true,
-    "removeComments": true,
-    "jsx": "react",
-    "jsxFactory": "Jsx",
-    "resolveJsonModule": true,
-    "incremental": true,
-    "tsBuildInfoFile": "./out/tsbuildinfo"
-  },
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "out",
-    "deps",
-    ".git",
-    "project",
-    "node_modules",
-    // "src"
-  ]
+	"compileOnSave": true,
+	"compilerOptions": {
+		"noEmitHelpers": true,
+		"module": "commonjs",
+		"target": "ES2018",
+		"lib": ["ES2018"],
+		"moduleResolution": "node",
+		"sourceMap": false,
+		"outDir": "out/build",
+		"rootDir": ".",
+		"baseUrl": ".",
+		"declaration": true,
+		"alwaysStrict": true,
+		"allowJs": true,
+		"checkJs": false,
+		"strict": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": false,
+		"emitDecoratorMetadata": false,
+		"experimentalDecorators": true,
+		"removeComments": true,
+		"jsx": "react",
+		"jsxFactory": "Jsx",
+		"resolveJsonModule": true,
+		"incremental": true,
+		"tsBuildInfoFile": "./out/tsbuildinfo"
+	},
+	"include": [
+		"**/*"
+	],
+	"exclude": [
+		"out",
+		"deps",
+		".git",
+		"project",
+		"node_modules",
+		// "src"
+	]
 }

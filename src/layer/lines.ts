@@ -2,7 +2,6 @@
 
 import { Box, Label, Morph } from "quark";
 import type { EditSession } from "../edit_session";
-import { Vec2 } from "quark/types";
 
 export interface LayerConfig {
 	width: number,

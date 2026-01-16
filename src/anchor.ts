@@ -1,8 +1,7 @@
 "use strict";
 
 import {EventEmitter} from "./lib/event_emitter";
-import type { Delta } from "./range";
-import type { Point } from "./occur";
+import type { Delta,Point } from "./range";
 import type { Document } from "./document";
 
 export interface AnchorEvents {

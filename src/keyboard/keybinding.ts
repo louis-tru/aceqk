@@ -22,7 +22,7 @@ export interface KeyBinding {
 
 export class KeyBinding {
 	private $editor: Editor;
-	private $data: {editor: Editor};
+	public $data: {editor: Editor, lastCommand?: string, count?: number};
 	public $handlers: (KeyboardHandler)[];
 	private $defaultHandler!: KeyboardHandler;
 
@@ -90,10 +90,11 @@ export class KeyBinding {
 	 * @param {KeyboardHandler & {attach?: (editor: any) => void, detach?: (editor: any) => void;}} kb
 	 * @returns {boolean}
 	 */
-	removeKeyboardHandler(kb: KeyboardHandler & {
+	removeKeyboardHandler(kb?: KeyboardHandler & {
 			attach?: (editor: any) => void;
 			detach?: (editor: any) => void;
 	}): boolean {
+		if (!kb) return false;
 		var i = this.$handlers.indexOf(kb);
 		if (i == -1)
 			return false;

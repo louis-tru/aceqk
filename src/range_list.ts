@@ -9,7 +9,7 @@ export class RangeList {
 	public ranges: Range[] = [];
 	private session?: EditSession;
 	private onChange?: ((delta: Delta) => void);
-	private $bias: number = 1;
+	public $bias: number = 1;
 
 	/**
 	 * @param {Point} pos

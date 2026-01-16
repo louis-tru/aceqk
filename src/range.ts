@@ -11,22 +11,25 @@ export interface Point {
 export interface IRange {
 	start: Point;
 	end: Point;
-}
-
-export interface Range extends IRange {
 	id?: number;
 	cursor?: Point;
 	isBackwards?: boolean;
-	collapseChildren?: number
+	collapseChildren?: number;
+	linked?: boolean;
 }
 
+export interface Range extends IRange {}
+
 export interface Delta {
-	action: 'insert' | 'remove';
+	action: 'insert' | 'remove'// | 'removeFolds';
 	start: Point;
 	end: Point;
 	lines: string[];
 	id?: number,
-	folds?: Fold[]
+	folds?: Fold[],
+	ignore?: boolean,
+	value?: Range,
+	rev?: number
 }
 
 /**
@@ -52,24 +55,6 @@ export class Range {
 			row: endRow,
 			column: endColumn
 		};
-	}
-
-	/**
-	 * Creates and returns a new `Range` based on the `start` [[Point]] and `end` [[Point]] of the given parameters.
-	 * @param {IRange} range A range to convert
-	 * @returns {Range}
-	**/
-	static new(range: IRange): Range {
-		return new Range(range.start.row, range.start.column, range.end.row, range.end.column);
-	}
-
-	/**
-	 * Returns `true` if the given `range` is empty (starting [[Point]] == ending [[Point]]).
-	 * @param {IRange} range A range to check
-	 * @returns {Boolean}
-	 **/
-	static isEmpty(range: IRange) {
-		return (range.start.row === range.end.row && range.start.column === range.end.column);
 	}
 
 	/**
@@ -498,6 +483,26 @@ export class Range {
 	static fromPoints(start: Point, end: Point) {
 		return new Range(start.row, start.column, end.row, end.column);
 	};
+
+	static readonly zero = () => new Range(0, 0, 0, 0);
+
+	/**
+	 * Creates and returns a new `Range` based on the `start` [[Point]] and `end` [[Point]] of the given parameters.
+	 * @param {IRange} range A range to convert
+	 * @returns {Range}
+	**/
+	static new(range: IRange): Range {
+		return new Range(range.start.row, range.start.column, range.end.row, range.end.column);
+	}
+
+	/**
+	 * Returns `true` if the given `range` is empty (starting [[Point]] == ending [[Point]]).
+	 * @param {IRange} range A range to check
+	 * @returns {Boolean}
+	 **/
+	static isEmpty(range: IRange) {
+		return (range.start.row === range.end.row && range.start.column === range.end.column);
+	}
 
 	/**
 	 * Compares `p1` and `p2` [[Point]]'s, useful for sorting

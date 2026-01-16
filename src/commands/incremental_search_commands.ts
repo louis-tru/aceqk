@@ -8,6 +8,7 @@ import {UIEvent} from 'quark/event';
 import type { Editor } from "../editor";
 import type { ExecEventHandler } from "./command_manager";
 import type {Selection} from "../selection";
+import type {Range} from "../range";
 
 // These commands can be installed in a normal key handler to start iSearch:
 export const iSearchStartCommands: Command[] = [{
@@ -116,13 +117,15 @@ export const iSearchCommands: Command[] = [{
 	name: 'selectAllMatches',
 	bindKey: 'Ctrl-space',
 	exec: function(iSearch: IncrementalSearch) {
-		var ed = iSearch.$editor,
+		const ed = iSearch.$editor,
 			hl = ed.session.$isearchHighlight,
-			ranges = hl && hl.cache ? hl.cache
-				.reduce(function(ranges: Range[], ea?: Range[]) {
-					return ranges.concat(ea ? ea : []); }, []) : [];
+			ranges = hl && hl.cache ? (hl.cache as Range[][])
+				.reduce(function(ranges, ea) {
+					return ranges.concat(ea ? ea : []);
+				}, []) : [];
+
 		iSearch.deactivate(false);
-		ranges.forEach(ed.selection.addRange.bind(ed.selection));
+		ranges.forEach(e=>ed.selection.addRange(e));
 	}
 }, {
 	name: 'searchAsRegExp',

@@ -13,7 +13,7 @@ import {UndoManager} from "./undomanager";
 import {VirtualRenderer} from "./virtual_renderer";
 import {Document} from "./document";
 import qk, {Text} from "quark";
-import config_ from "./config";
+import cfg from "./config";
 import { SyntaxMode } from "./mode";
 
 // Side-effect imports to register editor extensions (modes, themes, etc.)
@@ -25,7 +25,7 @@ import "./mode/folding/fold_mode";
 import "./theme/textmate";
 import "./ext/error_marker";
 
-export const config = config_;
+export const config = cfg;
 
 /**
  * Embeds the Ace editor into the DOM, at the element provided by `el`.
@@ -66,7 +66,7 @@ export function edit(el?: Text & {env?: any, value?: any}, options: Partial<Edit
 	});
 	(editor.container as any).env = editor.env = env;
 	return editor;
-};
+}
 
 /**
  * Creates a new [[EditSession]], and returns the associated [[Document]].
@@ -78,7 +78,7 @@ export function createEditSession(text: string|Document, mode?: SyntaxMode): Edi
 	var doc = new EditSession(text, mode);
 	doc.setUndoManager(new UndoManager());
 	return doc;
-};
+}
 export {Range};
 export {Editor};
 export {EditSession};

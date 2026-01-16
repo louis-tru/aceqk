@@ -1,4 +1,10 @@
 "use strict";
+
+import type { EditSession } from "./edit_session";
+import type { LayerConfig } from "./layer/lines";
+import type { Marker, MarkerLike } from "./layer/marker";
+import type { Point, Range } from "./range";
+
 /**
  * @typedef {import("./edit_session").EditSession} EditSession
  * @typedef {{range: import("./range").Range, className: string}} MarkerGroupItem
@@ -13,7 +19,19 @@ Potential improvements:
 - use binary search when looking for hover match
 */
 
-class MarkerGroup {
+export interface MarkerGroupItem {
+	range: Range;
+	className: string;
+}
+
+export interface MarkerGroup extends MarkerLike {
+	readonly MAX_MARKERS: number;
+}
+
+export class MarkerGroup {
+	readonly session: EditSession;
+	private markerType?: "fullLine" | "line";
+	private markers: MarkerGroupItem[];
 	/**
 	 * @param {EditSession} session
 	 * @param {{markerType: "fullLine" | "line" | undefined}} [options] Options controlling the behvaiour of the marker.
@@ -22,14 +40,11 @@ class MarkerGroup {
 	 * - `fullLine`: will fully highlight all the rows within the range, including the characters before and after the range on the respective rows.
 	 * - `line`: will fully highlight the lines within the range but will only cover the characters between the start and end of the range.
 	 */
-	constructor(session, options) {
+	constructor(session: EditSession, options: {markerType?: "fullLine" | "line"} = {}) {
 		if (options)
 			this.markerType = options.markerType;
-		/**@type {import("../ace-internal").Ace.MarkerGroupItem[]}*/
 		this.markers = [];
-		/**@type {EditSession}*/
 		this.session = session;
-		// @ts-expect-error TODO: could potential error here, or most likely missing checks in other places
 		session.addDynamicMarker(this);
 	}
 
@@ -38,7 +53,7 @@ class MarkerGroup {
 	 * @param {import("../ace-internal").Ace.Point} pos
 	 * @returns {import("../ace-internal").Ace.MarkerGroupItem | undefined}
 	 */
-	getMarkerAtPosition(pos) {
+	getMarkerAtPosition(pos: Point) {
 		return this.markers.find(function(marker) {
 			return marker.range.contains(pos.row, pos.column);
 		});
@@ -51,7 +66,7 @@ class MarkerGroup {
 	 * @param {MarkerGroupItem} b second marker.
 	 * @returns {number} negative number if a should be before b, positive number if b should be before a, 0 otherwise.
 	 */
-	markersComparator(a, b) {
+	markersComparator(a: MarkerGroupItem, b: MarkerGroupItem) {
 		return a.range.start.row - b.range.start.row;
 	}
 
@@ -59,9 +74,9 @@ class MarkerGroup {
 	 * Sets marker definitions to be rendered. Limits the number of markers at MAX_MARKERS.
 	 * @param {MarkerGroupItem[]} markers an array of marker definitions.
 	 */
-	setMarkers(markers) {
+	setMarkers(markers: MarkerGroupItem[]) {
 		this.markers = markers.sort(this.markersComparator).slice(0, this.MAX_MARKERS);
-		this.session._signal("changeBackMarker");
+		this.session._signal("changeBackMarker", void 0, this.session); // force marker layer redraw
 	}
 
 	/**
@@ -70,7 +85,7 @@ class MarkerGroup {
 	 * @param {EditSession} session
 	 * @param {LayerConfig} config
 	 */
-	update(html, markerLayer, session, config) {
+	update(html: any, markerLayer: Marker, session: EditSession, config: LayerConfig) {
 		if (!this.markers || !this.markers.length)
 			return;
 		var visibleRangeStartRow = config.firstRow, visibleRangeEndRow = config.lastRow;
@@ -105,7 +120,7 @@ class MarkerGroup {
 			var screenRange = markerVisibleRange.toScreenRange(session);
 			if (screenRange.isEmpty()) {
 				// we are inside a fold
-				foldLine = session.getNextFoldLine(markerVisibleRange.end.row, foldLine);
+				foldLine = session.getNextFoldLine(markerVisibleRange.end.row, foldLine!);
 				if (foldLine && foldLine.end.row > markerVisibleRange.end.row) {
 					visibleRangeStartRow = foldLine.end.row;
 				}
@@ -128,7 +143,5 @@ class MarkerGroup {
 }
 
 // this caps total amount of markers at 10K
-MarkerGroup.prototype.MAX_MARKERS = 10000;
-
-exports.MarkerGroup = MarkerGroup;
+(MarkerGroup.prototype as RemoveReadonly<MarkerGroup>).MAX_MARKERS = 10000;
 

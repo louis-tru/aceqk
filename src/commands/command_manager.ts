@@ -32,7 +32,7 @@ export interface CommandManager extends EventEmitter<CommandManagerEvents>, Incr
 }
 
 export class CommandManager extends MultiHashHandler {
-	private byName: Dict<Command>;
+	public byName: Dict<Command>;
 	private $inReplay?: boolean;
 	private $addCommandToMacro?: (e: any) => void;
 	private macro: [Command, any][] = [];

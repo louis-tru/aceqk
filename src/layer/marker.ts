@@ -14,22 +14,24 @@ export type MarkerRenderer = (html: string[],
 
 export interface MarkerLike {
 	range?: Range;
-	type: string;
+	type?: string | number;
 	renderer?: MarkerRenderer;
-	clazz: string;
 	inFront?: boolean;
 	id?: number;
+	clazz: string;
 	update: (html: string[],
 				// TODO maybe define Marker class
 				marker: Marker,
 				session: EditSession,
 				config: LayerConfig) => void;
-	[key: string]: any;
+	// [key: string]: any;
+	setRegexp?(regExp?: RegExp): void;
+	regExp?: RegExp;
 }
 
 export class Marker {
 	private $padding = 0;
-	private element: Morph & {childNodes: View[]};
+	public element: Morph & {childNodes: View[]};
 	private session: EditSession;
 
 	/**

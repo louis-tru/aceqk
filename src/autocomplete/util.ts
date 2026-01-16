@@ -1,10 +1,6 @@
 "use strict";
 
-/**
- * @typedef {import("../editor").Editor} Editor
- */
-
-import {Ace} from "../../ace-internal";
+import type {Editor} from "../editor";
 
 export function parForEach(
 	array: any[],
@@ -54,7 +50,7 @@ export function retrieveFollowingIdentifier(text: string, pos: number, regex?: R
  * @param editor
  * @return {string}
  */
-export function getCompletionPrefix(editor: Ace.Editor) {
+export function getCompletionPrefix(editor: Editor) {
 	var pos = editor.getCursorPosition();
 	var line = editor.session.getLine(pos.row);
 	var prefix: string | null = null;
@@ -74,7 +70,7 @@ export function getCompletionPrefix(editor: Ace.Editor) {
  * @param {string} [previousChar] if not provided, it falls back to the preceding character in the editor
  * @returns {boolean} whether autocomplete should be triggered
  */
-export function triggerAutocomplete(editor: Ace.Editor, previousChar?: string) {
+export function triggerAutocomplete(editor: Editor, previousChar?: string) {
 	previousChar = previousChar || editor.session.getPrecedingCharacter();
 	return editor.completers.some((completer) => {
 		if (completer.triggerCharacters && Array.isArray(completer.triggerCharacters)) {

@@ -1,13 +1,14 @@
 "use strict";
+
 import {VirtualRenderer as Renderer} from "../virtual_renderer";
 import {Editor} from "../editor";
-import {Range} from "../range";
+import {Range,Point} from "../range";
 import * as lang from "../lib/lang";
 import config from "../config";
-// var event = require("../lib/event");
-// var dom = require("../lib/dom");
-// var userAgent = require("./../lib/useragent");
-import {Window,Box} from "quark";
+import {Window,Text,View,createCss} from "quark";
+import type { Completion, AcePopupNavigation } from "../autocomplete";
+import { getChildren } from "../lib/dom";
+import {MouseEvent} from "../mouse/mouse_event";
 
 const nls = config.nls;
 
@@ -16,20 +17,18 @@ export var getAriaId = function (index: number) {
 };
 
 // Safari requires different ARIA A11Y attributes compared to other browsers
-// var popupAriaRole = userAgent.isSafari ? "menu" : "listbox";
-// var optionAriaRole = userAgent.isSafari ? "menuitem" : "option";
-// var ariaActiveState = userAgent.isSafari ? "aria-current" : "aria-selected";
+const popupAriaRole = /*userAgent.isSafari*/false ? "menu" : "listbox";
+const optionAriaRole = /*userAgent.isSafari*/false ? "menuitem" : "option";
+const ariaActiveState = /*userAgent.isSafari*/false ? "aria-current" : "aria-selected";
 
 /**
  *
- * @param {HTMLElement} [el]
+ * @param {Text} [el]
  * @return {Editor}
  */
-export function $singleLineEditor(el: Box): Editor {
-	var renderer = new Renderer(el);
-
-	renderer.$maxLines = 4;
-	var editor = new Editor(renderer);
+export function $singleLineEditor(el?: Text, editor?: Editor): Editor {
+	editor = editor || new Editor(new Renderer(el));
+	editor.renderer.$maxLines = 4;
 
 	editor.setHighlightActiveLine(false);
 	editor.setShowPrintMargin(false);
@@ -42,31 +41,68 @@ export function $singleLineEditor(el: Box): Editor {
 	return editor;
 };
 
+export interface AcePopupEventsExtension {
+	"click": (e: MouseEvent, emitter: AcePopup) => void;
+	"dblclick": (e: MouseEvent, emitter: AcePopup) => void;
+	"tripleclick": (e: MouseEvent, emitter: AcePopup) => void;
+	"quadclick": (e: MouseEvent, emitter: AcePopup) => void;
+	"show": (e: undefined, emitter: AcePopup) => void;
+	"hide": (e: undefined, emitter: AcePopup) => void;
+	// "select": (hide: boolean, emitter: AcePopup) => void;
+	"changeHoverMarker": (e: any, emitter: AcePopup) => void;
+}
+
+type CompletionData = Completion & {
+	name?: string, className?: string, matchMask?: any, message?: string
+};
+
+export interface AcePopup {
+	setSelectOnHover: (val: boolean) => void,
+	setRow: (line: number) => void,
+	getRow: () => number,
+	getHoveredRow: () => number,
+	filterText: string,
+	isOpen: boolean,
+	isTopdown: boolean,
+	autoSelect: boolean,
+	data: CompletionData[],
+	setData: (data: CompletionData[], filterText?: string) => void,
+	getData: (row: number) => CompletionData,
+	hide: () => void,
+	anchor?: "top" | "bottom",
+	anchorPosition: Point,
+	tryShow: (pos: any, lineHeight: number, anchor?: "top" | "bottom", forceShow?: boolean) => boolean,
+	$borderSize: number,
+	show: (pos: any, lineHeight: number, topdownOnly?: boolean) => void,
+	goTo: (where: AcePopupNavigation) => void,
+	getTextLeftOffset: () => number,
+	$imageSize: number,
+	anchorPos: any,
+	isMouseOver?: boolean,
+	selectedNode?: View,
+}
+
 /**
  * This object is used in some places where needed to show popups - like prompt; autocomplete etc.
  */
-export class AcePopup {
+export class AcePopup extends Editor {
 	/**
 	 * Creates and renders single line editor in popup window. If `parentNode` param is isset, then attaching it to this element.
-	 * @param {Element} [parentNode]
+	 * @param {View} [parentNode]
 	 */
-	constructor(win: Window, parentNode?: Box) {
-		// TODO ... use quark Box instead of HTMLElement
+	constructor(win: Window, parentNode?: View) {
 		// var el = dom.createElement("div");
-		var el = new Box(win);
-		/**@type {AcePopup}*/
-		// @ts-ignore
-		var popup = $singleLineEditor(el);
+		const el = new Text(win);
+		super(new Renderer(el));
+		$singleLineEditor(el, this);
 
+		const popup = this;
 		if (parentNode) {
-			// parentNode.appendChild(el);
 			parentNode.append(el);
 		}
-		// el.style.display = "none";
 		el.style.visible = false;
-		// TODO ... set other styles
-		// popup.renderer.content.style.cursor = "default";
-		// popup.renderer.setStyle("ace_autocomplete");
+		popup.renderer.content.style.cursor = "normal";
+		popup.renderer.setStyle("ace_autocomplete");
 
 		// Set aria attributes for the popup
 		popup.renderer.$textLayer.element.setAttribute("role", popupAriaRole);
@@ -83,16 +119,15 @@ export class AcePopup {
 		popup.$isFocused = true;
 
 		popup.renderer.$cursorLayer.restartTimer = noop;
-		popup.renderer.$cursorLayer.element.style.opacity = "0";
+		popup.renderer.$cursorLayer.element.style.opacity = 0;
 
 		popup.renderer.$maxLines = 8;
 		popup.renderer.$keepTextAreaAtCursor = false;
 
 		popup.setHighlightActiveLine(false);
 		// set default highlight color
-		// @ts-ignore
-		popup.session.highlight("");
-		popup.session.$searchHighlight.clazz = "ace_highlight-marker";
+		popup.session.highlight(void 0);
+		popup.session.$searchHighlight!.clazz = "ace_highlight-marker";
 
 		popup.on("mousedown", function(e) {
 			var pos = e.getDocumentPosition();
@@ -101,7 +136,7 @@ export class AcePopup {
 			e.stop();
 		});
 
-		var lastMouseEvent;
+		var lastMouseEvent: any = null;
 		var hoverMarker = new Range(-1, 0, -1, Infinity);
 		var selectionMarker = new Range(-1, 0, -1, Infinity);
 		selectionMarker.id = popup.session.addMarker(selectionMarker, "ace_active-line", "fullLine");
@@ -110,7 +145,7 @@ export class AcePopup {
 				hoverMarker.id = popup.session.addMarker(hoverMarker, "ace_line-hover", "fullLine");
 			} else if (hoverMarker.id) {
 				popup.session.removeMarker(hoverMarker.id);
-				hoverMarker.id = null;
+				hoverMarker.id = void 0;
 			}
 		};
 		popup.setSelectOnHover(false);
@@ -144,8 +179,9 @@ export class AcePopup {
 		// set aria attributes on all visible elements of the popup
 		popup.renderer.on("afterRender", function () {
 			var t = popup.renderer.$textLayer;
+			var childNodes = getChildren(t.element);
 			for (var row = t.config.firstRow, l = t.config.lastRow; row <= l; row++) {
-				const popupRowElement = /** @type {HTMLElement|null} */(t.element.childNodes[row - t.config.firstRow]);
+				const popupRowElement = (childNodes[row - t.config.firstRow]);
 
 				popupRowElement.setAttribute("role", optionAriaRole);
 				popupRowElement.setAttribute("aria-roledescription", nls("autocomplete.popup.item.aria-roledescription", "item"));
@@ -159,19 +195,19 @@ export class AcePopup {
 					popupRowElement.setAttribute("aria-label", ariaLabel);
 				}
 
-				const highlightedSpans = popupRowElement.querySelectorAll(".ace_completion-highlight");
+				const highlightedSpans = popupRowElement.querySelectorAllForClass(".ace_completion-highlight");
 				highlightedSpans.forEach(span => {
 					span.setAttribute("role", "mark");
 				});
 			}
 		});
-		popup.renderer.on("afterRender", function () {
+		popup.renderer.on("afterRender", () => {
 			var row = popup.getRow();
 			var t = popup.renderer.$textLayer;
-			var selected = /** @type {HTMLElement|null} */(t.element.childNodes[row - t.config.firstRow]);
-			var el = document.activeElement; // Active element is textarea of main editor
+			var selected = (getChildren(t.element)[row - t.config.firstRow]);
+			var el = this.container.window.activeView; // Active element is textarea of main editor
 			if (selected !== popup.selectedNode && popup.selectedNode) {
-				dom.removeCssClass(popup.selectedNode, "ace_selected");
+				popup.selectedNode.removeClass("ace_selected");
 				popup.selectedNode.removeAttribute(ariaActiveState);
 				popup.selectedNode.removeAttribute("id");
 			}
@@ -180,27 +216,28 @@ export class AcePopup {
 			popup.selectedNode = selected;
 			if (selected) {
 				var ariaId = getAriaId(row);
-				dom.addCssClass(selected, "ace_selected");
-				selected.id = ariaId;
+				selected.addClass("ace_selected");
+				selected.setAttribute("id", ariaId);
 				t.element.setAttribute("aria-activedescendant", ariaId);
 				el.setAttribute("aria-activedescendant", ariaId);
 				selected.setAttribute(ariaActiveState, "true");
 			}
 		});
 		var hideHoverMarker = function() { setHoverMarker(-1); };
-		var setHoverMarker = function(row, suppressRedraw) {
+		var setHoverMarker = function(row: number, suppressRedraw?: boolean) {
 			if (row !== hoverMarker.start.row) {
 				hoverMarker.start.row = hoverMarker.end.row = row;
 				if (!suppressRedraw)
-					popup.session._emit("changeBackMarker");
-				popup._emit("changeHoverMarker");
+					popup.session._emit("changeBackMarker", void 0, popup.session);
+				popup._emit("changeHoverMarker", void 0, popup);
 			}
 		};
 		popup.getHoveredRow = function() {
 			return hoverMarker.start.row;
 		};
 
-		event.addListener(popup.container, "mouseout", function() {
+		// event.addListener(popup.container, "mouseout", function() {
+		popup.container.onMouseLeave.on(function() {
 			popup.isMouseOver = false;
 			hideHoverMarker();
 		});
@@ -219,16 +256,15 @@ export class AcePopup {
 
 		var bgTokenizer = popup.session.bgTokenizer;
 		bgTokenizer.$tokenizeRow = function(row) {
-			/**@type {import("../../ace-internal").Ace.Completion &{name?, className?, matchMask?, message?}}*/
 			var data = popup.data[row];
-			var tokens = [];
+			var tokens: any[] = [];
 			if (!data)
 				return tokens;
 			if (typeof data == "string")
 				data = {value: data};
-			var caption = data.caption || data.value || data.name;
+			var caption = data.caption || data.value || data.name || '';
 
-			function addToken(value, className) {
+			function addToken(value: string, className: string) {
 				value && tokens.push({
 					type: (data.className || "") + (className || ""),
 					value: value
@@ -264,7 +300,7 @@ export class AcePopup {
 		bgTokenizer.start = noop;
 
 		popup.session.$computeWidth = function() {
-			return this.screenWidth = 0;
+			return popup.session.screenWidth = 0;
 		};
 
 		// public
@@ -293,10 +329,10 @@ export class AcePopup {
 			if (selectionMarker.start.row != line) {
 				popup.selection.clearSelection();
 				selectionMarker.start.row = selectionMarker.end.row = line || 0;
-				popup.session._emit("changeBackMarker");
+				popup.session._emit("changeBackMarker", void 0, popup.session);
 				popup.moveCursorTo(line || 0, 0);
 				if (popup.isOpen)
-					popup._signal("select");
+					popup._signal("select", void 0, popup);
 			}
 		};
 
@@ -307,12 +343,12 @@ export class AcePopup {
 		});
 
 		popup.hide = function() {
-			this.container.style.display = "none";
+			popup.container.style.visible = false;
 			popup.anchorPos = null;
-			popup.anchor = null;
+			popup.anchor = void 0;
 			if (popup.isOpen) {
 				popup.isOpen = false;
-				this._signal("hide");
+				popup._signal("hide", undefined, popup);
 			}
 		};
 
@@ -337,11 +373,11 @@ export class AcePopup {
 
 			var el = this.container;
 			var scrollBarSize = this.renderer.scrollBar.width || 10;
-			var screenHeight = window.innerHeight - scrollBarSize;
-			var screenWidth = window.innerWidth - scrollBarSize;
+			var screenHeight = this.window.size.height - scrollBarSize;
+			var screenWidth = this.window.size.width - scrollBarSize;
 			var renderer = this.renderer;
 			// var maxLines = Math.min(renderer.$maxLines, this.session.getLength());
-			var maxH = renderer.$maxLines * lineHeight * 1.4;
+			var maxH = (renderer.$maxLines || 0) * lineHeight * 1.4;
 			var dims = { top: 0, bottom: 0, left: 0 };
 
 			var spaceBelow = screenHeight - pos.top - 3 * this.$borderSize - lineHeight;
@@ -375,39 +411,40 @@ export class AcePopup {
 					renderer.$maxPixelHeight = spaceBelow;
 				}
 			} else {
-				renderer.$maxPixelHeight = null;
+				renderer.$maxPixelHeight = void 0;
 			}
 
-
 			if (anchor === "top") {
-				el.style.top = "";
-				el.style.bottom = (screenHeight + scrollBarSize - dims.bottom) + "px";
+				el.style.marginTop = 0;
+				el.style.marginBottom = (screenHeight + scrollBarSize - dims.bottom);
+				el.style.align = "bottom";
 				popup.isTopdown = false;
 			} else {
-				el.style.top = dims.top + "px";
-				el.style.bottom = "";
+				el.style.marginTop = dims.top;
+				el.style.marginBottom = 0;
+				el.style.align = "top";
 				popup.isTopdown = true;
 			}
 
-			el.style.display = "";
+			el.style.visible = true;
 
 			var left = pos.left;
-			if (left + el.offsetWidth > screenWidth)
-				left = screenWidth - el.offsetWidth;
+			var clSize = el.clientSize;
+			if (left + clSize.width > screenWidth)
+				left = screenWidth - clSize.width;
 
-			el.style.left = left + "px";
-			el.style.right = "";
-			dom.$fixPositionBug(el);
+			el.style.marginLeft = left;
+			el.style.marginRight = 0;
+			// dom.$fixPositionBug(el);
 
 			if (!popup.isOpen) {
 				popup.isOpen = true;
-				this._signal("show");
+				this._signal("show", void 0, this);
 				lastMouseEvent = null;
 			}
 
 			popup.anchorPos = pos;
 			popup.anchor = anchor;
-			
 
 			return true;
 		};
@@ -442,96 +479,97 @@ export class AcePopup {
 	}
 }
 
-dom.importCssString(`
-.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-	background-color: #CAD6FA;
-	z-index: 1;
-}
-.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-	background-color: #3a674e;
-}
-.ace_editor.ace_autocomplete .ace_line-hover {
-	border: 1px solid #abbffe;
-	margin-top: -1px;
-	background: rgba(233,233,253,0.4);
-	position: absolute;
-	z-index: 2;
-}
-.ace_dark.ace_editor.ace_autocomplete .ace_line-hover {
-	border: 1px solid rgba(109, 150, 13, 0.8);
-	background: rgba(58, 103, 78, 0.62);
-}
-.ace_completion-meta {
-	opacity: 0.5;
-	margin-left: 0.9em;
-}
-.ace_completion-message {
-	margin-left: 0.9em;
-	color: blue;
-}
-.ace_editor.ace_autocomplete .ace_completion-highlight{
-	color: #2d69c7;
-}
-.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{
-	color: #93ca12;
-}
-.ace_editor.ace_autocomplete {
-	width: 300px;
-	z-index: 200000;
-	border: 1px lightgray solid;
-	position: fixed;
-	box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-	line-height: 1.4;
-	background: #fefefe;
-	color: #111;
-}
-.ace_dark.ace_editor.ace_autocomplete {
-	border: 1px #484747 solid;
-	box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);
-	line-height: 1.4;
-	background: #25282c;
-	color: #c1c1c1;
-}
-.ace_autocomplete .ace_text-layer  {
-	width: calc(100% - 8px);
-}
-.ace_autocomplete .ace_line {
-	display: flex;
-	align-items: center;
-}
-.ace_autocomplete .ace_line > * {
-	min-width: 0;
-	flex: 0 0 auto;
-}
-.ace_autocomplete .ace_line .ace_ {
-	flex: 0 1 auto;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.ace_autocomplete .ace_completion-spacer {
-	flex: 1;
-}
-.ace_autocomplete.ace_loading:after  {
-	content: "";
-	position: absolute;
-	top: 0px;
-	height: 2px;
-	width: 8%;
-	background: blue;
-	z-index: 100;
-	animation: ace_progress 3s infinite linear;
-	animation-delay: 300ms;
-	transform: translateX(-100%) scaleX(1);
-}
-@keyframes ace_progress {
-	0% { transform: translateX(-100%) scaleX(1) }
-	50% { transform: translateX(625%) scaleX(2) } 
-	100% { transform: translateX(1500%) scaleX(3) } 
-}
-@media (prefers-reduced-motion) {
-	.ace_autocomplete.ace_loading:after {
-		transform: translateX(625%) scaleX(2);
-		animation: none;
-	 }
-}
-`, "autocompletion.css", false);
+createCss({
+	'.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line': {
+		backgroundColor: '#CAD6FA',
+		zIndex: 1
+	},
+	'.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line': {
+		backgroundColor: '#3a674e',
+	},
+	'.ace_editor.ace_autocomplete .ace_line-hover': {
+		border: '1 #abbffe',
+		marginTop: -1,
+		backgroundColor: 'rgba(233,233,253,0.4)',
+		// position: 'absolute',
+		zIndex: 2,
+	},
+	'.ace_dark.ace_editor.ace_autocomplete .ace_line-hover': {
+		border: '1 rgba(109, 150, 13, 0.8)',
+		backgroundColor: 'rgba(58, 103, 78, 0.62)',
+	},
+	'.ace_completion-meta ': {
+		opacity: 0.5,
+		// marginLeft: '0.9em',
+	},
+	'.ace_completion-message ': {
+		// marginLeft: '0.9em',
+		textColor: '#00f',
+	},
+	'.ace_editor.ace_autocomplete .ace_completion-highlight': {
+		textColor: '#2d69c7',
+	},
+	'.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight': {
+		textColor: '#93ca12',
+	},
+	'.ace_editor.ace_autocomplete': {
+		width: 300,
+		zIndex: 200000,
+		border: '1 #D3D3D3',
+		// position: 'fixed',
+		boxShadow: '2 3 5 rgba(0,0,0,.2)',
+		textLineHeight: 1.4,
+		backgroundColor: '#fefefe',
+		color: '#111',
+	},
+	'.ace_dark.ace_editor.ace_autocomplete': {
+		border: '1 #484747',
+		boxShadow: '2 3 5 rgba(0, 0, 0, 0.51)',
+		textLineHeight: 1.4,
+		backgroundColor: '#25282c',
+		color: '#c1c1c1',
+	},
+	'.ace_autocomplete .ace_text-layer': {
+		width: '8!',
+	},
+	'.ace_autocomplete .ace_line': {
+		// display: flex;
+		itemsAlign: 'center',
+	},
+	// '.ace_autocomplete .ace_line > *': {
+	// 	minWidth: 0,
+	// 	maxWidth: 'auto',
+	// 	// flex: 0 0 auto;
+	// },
+	'.ace_autocomplete .ace_line .ace_': {
+		// flex: 0 1 auto;
+		// overflow: hidden;
+		textOverflow: 'ellipsis',
+	},
+	'.ace_autocomplete .ace_completion-spacer': {
+		// flex: 1;
+	},
+	// '.ace_autocomplete.ace_loading:after': {
+		// content: "";
+		// position: absolute;
+		// top: 0px;
+		// height: 2px;
+		// width: 8%;
+		// background: blue;
+		// z-index: 100;
+		// animation: ace_progress 3s infinite linear;
+		// animation-delay: 300ms;
+		// transform: translateX(-100%) scaleX(1);
+	// },
+	// @keyframes ace_progress {
+	// 	0% { transform: translateX(-100%) scaleX(1) }
+	// 	50% { transform: translateX(625%) scaleX(2) } 
+	// 	100% { transform: translateX(1500%) scaleX(3) } 
+	// }
+	// @media (prefers-reduced-motion) {
+	// 	.ace_autocomplete.ace_loading:after {
+	// 		transform: translateX(625%) scaleX(2);
+	// 		animation: none;
+	// 	 }
+	// }
+});//	`, "autocompletion.css", false);

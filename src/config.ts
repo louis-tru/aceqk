@@ -16,7 +16,6 @@ export interface ConfigOptions {
 	useStrictCSP: boolean | null
 }
 
-/** @type {import("../ace-internal").Ace.ConfigOptions} */
 var options: ConfigOptions = {
 	packaged: false,
 	workerPath: null as string | null,
@@ -54,8 +53,7 @@ var reportErrorIfPathIsNotConfigured = function() {
 	}
 };
 
-class Config extends AppConfig {
-
+export class Config extends AppConfig {
 	/**
 	 * @template {keyof import("../ace-internal").Ace.ConfigOptions} K
 	 * @param {K} key - The key of the config option to retrieve.
@@ -218,6 +216,8 @@ class Config extends AppConfig {
 }
 
 const Default = new Config();
+
+export const nls = Default.nls.bind(Default);
 
 module.exports = exports = Default;
 export default Default;

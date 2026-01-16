@@ -1,10 +1,12 @@
 
 import {Range} from "../range";
-import {Ace} from "../../ace-internal";
+import type {Editor} from "../editor";
+import type {Document} from "../document";
+import type {Point} from "../range";
 
 var splitRegex = /[^a-zA-Z_0-9\$\-\u00C0-\u1FFF\u2C00-\uD7FF\w]+/;
 
-function getWordIndex(doc: Ace.Document, pos: Ace.Point) {
+function getWordIndex(doc: Document, pos: Point) {
 	var textBefore = doc.getTextRange(Range.fromPoints({
 		row: 0,
 		column: 0
@@ -16,7 +18,7 @@ function getWordIndex(doc: Ace.Document, pos: Ace.Point) {
  * Does a distance analysis of the word `prefix` at position `pos` in `doc`.
  * @return Map
  */
-function wordDistance(doc: Ace.Document, pos: Ace.Point) {
+function wordDistance(doc: Document, pos: Point) {
 	var prefixPos = getWordIndex(doc, pos);
 	var words = doc.getValue().split(splitRegex);
 	var wordScores = Object.create(null);
@@ -39,9 +41,9 @@ function wordDistance(doc: Ace.Document, pos: Ace.Point) {
 }
 
 export function getCompletions(
-		editor: Ace.Editor,
-		session: Ace.Document,
-		pos: Ace.Point, prefix: string, 
+		editor: Editor,
+		session: Document,
+		pos: Point, prefix: string, 
 		callback: (err: any, completions: any[]) => void)
 {
 	var wordScore = wordDistance(session, pos);

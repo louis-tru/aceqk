@@ -4,7 +4,7 @@ import * as useragent from "./lib/env";
 import * as lang from "./lib/lang";
 import * as oop from "./lib/oop";
 import {TextInput} from "./keyboard/textinput";
-import {MouseHandler} from "./mouse/mouse_handler";
+import {MouseHandler, MouseHandlerOptions} from "./mouse/mouse_handler";
 import {FoldHandler} from "./mouse/fold_handler";
 import {KeyBinding} from "./keyboard/keybinding";
 import {EditSession,EditSessionOptions,Operation} from "./edit_session";
@@ -20,24 +20,67 @@ import * as clipboard from "./clipboard";
 import keys from './lib/keys';
 import {HoverTooltip} from "./tooltip";
 import {Ace} from "../ace-internal";
+import type {InlineAutocomplete} from "./ext/inline_autocomplete";
 import type {OptionsProvider} from "./lib/app_config";
 import type {GutterTooltip} from "./mouse/default_gutter_handler";
 import type { Composition, VirtualRenderer, VirtualRendererOptions } from "./virtual_renderer";
-import {Box, Text} from "quark";
+import qk, {Window, Box, Text} from "quark";
 import type {KeyboardHandler, BindingCmd, Command} from "./keyboard/hash_handler";
 import type { KeyEvent } from "quark/event";
+import type {MouseEvent,ClipboardEvent} from "./mouse/mouse_event";
 import type {EditorMultiSelectProperties} from './multi_select'
-import { Vec2 } from "quark/types";
+import type { Vec2 } from "quark/types";
 import type {PromptOptions} from "./ext/prompt";
 import type { LineWidgets } from "./line_widgets";
 import type {IncrementalSearchOptions} from "./incremental_search";
+import type { AcePopupEventsExtension } from "./autocomplete/popup";
+import type { Autocomplete, Completer } from "./autocomplete";
+import type { Token } from "./background_tokenizer";
+import type { Selection } from "./selection";
+import './lib/ext'; // import extensions to quark.View and quark.event.KeyEvent
+import type { SearchBox } from "./ext/searchbox";
+import type {CodeLenseEditorExtension} from "./ext/code_lens";
+import type {ElasticTabstopsOptionsEditorExtension} from "./ext/elastic_tabstops_lite";
+import type {EmmetOptionsEditorExtension} from "./ext/emmet";
 
 const nls = config.nls;
 
-export interface EditorEvents {
+export interface ElasticTabstopsEditorExtension {
+	elasticTabstops?: import("./ext/elastic_tabstops_lite").ElasticTabstopsLite;
+}
+
+export interface TextareaEditorExtension {
+	setDisplaySettings?: (settings: any) => void;
+}
+
+export interface PromptEditorExtension {
+	cmdLine?: Editor;
+}
+
+export interface OptionsEditorExtension {
+	$options?: any;
+}
+
+export interface EmacsEditorExtension {
+	setEmacsMark?: (p?: Point) => void;
+	pushEmacsMark?: (p?: Point, activate?: boolean) => void;
+	emacsMark?: () => Point | undefined;
+	showCommandLine?: (arg: any) => void;
+	popEmacsMark?: () => Point | undefined;
+	getLastEmacsMark?: (p?: Point) => Point | undefined;
+	emacsMarkForSelection?: (replacement?: Point) => Point;
+}
+
+export interface TabstopManagerEditorExtension {
+	tabstopManager?: import("./snippets").TabstopManager;
+	insertSnippet(content: any, options: {}): void;
+	expandSnippet(options: {}): any;
+}
+
+export interface EditorEvents extends AcePopupEventsExtension {
 	"change": (delta: Delta, emitter: Editor) => void;
-	"changeSelection": (e: undefined, emitter: Editor) => void;
-	"input": (e: undefined, emitter: Editor) => void;
+	"changeSelection": (e: void, emitter: Editor) => void;
+	"input": (e: void, emitter: Editor) => void;
 	/**
 	 * Emitted whenever the [[EditSession]] changes.
 	 * @param e An object with two properties, `oldSession` and `session`, that represent the old and new [[EditSession]]s.
@@ -76,19 +119,30 @@ export interface EditorEvents {
 	//from code_lens extension
 	"codeLensClick": (e: any, emitter: Editor) => void;
 
-	"select": (e: undefined, emitter: Editor) => void;
+	"select": (e: void, emitter: Editor) => void;
 	"gutterkeydown": (e: GutterKeyboardEvent, emitter: Editor) => void;
 	"gutterclick": (e: MouseEvent, emitter: Editor) => void;
+	"guttermousedown": (e: MouseEvent, emitter: Editor) => void;
+	"gutterdblclick": (e: MouseEvent, emitter: Editor) => void;
 	"showGutterTooltip": (e: GutterTooltip, emitter: Editor) => void;
 	"hideGutterTooltip": (e: GutterTooltip, emitter: Editor) => void;
-	"compositionStart": (e: undefined, emitter: Editor) => void;
+	"compositionStart": (e: void, emitter: Editor) => void;
 
 	// from incremental search extension
 	"incrementalSearchSettingChanged": (e: {isEnabled: boolean}, emitter: Editor) => void;
+
+	// from default commands extension
+	"cut": (e: Range, emitter: Editor) => void;
 }
 
-export interface EditorOptions extends EditSessionOptions, Ace.MouseHandlerOptions,
-		VirtualRendererOptions, IncrementalSearchOptions {
+export interface EditorOptions extends
+	EditSessionOptions,
+	MouseHandlerOptions,
+	VirtualRendererOptions,
+	IncrementalSearchOptions,
+	ElasticTabstopsOptionsEditorExtension,
+	EmmetOptionsEditorExtension
+{
 	selectionStyle: "fullLine" | "screenLine" | "text" | "line";
 	highlightActiveLine: boolean;
 	highlightSelectedWord: boolean;
@@ -112,45 +166,17 @@ export interface EditorOptions extends EditSessionOptions, Ace.MouseHandlerOptio
 	relativeLineNumbers: boolean;
 	enableMultiselect: boolean;
 	enableKeyboardAccessibility: boolean;
-	enableCodeLens: boolean;
+	enableCodeLens: boolean; // @file ext/code_lens
 	textInputAriaLabel: string;
 	enableMobileMenu: boolean;
-}
-
-export interface CodeLenseEditorExtension {
-	codeLensProviders?: Ace.CodeLenseProvider[];
-	$codeLensClickHandler?: any;
-	$updateLenses?: () => void;
-	$updateLensesOnInput?: () => void;
-}
-
-export interface ElasticTabstopsEditorExtension {
-	elasticTabstops?: import("./ext/elastic_tabstops_lite").ElasticTabstopsLite;
-}
-
-export interface TextareaEditorExtension {
-	setDisplaySettings?: (settings: any) => void;
-}
-
-export interface PromptEditorExtension {
-	cmdLine?: Editor;
-}
-
-export interface OptionsEditorExtension {
-	$options?: any;
-}
-
-export interface EmacsEditorExtension {
-	pushEmacsMark?: (p: any, activate: boolean) => void;
-	emacsMark?: () => boolean;
-	showCommandLine?: (arg: any) => void;
 }
 
 export interface Editor extends EventEmitter<EditorEvents>,
 		EditorMultiSelectProperties,
 		OptionsProvider<EditorOptions>,
 		CodeLenseEditorExtension, ElasticTabstopsEditorExtension,
-		TextareaEditorExtension, PromptEditorExtension, OptionsEditorExtension, EmacsEditorExtension {
+		TextareaEditorExtension, PromptEditorExtension, OptionsEditorExtension, 
+		EmacsEditorExtension, TabstopManagerEditorExtension {
 	session: EditSession;
 	$mergeUndoDeltas?: any,
 	$highlightSelectedWord?: boolean,
@@ -163,14 +189,16 @@ export interface Editor extends EventEmitter<EditorEvents>,
 	$selectionStyle?: string,
 	env?: any;
 	widgetManager?: LineWidgets,
-	completer?: Ace.Autocomplete | Ace.InlineAutocomplete,
-	completers: Ace.Completer[],
+	completer?: Autocomplete | InlineAutocomplete,
+	completers: Completer[],
 	$highlightTagPending?: boolean,
 	showKeyboardShortcuts?: () => void,
 	showSettingsMenu?: () => void,
-	searchBox?: Ace.SearchBox,
-	// _eventRegistry?: any,
+	searchBox?: SearchBox,
+	_eventRegistry?: any,
 	$textInputAriaLabel?: string;
+	$emacsModeHandler?: import("./keyboard/emacs").EmacsKeyboardHandler;
+	$handlesEmacsOnCopy?: boolean;
 }
 
 /**
@@ -184,15 +212,16 @@ export class Editor extends EventEmitter<EditorEvents> {
 	readonly id: string = "editor" + (++Editor.$uid);
 	private static $uid: number = 0;
 	public session: EditSession;
-	private $toDestroy: any[] = [];
+	public $toDestroy: any[] = [];
 	readonly renderer: VirtualRenderer;
 	readonly container: Text;
 	readonly commands: CommandManager;
 	readonly textInput: TextInput;
-	private $mouseHandler: MouseHandler;
+	public $mouseHandler: MouseHandler;
 	public keyBinding: KeyBinding;
 	public $search: Search;
 	private _$emitInputEvent: ReturnType<typeof lang.delayedCall>;
+	readonly window: Window;
 
 	/**
 	 * Creates a new `Editor` object.
@@ -206,6 +235,7 @@ export class Editor extends EventEmitter<EditorEvents> {
 		const container = renderer.getContainerElement();
 		this.container = container;
 		this.renderer = renderer;
+		this.window = renderer.window;
 		this.commands = new CommandManager(useragent.macOS ? "mac" : "win", defaultCommands);
 		this.textInput = new TextInput(renderer.getTextAreaContainer(), this);
 		this.renderer.textarea = this.textInput.getElement();
@@ -261,9 +291,9 @@ export class Editor extends EventEmitter<EditorEvents> {
 	}
 
 	private previousCommand?: string;
-	private curOp?: Operation;
-	private prevOp: Operation = {};
-	public selection: Ace.Selection;
+	public curOp?: Operation;
+	public prevOp: Operation = {};
+	public selection: Selection;
 	private $lastSel?: Ace.Range | Ace.Range[];
 	private $mergeableCommands = ["backspace", "del", "insertstring"];
 	private $toggleWordPairs = [
@@ -414,6 +444,8 @@ export class Editor extends EventEmitter<EditorEvents> {
 	 **/
 	setSession(session: EditSession) {
 		if (this.session == session)
+			return;
+		if (!session)
 			return;
 
 		// make sure operationEnd events are not emitted to wrong session
@@ -697,7 +729,7 @@ export class Editor extends EventEmitter<EditorEvents> {
 		this.textInput.blur();
 	}
 
-	private $isFocused?: boolean;
+	public $isFocused?: boolean;
 
 	/**
 	 * Emitted once the editor comes into focus.
@@ -1987,7 +2019,7 @@ export class Editor extends EventEmitter<EditorEvents> {
 		var cursor =  this.selection.getCursor();
 		var url = this.findLinkAt(cursor.row, cursor.column);
 		if (url)
-			window.open(url, '_blank');
+			qk.app.openURL(url); // open link in external browser
 		return url != null;
 	}
 
@@ -2385,10 +2417,10 @@ export class Editor extends EventEmitter<EditorEvents> {
 	 * @param {boolean} [select]
 	 * @param {boolean} [expand]
 	 */
-	jumpToMatching(select: boolean, expand: boolean) {
+	jumpToMatching(select?: boolean, expand?: boolean) {
 		var cursor = this.getCursorPosition();
 		var iterator = new TokenIterator(this.session, cursor.row, cursor.column);
-		var prevToken = iterator.getCurrentToken();
+		var prevToken: Token | null = iterator.getCurrentToken();
 		var tokenCount = 0;
 		if (prevToken && prevToken.type.indexOf('tag-name') !== -1) {
 			prevToken = iterator.stepBackward();
@@ -2401,7 +2433,7 @@ export class Editor extends EventEmitter<EditorEvents> {
 		var matchType;
 		var found = false;
 		var depth: Dict<number> = {};
-		var i = cursor.column - token.start;
+		var i = cursor.column - token.start!;
 		var bracketType;
 		var brackets = {
 			")": "(",
@@ -2449,10 +2481,10 @@ export class Editor extends EventEmitter<EditorEvents> {
 					depth[token.value] = 0;
 				}
 
-				if (prevToken.value === '<' && tokenCount > 1) {
+				if (prevToken!.value === '<' && tokenCount > 1) {
 					depth[token.value]++;
 				}
-				else if (prevToken.value === '</') {
+				else if (prevToken!.value === '</') {
 					depth[token.value]--;
 				}
 
@@ -2921,7 +2953,7 @@ export class Editor extends EventEmitter<EditorEvents> {
 				if (pos.top >= 0 && top + rect.y < 0) {
 					shouldScroll = true;
 				} else if (pos.top < config.height &&
-					pos.top + rect.y + config.lineHeight > window.innerHeight) {
+					pos.top + rect.y + config.lineHeight > self.window.size.height) {
 					shouldScroll = false;
 				} else {
 					shouldScroll = null;
@@ -3101,29 +3133,29 @@ config.defineOptions(Editor.prototype, "editor", {
 				this.renderer.enableKeyboardAccessibility = true;
 				this.renderer.keyboardFocusClassName = "ace_keyboard-focus";
 
-				this.textInput.getElement().data["tabindex"] = -1;
+				this.textInput.getElement().setAttribute("tabindex", -1);
 				// VoiceOver on Mac OS works best with single line in the textarea, the screen readers on
 				// Windows work best with multiple lines in the textarea.
 				this.textInput.setNumberOfExtraLines(useragent.windows ? 3 : 0);
-				this.renderer.scroller.data["tabindex"] = 0;
-				this.renderer.scroller.data["role"] = "group";
-				this.renderer.scroller.data["aria-roledescription"] = nls("editor.scroller.aria-roledescription", "editor");
+				this.renderer.scroller.setAttribute("tabindex", 0);
+				this.renderer.scroller.setAttribute("role", "group");
+				this.renderer.scroller.setAttribute("aria-roledescription", nls("editor.scroller.aria-roledescription", "editor"));
 				this.renderer.scroller.cssclass.add(this.renderer.keyboardFocusClassName);
-				this.renderer.scroller.data["aria-label"] =
-					nls("editor.scroller.aria-label", "Editor content, press Enter to start editing, press Escape to exit");
+				this.renderer.scroller.setAttribute("aria-label",
+					nls("editor.scroller.aria-label", "Editor content, press Enter to start editing, press Escape to exit"));
 
 				this.renderer.scroller.onKeyUp.on(focusOnEnterKeyup);
 				this.commands.addCommand(blurCommand);
 
-				this.renderer.$gutter.data["tabindex"] = 0;
-				this.renderer.$gutter.data["aria-hidden"] = false;
-				this.renderer.$gutter.data["role"] = "group";
-				this.renderer.$gutter.data["aria-roledescription"] = nls("editor.gutter.aria-roledescription", "editor gutter");
-				this.renderer.$gutter.data["aria-label"] =
-					nls("editor.gutter.aria-label", "Editor gutter, press Enter to interact with controls using arrow keys, press Escape to exit");
+				this.renderer.$gutter.setAttribute("tabindex", 0);
+				this.renderer.$gutter.setAttribute("aria-hidden", false);
+				this.renderer.$gutter.setAttribute("role", "group");
+				this.renderer.$gutter.setAttribute("aria-roledescription", nls("editor.gutter.aria-roledescription", "editor gutter"));
+				this.renderer.$gutter.setAttribute("aria-label",
+					nls("editor.gutter.aria-label", "Editor gutter, press Enter to interact with controls using arrow keys, press Escape to exit"));
 				this.renderer.$gutter.cssclass.add(this.renderer.keyboardFocusClassName);
 
-				this.renderer.content.data["aria-hidden"] = true;
+				this.renderer.content.setAttribute("aria-hidden", true);
 
 				if (!gutterKeyboardHandler)
 					gutterKeyboardHandler = new GutterKeyboardHandler(this);
@@ -3136,24 +3168,24 @@ config.defineOptions(Editor.prototype, "editor", {
 			} else {
 				this.renderer.enableKeyboardAccessibility = false;
 
-				this.textInput.getElement().data["tabindex"] = 0;
+				this.textInput.getElement().setAttribute("tabindex", 0);
 				this.textInput.setNumberOfExtraLines(0);
-				this.renderer.scroller.data["tabindex"] = -1;
-				this.renderer.scroller.data["role"] = null;
-				this.renderer.scroller.data["aria-roledescription"] = null;
+				this.renderer.scroller.setAttribute("tabindex", -1);
+				this.renderer.scroller.setAttribute("role", null);
+				this.renderer.scroller.setAttribute("aria-roledescription", null);
 				this.renderer.scroller.cssclass.remove(this.renderer.keyboardFocusClassName||'');
-				this.renderer.scroller.data["aria-label"] = null;
+				this.renderer.scroller.setAttribute("aria-label", null);
 
 				this.renderer.scroller.removeEventListener("keyup", focusOnEnterKeyup.bind(this));
 				this.commands.removeCommand(blurCommand);
 
-				this.renderer.content.data["aria-hidden"] = null;
+				this.renderer.content.setAttribute("aria-hidden", null);
 
-				this.renderer.$gutter.data["tabindex"] = -1;
-				this.renderer.$gutter.data["aria-hidden"] = true;
-				this.renderer.$gutter.data["role"] = null;
-				this.renderer.$gutter.data["aria-roledescription"] = null;
-				this.renderer.$gutter.data["aria-label"] = null;
+				this.renderer.$gutter.setAttribute("tabindex", -1);
+				this.renderer.$gutter.setAttribute("aria-hidden", true);
+				this.renderer.$gutter.setAttribute("role", null);
+				this.renderer.$gutter.setAttribute("aria-roledescription", null);
+				this.renderer.$gutter.setAttribute("aria-label", null);
 				this.renderer.$gutter.cssclass.remove(this.renderer.keyboardFocusClassName||'');
 
 				if (gutterKeyboardHandler)

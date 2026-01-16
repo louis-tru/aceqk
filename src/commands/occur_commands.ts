@@ -1,6 +1,6 @@
 
 import {Occur} from "../occur";
-import type {Command} from ".";
+import type {Command} from "../keyboard/hash_handler";
 import type { Editor } from "../editor";
 import {HashHandler} from "../keyboard/hash_handler";
 
@@ -39,7 +39,7 @@ const occurCommands: Command[] = [{
 }];
 
 class OccurKeyboardHandler extends HashHandler {
-	private isOccurHandler = true;
+	public isOccurHandler = true;
 	private $editor: Editor;
 
 	constructor(editor: Editor) {
@@ -67,7 +67,7 @@ class OccurKeyboardHandler extends HashHandler {
 
 	static uninstallFrom(editor: Editor) {
 	editor.commands.removeCommands(occurCommands);
-	var handler = editor.getKeyboardHandler();
+	var handler = editor.getKeyboardHandler() as OccurKeyboardHandler;
 	if (handler.isOccurHandler)
 		editor.keyBinding.removeKeyboardHandler(handler);
 	};

@@ -1,30 +1,77 @@
 "use strict";
 
-// var event = require("../lib/event");
-// var useragent = require("../lib/useragent");
-import type {MouseEvent as UIMouseEvent} from "quark/event";
+import * as useragent from "../lib/env";
+import * as event from "../lib/event";
+import {MouseEvent as UIMouseEvent} from "quark/event";
+import type {UIEvent, ClickEvent, KeyEvent} from "quark/event";
 import type { Editor } from "../editor";
+import type { Point } from "../range";
+import { KeyboardKeyCode } from "quark/keyboard";
+import { Vec2 } from "quark/types";
+
+export type ClipboardEvent = UIEvent;
 
 /*
  * Custom Ace mouse event
  */
 export class MouseEvent {
-	domEvent: UIMouseEvent;
-	constructor(domEvent: UIMouseEvent, editor: Editor) {
-		/** @type {number} */this.speed;
-		/** @type {number} */this.wheelX;
-		/** @type {number} */this.wheelY;
+	public domEvent: KeyEvent & {_clicks?: number};
+	public x: number;
+	public y: number;
+	public position: Vec2;
+	public editor: Editor;
+	private $pos: Point | null;
+	private $inSelection: boolean | null;
+	public propagationStopped: boolean;
+	public defaultPrevented: boolean;
+	public speed: number;
+	public wheelX: number;
+	public wheelY: number;
+	readonly detail: number;
+	public time: number = 0;
+
+	get clientY() {
+		return this.x;
+	}
+
+	get clientX() {
+		return this.y;
+	}
+
+	/**
+	 * @param {UIMouseEvent | ClickEvent} domEvent
+	 * @param {Editor} editor
+	 */
+	constructor(domEvent: UIMouseEvent | ClickEvent, editor: Editor) {
 		this.domEvent = domEvent;
 		this.editor = editor;
 
-		this.x = this.clientX = domEvent.clientX;
-		this.y = this.clientY = domEvent.clientY;
+		this.x = domEvent.position.x;
+		this.y = domEvent.position.y;
+		this.position = Vec2.new(this.x, this.y);
+		this.speed = 1;
 
 		this.$pos = null;
 		this.$inSelection = null;
 
 		this.propagationStopped = false;
 		this.defaultPrevented = false;
+		this.detail = 0;
+
+		if (domEvent.keycode == KeyboardKeyCode.MOUSE_LEFT && domEvent instanceof UIMouseEvent) {
+			const now = Date.now();
+			let detail = domEvent.sender.getAttribute("detail") as number || 0;
+			let detailTime = domEvent.sender.getAttribute("detailTime") as number || 0;
+			if (now - detailTime > 400) {
+				detail = 1;
+				detailTime = now;
+			} else {
+				detail++;
+			}
+			domEvent.sender.setAttribute("detail", detail);
+			domEvent.sender.setAttribute("detailTime", detailTime);
+			this.detail = detail;
+		}
 	}
 	
 	stopPropagation() {
@@ -47,11 +94,11 @@ export class MouseEvent {
 	 * 
 	 * @return {Object} 'row' and 'column' of the document position
 	 */
-	getDocumentPosition() {
+	getDocumentPosition(): Point {
 		if (this.$pos)
 			return this.$pos;
 		
-		this.$pos = this.editor.renderer.screenToTextCoordinates(this.clientX, this.clientY);
+		this.$pos = this.editor.renderer.screenToTextCoordinates(this.position.x, this.position.y);
 		return this.$pos;
 	}
 
@@ -103,10 +150,10 @@ export class MouseEvent {
 	 * @return {Boolean} whether the shift key was pressed when the event was emitted
 	 */
 	getShiftKey() {
-		return this.domEvent.shiftKey;
+		return this.domEvent.shift;
 	}
 
 	getAccelKey() {
-		return useragent.isMac ? this.domEvent.metaKey : this.domEvent.ctrlKey;
+		return useragent.isMac ? this.domEvent.command : this.domEvent.ctrl;
 	}
 }

@@ -4,14 +4,15 @@
  */
 import {snippetManager} from "../snippets";
 import {AceInlineScreenReader} from "./inline_screenreader";
-import { Ace } from "../../ace-internal";
+import type {Editor} from "../editor";
+import type { Completion } from "../autocomplete";
 
 /**
  * This object is used to manage inline code completions rendered into an editor with ghost text.
  */
 export class AceInline {
 
-	editor: Ace.Editor | null;
+	editor: Editor | null;
 	inlineScreenReader: AceInlineScreenReader | null;
 
 	/**
@@ -28,7 +29,7 @@ export class AceInline {
 	 * @param {string} prefix
 	 * @returns {boolean} True if the completion could be rendered to the editor, false otherwise
 	 */
-	show(editor: Ace.Editor, completion?: Ace.Completion, prefix?: string): boolean {
+	show(editor: Editor, completion?: Completion, prefix?: string): boolean {
 		prefix = prefix || "";
 		if (editor && this.editor && this.editor !== editor) {
 			this.hide();

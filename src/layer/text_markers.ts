@@ -6,6 +6,7 @@ import { View, Label, Text as TextView, ViewType } from "quark";
 import type { VirtualRenderer } from "../virtual_renderer";
 import {Editor} from "../editor";
 import config from "../config";
+import { removeClassRecursive,getChildren,replaceChild } from "../lib/dom";
 
 export type TextMarker = {
 	range: IRange;
@@ -15,47 +16,13 @@ export type TextMarker = {
 
 export type TextMarkerMixin = typeof textMarkerMixin;
 
-// Removes a class from a View and its children recursively
-export function removeClass(element: View, className: string, deep = false) {
-	if (!element)
-		return;
-	var v = element.first;
-	while (v) {
-		v.cssclass.remove(className);
-		if (deep)
-			removeClass(v, className, deep);
-		v = v.next;
-	}
-}
-
-export function childViews(element: View): View[] {
-	var nodes: View[] = [];
-	var v = element.first;
-	while (v) {
-		nodes.push(v);
-		v = v.next;
-	}
-	return nodes;
-}
-
-export function replaceChild(node: View, newChildren: View[] | View) {
-	if (!Array.isArray(newChildren)) {
-		newChildren = [newChildren];
-	}
-	newChildren.forEach(fragNode => {
-		node.after(fragNode);
-		node = fragNode;
-	});
-	node.remove();
-}
-
 const textMarkerMixin = {
 	/**
 	 * @param {string} className
 	 * @this {Text}
 	 */
 	$removeClass(this: Text, className: string) {
-		removeClass(this.element, className, true);
+		removeClassRecursive(this.element, className, true);
 	},
 	/**
 	 * @this {Text}
@@ -107,7 +74,7 @@ const textMarkerMixin = {
 
 		var lineElements: View[] = [];
 		if (lineElement.cssclass.has('ace_line_group')) {
-			lineElements = childViews(lineElement);
+			lineElements = getChildren(lineElement);
 		}
 		else {
 			lineElements = [lineElement];
@@ -115,11 +82,11 @@ const textMarkerMixin = {
 
 		var currentColumn = 0;
 		lineElements.forEach((lineElement) => {
-			const childNodes = childViews(lineElement);
+			const childNodes = getChildren(lineElement);
 			for (let i = 0; i < childNodes.length; i++) {
 				let subChildNodes = [childNodes[i]];
 				let parentNode = lineElement;
-				let childNodes2 = childViews(childNodes[i]);
+				let childNodes2 = getChildren(childNodes[i]);
 				if (childNodes2.length > 0) {
 					subChildNodes = childNodes2;
 					parentNode = childNodes[i];

@@ -8,7 +8,7 @@
  */
 import {applyDelta} from "./apply_delta";
 import {EventEmitter} from "./lib/event_emitter";
-import {Range,Delta} from "./range";
+import {Range,Delta, IRange} from "./range";
 import {Anchor} from "./anchor";
 import {Ace} from "../ace-internal";
 
@@ -35,9 +35,8 @@ export interface DocumentEvents {
  * At its core, `Document`s are just an array of strings, with each row in the document matching up to the array index.
  **/
 export class Document extends EventEmitter<DocumentEvents> {
-	private $autoNewLine = "";
-	private $newLineMode = "auto";
-	/**@type {string[]}*/
+	public $autoNewLine = "";
+	private $newLineMode: NewLineMode = "auto";
 	public $lines: string[] = [""];
 
 	/**
@@ -504,11 +503,10 @@ export class Document extends EventEmitter<DocumentEvents> {
 	 * If the text is the exact same as what currently exists, this function returns an object containing the current `range.end` value.
 	 *
 	 **/
-	replace(range: Ace.IRange, text: string) {
+	replace(range: IRange, text: string) {
 		if (!(range instanceof Range))
 			range = Range.fromPoints(range.start, range.end);
-		// @ts-expect-error
-		if (text.length === 0 && range.isEmpty())
+		if (text.length === 0 && (range as Range).isEmpty())
 			return range.start;
 
 		// Shortcut: If the text we want to insert is the same as it is already

@@ -22,7 +22,7 @@ export const commands: Command[] = [{
 	exec: function(editor) {
 		config.loadModule("ace/ext/settings_menu", function(module) {
 			module.init(editor);
-			editor.showSettingsMenu();
+			editor.showSettingsMenu!();
 		});
 	},
 	readOnly: true
@@ -428,7 +428,7 @@ export const commands: Command[] = [{
 	name: "jumptomatching",
 	description: "Jump to matching",
 	bindKey: bindKey("Ctrl-\\|Ctrl-P", "Command-\\"),
-	exec: function(editor) { editor.jumpToMatching(); },
+	exec: function(editor: Editor) { editor.jumpToMatching(); },
 	multiSelectAction: "forEach",
 	scrollIntoView: "animate",
 	readOnly: true
@@ -436,7 +436,7 @@ export const commands: Command[] = [{
 	name: "selecttomatching",
 	description: "Select to matching",
 	bindKey: bindKey("Ctrl-Shift-\\|Ctrl-Shift-P", "Command-Shift-\\"),
-	exec: function(editor) { editor.jumpToMatching(true); },
+	exec: function(editor: Editor) { editor.jumpToMatching(true); },
 	multiSelectAction: "forEach",
 	scrollIntoView: "animate",
 	readOnly: true
@@ -471,7 +471,7 @@ export const commands: Command[] = [{
 	exec: function(editor) {
 		var cutLine = editor.$copyWithEmptySelection && editor.selection.isEmpty();
 		var range = cutLine ? editor.selection.getLineRange() : editor.selection.getRange();
-		editor._emit("cut", range);
+		editor._emit("cut", range, editor);
 
 		if (!range.isEmpty())
 			editor.session.remove(range);
@@ -798,7 +798,7 @@ export const commands: Command[] = [{
 	exec: function(editor) {
 		var endRow = editor.session.doc.getLength() - 1;
 		var endCol = editor.session.doc.getLine(endRow).length;
-		var ranges = editor.selection.rangeList.ranges;
+		var ranges = editor.selection.rangeList!.ranges;
 		var newRanges = [];
 
 		// If multiple selections don't exist, rangeList will return 0 so replace with single range
