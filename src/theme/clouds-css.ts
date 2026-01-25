@@ -85,7 +85,8 @@ dom.importCss({
 	borderColor: "#000000",
 },
 
-".ace-clouds .ace_storage,.ace-clouds .ace_support.ace_class,.ace-clouds .ace_support.ace_function,.ace-clouds .ace_support.ace_other,.ace-clouds .ace_support.ace_type": {
+".ace-clouds .ace_storage,.ace-clouds .ace_support.ace_class,.ace-clouds .ace_support.ace_function,\
+.ace-clouds .ace_support.ace_other,.ace-clouds .ace_support.ace_type": {
 	textColor:"#C52727",
 },
 

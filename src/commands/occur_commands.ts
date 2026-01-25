@@ -1,8 +1,7 @@
 
 import {Occur} from "../occur";
-import type {Command} from "../keyboard/hash_handler";
+import {HashHandler,Command} from "../keyboard/hash_handler";
 import type { Editor } from "../editor";
-import {HashHandler} from "../keyboard/hash_handler";
 
 // These commands can be installed in a normal command handler to start occur:
 export const occurStartCommand: Command = {

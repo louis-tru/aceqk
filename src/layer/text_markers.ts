@@ -120,7 +120,7 @@ const textMarkerMixin = {
 								if (selectionLength > 0) {
 									// const selectedSpan = this.dom.createElement('span');
 									const selectedSpan = new Label(this.element.window);
-									selectedSpan.cssclass.add(marker.className);
+									selectedSpan.addClass(marker.className);
 									selectedSpan.value = nodeText.substring(
 										beforeSelection,
 										beforeSelection + selectionLength
@@ -141,7 +141,7 @@ const textMarkerMixin = {
 							else {
 								// const selectedSpan = this.dom.createElement('span');
 								const selectedSpan = new Label(this.element.window) as Label & {"charCount"?: number};
-								selectedSpan.cssclass.add(marker.className);
+								selectedSpan.addClass(marker.className);
 								selectedSpan.value = nodeText;
 								selectedSpan["charCount"] = node["charCount"];
 								// parentNode.replaceChild(selectedSpan, node);
@@ -152,7 +152,7 @@ const textMarkerMixin = {
 						// else if (node.nodeType === 1) { //element node
 						else {
 							if (nodeStart >= startCol && nodeEnd <= endCol) {
-								node.cssclass.add(marker.className);
+								node.addClass(marker.className);
 							}
 							else {
 								const beforeSelection = Math.max(0, startCol - nodeStart);

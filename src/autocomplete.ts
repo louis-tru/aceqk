@@ -37,41 +37,6 @@ import type { Editor } from "./editor";
  * @export
  */
 
-
-export type CompleterCallback = (error: any, completions: Completion[]) => void;
-
-export interface Completer {
-	/** Regular expressions defining valid identifier characters for completion triggers */
-	identifierRegexps?: Array<RegExp>,
-
-	/** Main completion method that provides suggestions for the given context */
-	getCompletions(editor: Editor,
-						session: EditSession,
-						position: Point,
-						prefix: string,
-						callback: CompleterCallback): void;
-
-	/** Returns documentation tooltip for a completion item */
-	getDocTooltip?(item: Completion): void | string | Completion;
-
-	/** Called when a completion item becomes visible */
-	onSeen?: (editor: Editor, completion: Completion) => void;
-	/** Called when a completion item is inserted */
-	onInsert?: (editor: Editor, completion: Completion) => void;
-
-	/** Cleanup method called when completion is cancelled */
-	cancel?(): void;
-
-	/** Unique identifier for this completer */
-	id?: string;
-	/** Characters that trigger autocompletion when typed */
-	triggerCharacters?: string[];
-	/** Whether to hide inline preview text */
-	hideInlinePreview?: boolean;
-	/** Custom insertion handler for completion items */
-	insertMatch?: (editor: Editor, data: Completion) => void;
-}
-
 export interface BaseCompletion {
 	$score?: number;
 	matchMask?: number;
@@ -118,6 +83,39 @@ export interface ValueCompletion extends BaseCompletion {
  */
 export type Completion = SnippetCompletion | ValueCompletion;
 
+export type CompleterCallback = (error: any, completions: Completion[]) => void;
+
+export interface Completer {
+	/** Regular expressions defining valid identifier characters for completion triggers */
+	identifierRegexps?: Array<RegExp>,
+
+	/** Main completion method that provides suggestions for the given context */
+	getCompletions(editor: Editor,
+						session: EditSession,
+						position: Point,
+						prefix: string,
+						callback: CompleterCallback): void;
+
+	/** Returns documentation tooltip for a completion item */
+	getDocTooltip?(item: Completion): void | string | Completion;
+
+	/** Called when a completion item becomes visible */
+	onSeen?: (editor: Editor, completion: Completion) => void;
+	/** Called when a completion item is inserted */
+	onInsert?: (editor: Editor, completion: Completion) => void;
+
+	/** Cleanup method called when completion is cancelled */
+	cancel?(): void;
+
+	/** Unique identifier for this completer */
+	id?: string;
+	/** Characters that trigger autocompletion when typed */
+	triggerCharacters?: string[];
+	/** Whether to hide inline preview text */
+	hideInlinePreview?: boolean;
+	/** Custom insertion handler for completion items */
+	insertMatch?: (editor: Editor, data: Completion) => void;
+}
 
 export interface CompletionOptions {
 	matches?: Completion[];

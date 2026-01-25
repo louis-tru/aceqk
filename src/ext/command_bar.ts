@@ -407,7 +407,7 @@ export class CommandBarTooltip extends EventEmitter<CommandBarEvents> {
 			}
 		}
 
-		dom.buildDom(['box', { class: [BUTTON_CLASS_NAME, command.cssClass || ""].join(" "), ref: id }, buttonNode], parentEl, this.elements);
+		dom.buildDom(['box', { class: [BUTTON_CLASS_NAME, command.cssClass || ""], ref: id }, buttonNode], parentEl, this.elements);
 		this.commands[id] = command;
 		
 		var eventListener =

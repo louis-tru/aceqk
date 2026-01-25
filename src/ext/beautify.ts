@@ -442,7 +442,7 @@ export const commands: Command[] = [{
 	name: "beautify",
 	description: "Format selection (Beautify)",
 	exec: function(editor: Editor) {
-		exports.beautify(editor.session);
+		beautify(editor.session);
 	},
 	bindKey: "Ctrl-Shift-B"
 }];

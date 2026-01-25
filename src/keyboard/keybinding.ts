@@ -69,8 +69,8 @@ export class KeyBinding {
 	}, pos?: number) {
 		if (!kb)
 			return;
-		// @ts-ignore
-		if (typeof kb == "function" && !kb.handleKeyboard)
+		//// @ts-ignore
+		if (!kb.handleKeyboard && typeof kb == "function")
 			// @ts-ignore
 			kb.handleKeyboard = kb;
 		var i = this.$handlers.indexOf(kb);

@@ -265,9 +265,9 @@ export class LineWidgets {
 			(w.el as Text).value = w.text;
 		}
 		if (w.el) {
-			w.el.cssclass.add("ace_lineWidgetContainer");
+			w.el.addClass("ace_lineWidgetContainer");
 			if (w.className) {
-				w.el.cssclass.add(w.className);
+				w.el.addClass(w.className);
 			}
 			// w.el.style.position = "absolute";
 			w.el.style.zIndex = 5;
@@ -279,7 +279,7 @@ export class LineWidgets {
 			}
 			if (w.pixelHeight == null) {
 				// TODO: IGNORE measuring for now
-				w.pixelHeight = 0; // w.pixelHeight = w.el.offsetHeight;
+				w.pixelHeight = w.el.clientSize.height; // w.pixelHeight = w.el.offsetHeight;
 			}
 		}
 		if (w.rowCount == null) {

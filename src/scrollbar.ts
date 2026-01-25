@@ -15,18 +15,6 @@ export interface ScrollbarEvents {
 	"scroll": (e: { data: number }, emitter: Scrollbar) => void;
 }
 
-export interface Scrollbar {
-	setVisible(visible: boolean): void;
-}
-
-export interface HScrollbar extends Scrollbar {
-	setWidth(width: number): void;
-}
-
-export interface VScrollbar extends Scrollbar {
-	setHeight(width: number): void;
-}
-
 /**
  * An abstract class representing a native scrollbar control.
  **/

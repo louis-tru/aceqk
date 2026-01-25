@@ -1,6 +1,5 @@
 "use strict";
 
-// import util from "quark/util";
 import qk, { Window } from "quark";
 
 type OnRender = (changes: number) => void;

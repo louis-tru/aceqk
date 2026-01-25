@@ -472,7 +472,9 @@ export class InlineAutocomplete {
 
 const completers: Completer[] = [snippetCompleter, textCompleter, keyWordCompleter];
 
-require("../config").defineOptions(Editor.prototype, "editor", {
+import config from "../config";
+
+config.defineOptions(Editor.prototype, "editor", {
 	enableInlineAutocompletion: {
 		/**
 		 * @this{Editor}

@@ -20,7 +20,7 @@ export class AceInlineScreenReader {
 		this.editor = editor;
 		// this.screenReaderDiv = document.createElement("div");
 		this.screenReaderDiv = new Box(editor.window);
-		this.screenReaderDiv.class = ["ace_screenreader-only"];
+		this.screenReaderDiv.addClass("ace_screenreader-only");
 		this.editor.container.append(this.screenReaderDiv);
 	}
 
@@ -46,7 +46,7 @@ export class AceInlineScreenReader {
 					for (let lineIndex = 0; lineIndex < this._lines.length; lineIndex++) {
 						idString += `ace-inline-screenreader-line-${lineIndex} `;
 					}
-					selected.setAttribute("aria-describedby", idString);      
+					selected.setAttribute("aria-describedby", idString);
 				}
 			});
 		}

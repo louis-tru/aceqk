@@ -86,7 +86,9 @@ dom.importCss({
 	borderColor: "#929292",
 },
 
-".ace-clouds-midnight .ace_storage,.ace-clouds-midnight .ace_support.ace_class,.ace-clouds-midnight .ace_support.ace_function,.ace-clouds-midnight .ace_support.ace_other,.ace-clouds-midnight .ace_support.ace_type": {
+".ace-clouds-midnight .ace_storage,.ace-clouds-midnight .ace_support.ace_class,\
+.ace-clouds-midnight .ace_support.ace_function,.ace-clouds-midnight .ace_support.ace_other,\
+.ace-clouds-midnight .ace_support.ace_type": {
 	textColor:"#E92E2E",
 },
 

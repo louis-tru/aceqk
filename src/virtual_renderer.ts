@@ -188,7 +188,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		}
 		const window = this.window = this.container.window;
 
-		this.container.cssclass.add('ace_editor');
+		this.container.addClass('ace_editor');
 		this.container.style.layout = 'free'; // Use absolute free layout for all children
 
 		this.setTheme(theme||'');
@@ -1051,7 +1051,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			this.content.translate = Vec2.new(-this.scrollLeft, -config.offset);
 			this.scroller.class = this.scrollLeft <= 0 ? ["ace_scroller"] : ["ace_scroller", "ace_scroll-left"];
 			if (this.enableKeyboardAccessibility)
-				this.scroller.cssclass.add(this.keyboardFocusClassName!);
+				this.scroller.addClass(this.keyboardFocusClassName!);
 		}
 
 		// full
@@ -1784,7 +1784,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 **/
 	visualizeFocus() {
 		// dom.addCssClass(this.container, "ace_focus");
-		this.container.cssclass.add("ace_focus");
+		this.container.addClass("ace_focus");
 	}
 
 	/**
@@ -1793,7 +1793,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 **/
 	visualizeBlur() {
 		// dom.removeCssClass(this.container, "ace_focus");
-		this.container.cssclass.remove("ace_focus");
+		this.container.removeClass("ace_focus");
 	}
 
 	/**
@@ -1815,7 +1815,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		// 	composition.useTextareaForIME = this.$useTextareaForIME;
 
 		// if (this.$useTextareaForIME) {
-		// 	this.textarea.cssclass.add("ace_composition");
+		// 	this.textarea.addClass("ace_composition");
 		// 	// this.textarea.style.cssText = "";
 		// 	this.textarea.style = {marginLeft: 0, marginTop: 0, width: 'auto', height: 'auto'};
 		// 	this.$moveTextAreaToCursor();
@@ -1850,7 +1850,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		if (this.$composition.markerId)
 			this.session.removeMarker(this.$composition.markerId);
 
-		this.textarea.cssclass.remove("ace_composition");
+		this.textarea.removeClass("ace_composition");
 		var cursor = this.session.selection.cursor;
 		this.removeExtraToken(cursor.row, cursor.column);
 		this.$composition = void 0;
@@ -2110,7 +2110,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			// 	_self.container
 			// );
 			if (_self.theme)
-				_self.container.cssclass.remove(_self.theme.cssClass); // remove old theme class
+				_self.container.removeClass(_self.theme.cssClass); // remove old theme class
 			/**@type {any}*/
 			var padding = "padding" in module ? module.padding!
 				: "padding" in (_self.theme || {}) ? 4 : _self.$padding;
@@ -2130,7 +2130,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			_self.$theme = module.cssClass;
 
 			_self.theme = module;
-			_self.container.cssclass.add(module.cssClass);
+			_self.container.addClass(module.cssClass);
 			_self.container.cssclass[module.isDark ? "add" : "remove"]("ace_dark");
 
 			// force re-measure of the gutter width
@@ -2163,9 +2163,9 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 **/
 	setStyle(style: string, include?: boolean) {
 		if (include !== false) {
-			this.container.cssclass.add(style);
+			this.container.addClass(style);
 		} else {
-			this.container.cssclass.remove(style);
+			this.container.removeClass(style);
 		}
 	}
 
@@ -2175,7 +2175,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 *
 	 **/
 	unsetStyle(style: string) {
-		this.container.cssclass.remove(style);
+		this.container.removeClass(style);
 	}
 
 	/**
@@ -2238,12 +2238,12 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 				this.session.getLength() > 1 || this.session.getLine(0).length > 0);
 		if (hasValue && this.placeholderNode) {
 			this.off("afterRender", this.$updatePlaceholder);
-			this.container.cssclass.remove("ace_hasPlaceholder");
+			this.container.removeClass("ace_hasPlaceholder");
 			this.placeholderNode.remove();
 			this.placeholderNode = void 0;
 		} else if (!hasValue && !this.placeholderNode) {
 			this.on("afterRender", this.$updatePlaceholder);
-			this.container.cssclass.add("ace_hasPlaceholder");
+			this.container.addClass("ace_hasPlaceholder");
 			// var el = dom.createElement("div");
 			var el = new Text(this.window);
 			el.class = ["ace_placeholder"];

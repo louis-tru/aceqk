@@ -74,7 +74,7 @@ export class Tooltip {
 	 * @param {String} className
 	 **/
 	setClassName(className: string) {
-		this.getElement().cssclass.add(className);
+		this.getElement().addClass(className);
 	}
 
 	/**
@@ -82,14 +82,14 @@ export class Tooltip {
 	 */
 	setTheme(theme: Theme) {
 		if (this.theme) {
-			this.theme.isDark && this.getElement().cssclass.remove("ace_dark");
-			this.theme.cssClass && this.getElement().cssclass.remove(this.theme.cssClass);
+			this.theme.isDark && this.getElement().removeClass("ace_dark");
+			this.theme.cssClass && this.getElement().removeClass(this.theme.cssClass);
 		}
 		if (theme.isDark) {
-			this.getElement().cssclass.add("ace_dark");
+			this.getElement().addClass("ace_dark");
 		}
 		if (theme.cssClass) {
-			this.getElement().cssclass.add(theme.cssClass);
+			this.getElement().addClass(theme.cssClass);
 		}
 		this.theme = {
 			isDark: theme.isDark,

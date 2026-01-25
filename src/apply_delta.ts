@@ -62,7 +62,7 @@ export function applyDelta(docLines: string[], delta: Delta, doNotValidate?: boo
 			if (lines.length === 1) {
 				docLines[row] = line.substring(0, startColumn) + delta.lines[0] + line.substring(startColumn);
 			} else {
-				// @ts-ignore
+				//// @ts-ignore
 				docLines.splice(row, 1, ...delta.lines);
 				docLines[row] = line.substring(0, startColumn) + docLines[row];
 				docLines[row + delta.lines.length - 1] += line.substring(startColumn);

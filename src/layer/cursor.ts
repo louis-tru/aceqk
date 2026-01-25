@@ -53,7 +53,7 @@ export class Cursor {
 	/**
 	 * @param {boolean} [val]
 	 */
-	private $updateOpacity(val: boolean) {
+	private $updateOpacity(val?: boolean) {
 		var cursors = this.cursors;
 		for (var i = cursors.length; i--; )
 			cursors[i].opacity = val ? 1 : 0;
@@ -66,14 +66,14 @@ export class Cursor {
 		// this.$isAnimating = true;
 		// setTimeout(() => {
 		// 	if (this.$isAnimating) {
-		// 		this.element.cssclass.add("ace_animate-blinking");
+		// 		this.element.addClass("ace_animate-blinking");
 		// 	}
 		// });
 	}
 	
 	$stopCssAnimation() {
 		this.$isAnimating = false;
-		this.element.cssclass.remove("ace_animate-blinking");
+		this.element.removeClass("ace_animate-blinking");
 	}
 
 	/**
@@ -141,13 +141,13 @@ export class Cursor {
 
 	hideCursor() {
 		this.isVisible = false;
-		this.element.cssclass.add("ace_hidden-cursors");
+		this.element.addClass("ace_hidden-cursors");
 		this.restartTimer();
 	}
 
 	showCursor() {
 		this.isVisible = true;
-		this.element.cssclass.remove("ace_hidden-cursors");
+		this.element.removeClass("ace_hidden-cursors");
 		this.restartTimer();
 	}
 
@@ -159,7 +159,7 @@ export class Cursor {
 
 		if (this.smoothBlinking) {
 			this.$isSmoothBlinking = false;
-			this.element.cssclass.remove("ace_smooth-blinking");
+			this.element.removeClass("ace_smooth-blinking");
 		}
 		
 		update(true);
@@ -173,7 +173,7 @@ export class Cursor {
 			this.$isSmoothBlinking = true;
 			setTimeout(() => {
 				if (this.$isSmoothBlinking) {
-					this.element.cssclass.add("ace_smooth-blinking");
+					this.element.addClass("ace_smooth-blinking");
 				}
 			});
 		}
@@ -278,9 +278,9 @@ export class Cursor {
 		if (overwrite != this.overwrite) {
 			this.overwrite = overwrite;
 			if (overwrite)
-				this.element.cssclass.add("ace_overwrite-cursors");
+				this.element.addClass("ace_overwrite-cursors");
 			else
-				this.element.cssclass.remove("ace_overwrite-cursors");
+				this.element.removeClass("ace_overwrite-cursors");
 		}
 	}
 

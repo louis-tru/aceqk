@@ -32,23 +32,6 @@ export type Snippet = {
 	body?: string | string[];
 };
 
-// interface IRange {
-// 	start: Point;
-// 	end: Point;
-// 	id?: number;
-// 	cursor?: Point;
-// 	isBackwards?: boolean;
-// 	collapseChildren?: number;
-// 	linked?: boolean;
-// }
-
-// interface Token {
-// 	type: string;
-// 	value: string;
-// 	index?: number;
-// 	start?: number;
-// }
-
 export interface SnippetToken extends Partial<IRange> {
 // export interface SnippetToken extends Range {
 	fmtString?: boolean,

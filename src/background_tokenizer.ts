@@ -79,8 +79,8 @@ export class BackgroundTokenizer extends EventEmitter<BackgroundTokenizerEvents>
 
 			// only check every 5 lines
 			processedLines ++;
-			// @ts-ignore
-			if ((processedLines % 5 === 0) && (new Date() - workerStart) > 20) {
+			//// @ts-ignore
+			if ((processedLines % 5 === 0) && (new Date().valueOf() - workerStart.valueOf()) > 20) {
 				self.running = setTimeout(self.$worker, 20);
 				break;
 			}

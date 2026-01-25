@@ -3111,7 +3111,7 @@ config.defineOptions(Editor.prototype, "editor", {
 				this.renderer.scroller.setAttribute("tabindex", 0);
 				this.renderer.scroller.setAttribute("role", "group");
 				this.renderer.scroller.setAttribute("aria-roledescription", nls("editor.scroller.aria-roledescription", "editor"));
-				this.renderer.scroller.cssclass.add(this.renderer.keyboardFocusClassName);
+				this.renderer.scroller.addClass(this.renderer.keyboardFocusClassName);
 				this.renderer.scroller.setAttribute("aria-label",
 					nls("editor.scroller.aria-label", "Editor content, press Enter to start editing, press Escape to exit"));
 
@@ -3124,7 +3124,7 @@ config.defineOptions(Editor.prototype, "editor", {
 				this.renderer.$gutter.setAttribute("aria-roledescription", nls("editor.gutter.aria-roledescription", "editor gutter"));
 				this.renderer.$gutter.setAttribute("aria-label",
 					nls("editor.gutter.aria-label", "Editor gutter, press Enter to interact with controls using arrow keys, press Escape to exit"));
-				this.renderer.$gutter.cssclass.add(this.renderer.keyboardFocusClassName);
+				this.renderer.$gutter.addClass(this.renderer.keyboardFocusClassName);
 
 				this.renderer.content.setAttribute("aria-hidden", true);
 
@@ -3144,7 +3144,7 @@ config.defineOptions(Editor.prototype, "editor", {
 				this.renderer.scroller.setAttribute("tabindex", -1);
 				this.renderer.scroller.setAttribute("role", null);
 				this.renderer.scroller.setAttribute("aria-roledescription", null);
-				this.renderer.scroller.cssclass.remove(this.renderer.keyboardFocusClassName||'');
+				this.renderer.scroller.removeClass(this.renderer.keyboardFocusClassName||'');
 				this.renderer.scroller.setAttribute("aria-label", null);
 
 				this.renderer.scroller.removeEventListener("keyup", focusOnEnterKeyup.bind(this));
@@ -3157,7 +3157,7 @@ config.defineOptions(Editor.prototype, "editor", {
 				this.renderer.$gutter.setAttribute("role", null);
 				this.renderer.$gutter.setAttribute("aria-roledescription", null);
 				this.renderer.$gutter.setAttribute("aria-label", null);
-				this.renderer.$gutter.cssclass.remove(this.renderer.keyboardFocusClassName||'');
+				this.renderer.$gutter.removeClass(this.renderer.keyboardFocusClassName||'');
 
 				if (gutterKeyboardHandler)
 					gutterKeyboardHandler.removeListener();

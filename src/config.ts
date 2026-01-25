@@ -1,5 +1,6 @@
 "no use strict";
 
+import util from 'quark/util';
 import * as lang from "./lib/lang";
 import {AppConfig} from "./lib/app_config";
 import type { SyntaxMode } from "./mode";
@@ -136,7 +137,7 @@ export class Config extends AppConfig {
 		customLoader = cb;
 	};
 
-	public dynamicModules: Dict = {};
+	public dynamicModules: Dict<() => Promise<any>> = {};
 	private $loading: Dict<((module: any) => void)[] | null> = {};
 	private $loaded: Dict = {};
 
@@ -157,7 +158,8 @@ export class Config extends AppConfig {
 		const self = this;
 		var load = (module: any) => {
 			// require(moduleName) can return empty object if called after require([moduleName], callback)
-			if (module && !this.$loading[moduleName]) return onLoad && onLoad(module);
+			if (module && !this.$loading[moduleName])
+				return onLoad && onLoad(module);
 
 			if (!this.$loading[moduleName])
 				this.$loading[moduleName] = [];
@@ -178,13 +180,12 @@ export class Config extends AppConfig {
 			};
 
 			if (!this.get("packaged")) return afterLoad();
-			// TODO ...
 			// net.loadScript(this.moduleUrl(moduleName, moduleType), afterLoad);
 			reportErrorIfPathIsNotConfigured();
 		};
 
 		if (this.dynamicModules[moduleName]) {
-			this.dynamicModules[moduleName]().then((module: any) => {
+			this.dynamicModules[moduleName]().then((module) => {
 				if (module.default) {
 					load(module.default);
 				}
@@ -194,10 +195,14 @@ export class Config extends AppConfig {
 			});
 		} else {
 			// backwards compatibility for node and packaged version
+			let name = moduleName;
+			if (name.substring(0, 4) == "ace/") {
+				name = './' + moduleName.substring(4); // remove 'ace/' prefix
+			}
 			try {
-				loadedModule = this.$require(moduleName);
+				loadedModule = this.$require(name);
 			} catch (e) {}
-			load(loadedModule || exports.$loaded[moduleName]);
+			load(loadedModule || this.$loaded[moduleName]);
 		}
 	};
 
@@ -208,7 +213,7 @@ export class Config extends AppConfig {
 		}
 	};
 
-	setModuleLoader(moduleName: string, onLoad: () => void) {
+	setModuleLoader(moduleName: string, onLoad: () => Promise<any>) {
 		this.dynamicModules[moduleName] = onLoad;
 	};
 

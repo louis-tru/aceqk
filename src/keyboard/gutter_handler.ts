@@ -61,7 +61,7 @@ export class GutterKeyboardHandler {
 			e.cancelDefault();
 
 			// Scroll if the cursor is not currently within the viewport.
-			var row = this.editor.getCursorPosition().row;       
+			var row = this.editor.getCursorPosition().row;
 			if (!this.editor.isRowVisible(row))
 				this.editor.scrollToLine(row, true, true);
 
@@ -249,14 +249,14 @@ export class GutterKeyboardHandler {
 
 	$getFoldWidget(index: number | null) {
 		var cell = this.lines.get(index as number);
-		var v = cell.element.first;
+		var v = cell.element.first; // at 0
 		if (!v) return null;
 		return v.next; // at 1
 	}
 
 	$getCustomWidget(index: number | null) {
 		var cell = this.lines.get(index as number);
-		var v = cell.element.first;
+		var v = cell.element.first; // at 0
 		if (!v) return null;
 		v = v.next; // at 1
 		if (!v) return null;
@@ -267,7 +267,7 @@ export class GutterKeyboardHandler {
 
 	$getAnnotation(index: number | null) {
 		var cell = this.lines.get(index as number);
-		var v = cell.element.first;
+		var v = cell.element.first; // at 0
 		if (!v) return null;
 		v = v.next; // at 1
 		if (!v) return null;
@@ -335,7 +335,7 @@ export class GutterKeyboardHandler {
 
 		var foldWidget = this.$getFoldWidget(index)!;
 
-		foldWidget.cssclass.add(this.editor.renderer.keyboardFocusClassName!);
+		foldWidget.addClass(this.editor.renderer.keyboardFocusClassName!);
 		foldWidget.focus();
 	}
 
@@ -345,7 +345,7 @@ export class GutterKeyboardHandler {
 
 		var customWidget = this.$getCustomWidget(index);
 		if (customWidget) {
-			customWidget.cssclass.add(this.editor.renderer.keyboardFocusClassName!);
+			customWidget.addClass(this.editor.renderer.keyboardFocusClassName!);
 			customWidget.focus();
 		}
 	}
@@ -356,21 +356,21 @@ export class GutterKeyboardHandler {
 
 		var annotation = this.$getAnnotation(index)!;
 
-		annotation.cssclass.add(this.editor.renderer.keyboardFocusClassName!);
+		annotation.addClass(this.editor.renderer.keyboardFocusClassName!);
 		annotation.focus();
 	}
 
 	$blurFoldWidget(index: number | null) {
 		var foldWidget = this.$getFoldWidget(index)!;
 
-		foldWidget.cssclass.remove(this.editor.renderer.keyboardFocusClassName!);
+		foldWidget.removeClass(this.editor.renderer.keyboardFocusClassName!);
 		foldWidget.blur();
 	}
 
 	$blurCustomWidget(index: number | null) {
 		var customWidget = this.$getCustomWidget(index);
 		if (customWidget) {
-			customWidget.cssclass.remove(this.editor.renderer.keyboardFocusClassName!);
+			customWidget.removeClass(this.editor.renderer.keyboardFocusClassName!);
 			customWidget.blur();
 		}
 	}
@@ -378,7 +378,7 @@ export class GutterKeyboardHandler {
 	$blurAnnotation(index: number | null) {
 		var annotation = this.$getAnnotation(index)!;
 
-		annotation.cssclass.remove(this.editor.renderer.keyboardFocusClassName!);
+		annotation.removeClass(this.editor.renderer.keyboardFocusClassName!);
 		annotation.blur();
 	}
 

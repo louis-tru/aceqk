@@ -52,7 +52,8 @@ dom.importCss({
 	textColor:"#404F7D",
 },
 
-".ace-github-dark .ace_keyword,.ace-github-dark .ace_meta,.ace-github-dark .ace_storage,.ace-github-dark .ace_storage.ace_type,.ace-github-dark .ace_support.ace_type": {
+".ace-github-dark .ace_keyword,.ace-github-dark .ace_meta,.ace-github-dark .ace_storage,\
+.ace-github-dark .ace_storage.ace_type,.ace-github-dark .ace_support.ace_type": {
 	textColor:"#ff7b72",
 },
 
@@ -60,7 +61,9 @@ dom.importCss({
 	textColor:"#79c0ff",
 },
 
-".ace-github-dark .ace_constant.ace_character,.ace-github-dark .ace_constant.ace_language,.ace-github-dark .ace_constant.ace_numeric,.ace-github-dark .ace_keyword.ace_other.ace_unit,.ace-github-dark .ace_support.ace_constant,.ace-github-dark .ace_variable.ace_parameter": {
+".ace-github-dark .ace_constant.ace_character,.ace-github-dark .ace_constant.ace_language,\
+.ace-github-dark .ace_constant.ace_numeric,.ace-github-dark .ace_keyword.ace_other.ace_unit,\
+.ace-github-dark .ace_support.ace_constant,.ace-github-dark .ace_variable.ace_parameter": {
 	textColor:"#FFC58F",
 },
 
@@ -91,7 +94,10 @@ dom.importCss({
 	textColor:"#9fcef6",
 },
 
-".ace-github-dark .ace_entity.ace_name.ace_tag,.ace-github-dark .ace_entity.ace_other.ace_attribute-name,.ace-github-dark .ace_meta.ace_tag,.ace-github-dark .ace_string.ace_regexp,.ace-github-dark .ace_variable": {
+".ace-github-dark .ace_entity.ace_name.ace_tag,\
+.ace-github-dark .ace_entity.ace_other.ace_attribute-name,\
+.ace-github-dark .ace_meta.ace_tag,.ace-github-dark .ace_string.ace_regexp,\
+.ace-github-dark .ace_variable": {
 	textColor:"#FF9DA4",
 },
 

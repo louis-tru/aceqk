@@ -3,7 +3,7 @@
 import type {VScrollBar} from "../scrollbar";
 import type {VirtualRenderer} from "../virtual_renderer";
 
-interface Config {maxHeight?: number; lineHeight?: number; height?: number}
+export interface Config {maxHeight?: number; lineHeight?: number; height?: number}
 
 export class Decorator {
 	readonly renderer: VirtualRenderer;
@@ -13,18 +13,26 @@ export class Decorator {
 	private lineHeight: number;
 	private minDecorationHeight: number;
 	private halfMinDecorationHeight: number;
-	private colors = {
+	public colors = {
 		dark: {
 			"error": "rgba(255, 18, 18, 1)",
 			"warning": "rgba(18, 136, 18, 1)",
 			"info": "rgba(18, 18, 136, 1)",
+			"delete": "",
+			"insert": "",
 		},
 		light: {
 			"error": "rgb(255,51,51)",
 			"warning": "rgb(32,133,72)",
 			"info": "rgb(35,68,138)",
+			"delete": "",
+			"insert": "",
 		}
 	};
+
+	public canvas: any;
+	public canvasWidth: number = 0;
+
 	/**
 	 * @param {VScrollBar} scrollbarV
 	 * @param {VirtualRenderer} renderer
@@ -39,6 +47,7 @@ export class Decorator {
 	}
 
 	$createCanvas() {
+		this.canvas = {};
 		// this.canvas = dom.createElement("canvas");
 		// this.canvas.style.top = 0 + "px";
 		// this.canvas.style.right = 0 + "px";

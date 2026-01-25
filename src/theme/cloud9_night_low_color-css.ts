@@ -73,7 +73,10 @@ dom.importCss({
 	textColor:"#70C0B1",
 },
 
-".ace-cloud9-night-low-color .ace_constant.ace_character,.ace-cloud9-night-low-color .ace_constant.ace_language,.ace-cloud9-night-low-color .ace_constant.ace_numeric,.ace-cloud9-night-low-color .ace_keyword.ace_other.ace_unit": {
+".ace-cloud9-night-low-color .ace_constant.ace_character,\
+.ace-cloud9-night-low-color .ace_constant.ace_language,\
+.ace-cloud9-night-low-color .ace_constant.ace_numeric,\
+.ace-cloud9-night-low-color .ace_keyword.ace_other.ace_unit": {
 	textColor:"#DAA637",
 },
 

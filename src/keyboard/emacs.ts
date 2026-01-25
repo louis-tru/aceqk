@@ -336,7 +336,7 @@ var $resetMarkMode = function(e: any) {
 	e.editor.session.$emacsMark = null;
 };
 
-var keys = require("../lib/keys").KEY_MODS;
+import keys from "../lib/keys";
 var eMods: Record<string|number, string> = {C: "ctrl", S: "shift", M: "alt", CMD: "command"};
 var combinations = ["C-S-M-CMD",
 					"S-M-CMD", "C-M-CMD", "C-S-CMD", "C-S-M",
@@ -345,7 +345,8 @@ var combinations = ["C-S-M-CMD",
 combinations.forEach(function(c) {
 	var hashId = 0;
 	c.split("-").forEach(function(c) {
-		hashId = hashId | keys[eMods[c]];
+		const k = eMods[c] as keyof typeof keys.KEY_MODS;
+		hashId = hashId | keys.KEY_MODS[k] as number;
 	});
 	eMods[hashId] = c.toLowerCase() + "-";
 });

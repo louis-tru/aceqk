@@ -42,7 +42,7 @@ export class MinimalGutterDiffDecorator {
 	renderGutters(e?: void, gutterLayer?: any) {
 		const cells = this.editor.renderer.$gutterLayer.$lines.cells;
 		cells.forEach((cell) => {
-			Object.values(this.gutterCellsClasses).forEach(e=>cell.element.cssclass.remove(e));
+			Object.values(this.gutterCellsClasses).forEach(e=>cell.element.removeClass(e));
 		});
 		const dir = this.type === -1 ? "old" : "new";
 		const diffClass = this.type === -1 ? this.gutterCellsClasses.delete : this.gutterCellsClasses.add;
@@ -52,7 +52,7 @@ export class MinimalGutterDiffDecorator {
 
 			cells.forEach((cell) => {
 				if (cell.row >= startRow && cell.row <= endRow) {
-					cell.element.cssclass.add(diffClass);
+					cell.element.addClass(diffClass);
 				}
 			});
 		});

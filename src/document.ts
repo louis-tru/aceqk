@@ -103,11 +103,11 @@ export class Document extends EventEmitter<DocumentEvents> {
 	 **/
 	getNewLineCharacter() {
 		switch (this.$newLineMode) {
-		  case "windows":
+		case "windows":
 			return "\r\n";
-		  case "unix":
+		case "unix":
 			return "\n";
-		  default:
+		default:
 			return this.$autoNewLine || "\n";
 		}
 	}

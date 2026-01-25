@@ -73,7 +73,7 @@ export class InlineDiffView extends BaseDiffView {
 		// gutterLayerElement.style.position = "absolute";
 		// this.gutterLayer.element.style.position = "absolute";
 		this.gutterLayer.element.style.width = "100%";
-		this.gutterLayer.element.cssclass.add("ace_mini-diff_gutter_other");
+		this.gutterLayer.element.addClass("ace_mini-diff_gutter_other");
 		
 
 		this.gutterLayer.$updateGutterWidth = function() {};

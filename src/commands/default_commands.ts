@@ -20,10 +20,10 @@ export const commands: Command[] = [{
 	description: "Show settings menu",
 	bindKey: bindKey("Ctrl-,", "Command-,"),
 	exec: function(editor) {
-		config.loadModule("ace/ext/settings_menu", function(module) {
-			module.init(editor);
-			editor.showSettingsMenu!();
-		});
+		// config.loadModule("ace/ext/settings_menu", function(module) {
+		// 	module.init(editor);
+		// 	editor.showSettingsMenu!();
+		// });
 	},
 	readOnly: true
 }, {

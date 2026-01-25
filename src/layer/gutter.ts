@@ -292,7 +292,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		if (this.$cursorCell && this.$cursorCell.row == row)
 			return;
 		if (this.$cursorCell)
-			this.$cursorCell.element.cssclass.remove("ace_gutter-active-line");
+			this.$cursorCell.element.removeClass("ace_gutter-active-line");
 		var cells = this.$lines.cells;
 		this.$cursorCell = void 0;
 		for (var i = 0; i < cells.length; i++) {
@@ -457,7 +457,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 				className += "ace_gutter-active-line ";
 				if (this.$cursorCell != cell) {
 					if (this.$cursorCell)
-						this.$cursorCell.element.cssclass.remove("ace_gutter-active-line");
+						this.$cursorCell.element.removeClass("ace_gutter-active-line");
 					this.$cursorCell = cell;
 				}
 			}
@@ -522,10 +522,8 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			// dom.setStyle(foldWidget.style, "display", "inline-block");
 
 			// Set a11y properties.
-			// foldWidget.setAttribute("role", "button");
-			foldWidget.data.role = "button";
-			// foldWidget.setAttribute("tabindex", "-1");
-			foldWidget.data.tabindex = -1;
+			foldWidget.setAttribute("role", "button");
+			foldWidget.setAttribute("tabindex", "-1");
 
 			var foldRange = session.getFoldWidgetRange(row);
 
@@ -607,9 +605,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			annotationIconNode.class = [iconClassName];
 
 			if (this.$useSvgGutterIcons)
-				annotationIconNode.cssclass.add(this.$annotations[row].className);
+				annotationIconNode.addClass(this.$annotations[row].className);
 			else 
-				element.cssclass.add(this.$annotations[row].className.replace(" ", ""));
+				element.addClass(this.$annotations[row].className.replace(" ", ""));
 
 			// dom.setStyle(annotationIconNode.style, "height", lineHeight);
 			annotationIconNode.style.height = lineHeight;
@@ -705,9 +703,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	 */
 	setShowFoldWidgets(show: boolean) {
 		if (show)
-			this.element.cssclass.add("ace_folding-enabled");
+			this.element.addClass("ace_folding-enabled");
 		else
-			this.element.cssclass.remove("ace_folding-enabled");
+			this.element.removeClass("ace_folding-enabled");
 
 		this.$showFoldWidgets = show;
 		this.$padding = void 0;
@@ -815,6 +813,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			// dom.setStyle(customWidget.style, "display", "inline-block");
 			customWidget.visible = true;
 			// dom.setStyle(customWidget.style, "height", "inherit");
+			customWidget.style.height = "auto";
 			
 			if (callbacks&& callbacks.onClick) {
 				customWidget.addEventListener("click", (e) => {

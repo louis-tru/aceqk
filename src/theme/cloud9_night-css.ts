@@ -65,7 +65,9 @@ dom.importCss({
 	textColor:"#343434",
 },
 
-".ace-cloud9-night .ace_keyword,.ace-cloud9-night .ace_meta,.ace-cloud9-night .ace_storage,.ace-cloud9-night .ace_storage.ace_type,.ace-cloud9-night .ace_support.ace_type": {
+".ace-cloud9-night .ace_keyword,.ace-cloud9-night .ace_meta,\
+.ace-cloud9-night .ace_storage,\
+.ace-cloud9-night .ace_storage.ace_type,.ace-cloud9-night .ace_support.ace_type": {
 	textColor:"#C397D8",
 },
 
@@ -73,7 +75,9 @@ dom.importCss({
 	textColor:"#70C0B1",
 },
 
-".ace-cloud9-night .ace_constant.ace_character,.ace-cloud9-night .ace_constant.ace_language,.ace-cloud9-night .ace_constant.ace_numeric,.ace-cloud9-night .ace_keyword.ace_other.ace_unit,.ace-cloud9-night .ace_support.ace_constant,.ace-cloud9-night .ace_variable.ace_parameter": {
+".ace-cloud9-night .ace_constant.ace_character,.ace-cloud9-night .ace_constant.ace_language, \
+.ace-cloud9-night .ace_constant.ace_numeric,.ace-cloud9-night .ace_keyword.ace_other.ace_unit,\
+.ace-cloud9-night .ace_support.ace_constant,.ace-cloud9-night .ace_variable.ace_parameter": {
 	textColor:"#E78C45",
 },
 

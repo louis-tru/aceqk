@@ -6,6 +6,8 @@ import {EventEmitter} from "../lib/event_emitter";
 import type { Editor } from "../editor";
 import type {UIEvent} from "quark/event";
 
+export type {Command, CommandKey, BindingCmd,Platform,CommandLike,CommandLikes} from "../keyboard/hash_handler";
+
 export type ExecEventHandler = (obj: {
 	editor: Editor,
 	command: Command,

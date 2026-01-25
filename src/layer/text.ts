@@ -594,7 +594,7 @@ export class Text extends EventEmitter<TextEvents> {
 		}
 		// var activeIndentGuides = this.element.querySelectorAll(".ace_indent-guide-active");
 		for (var i = 0; i < activeIndentGuides.length; i++) {
-			activeIndentGuides[i].cssclass.remove("ace_indent-guide-active");
+			activeIndentGuides[i].removeClass("ace_indent-guide-active");
 		}
 	}
 
@@ -619,7 +619,7 @@ export class Text extends EventEmitter<TextEvents> {
 			if (childNodes.length) {
 				let node = childNodes[indentLevel - 1];
 				if (node && node.cssclass.has("ace_indent-guide"))
-					node.cssclass.add("ace_indent-guide-active");
+					node.addClass("ace_indent-guide-active");
 			}
 		}
 	}

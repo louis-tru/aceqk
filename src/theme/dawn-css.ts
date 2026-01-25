@@ -56,7 +56,8 @@ dom.importCss({
 	textColor:"#794938",
 },
 
-".ace-dawn .ace_constant,.ace-dawn .ace_constant.ace_character,.ace-dawn .ace_constant.ace_character.ace_escape,.ace-dawn .ace_constant.ace_other": {
+".ace-dawn .ace_constant,.ace-dawn .ace_constant.ace_character,\
+.ace-dawn .ace_constant.ace_character.ace_escape,.ace-dawn .ace_constant.ace_other": {
 	textColor:"#811F24",
 },
 

@@ -149,7 +149,11 @@ dom.importCss({
 	textColor: "#66b2f0",
 },
 
-".ace-cloud_editor_dark .ace_entity.ace_name.ace_tag,.ace-cloud_editor_dark .ace_entity.ace_other.ace_attribute-name,.ace-cloud_editor_dark .ace_meta.ace_tag,.ace-cloud_editor_dark .ace_string.ace_regexp,.ace-cloud_editor_dark .ace_variable": {
+".ace-cloud_editor_dark .ace_entity.ace_name.ace_tag,\
+.ace-cloud_editor_dark .ace_entity.ace_other.ace_attribute-name,\
+.ace-cloud_editor_dark .ace_meta.ace_tag,\
+.ace-cloud_editor_dark .ace_string.ace_regexp,\
+.ace-cloud_editor_dark .ace_variable": {
 	textColor: "#66b2f0",
 },
 

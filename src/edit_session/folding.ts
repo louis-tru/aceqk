@@ -1066,7 +1066,7 @@ export function Folding(this: EditSession) {
 		if (!range) {
 			var el = e.origin;
 			if (el && /ace_fold-widget/.test(el.class+''))
-				el.cssclass.add("ace_invalid");
+				el.addClass("ace_invalid");
 		}
 	};
 
