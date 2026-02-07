@@ -156,3 +156,6 @@ SPARQLHighlightRules.metaData = {
 oop.inherits(SPARQLHighlightRules, TextHighlightRules);
 
 exports.SPARQLHighlightRules = SPARQLHighlightRules;
+
+
+export {};

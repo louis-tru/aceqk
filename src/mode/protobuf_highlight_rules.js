@@ -61,3 +61,6 @@
     oop.inherits(ProtobufHighlightRules, TextHighlightRules);
 
     exports.ProtobufHighlightRules = ProtobufHighlightRules;
+
+
+export {};

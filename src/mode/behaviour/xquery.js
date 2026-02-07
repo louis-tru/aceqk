@@ -60,3 +60,6 @@ function hasType(token, type) {
   oop.inherits(XQueryBehaviour, Behaviour);
 
   exports.XQueryBehaviour = XQueryBehaviour;
+
+
+export {};

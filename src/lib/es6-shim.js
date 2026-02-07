@@ -127,3 +127,6 @@ if (!Array.of) {
 		return Array.prototype.slice.call(arguments);
 	});
 }
+
+
+export {};

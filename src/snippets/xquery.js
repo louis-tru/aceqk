@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./xquery.snippets");
 exports.scope = "xquery";
+
+
+export {};

@@ -92,3 +92,6 @@ var WollokHighlightRules = function() {
 oop.inherits(WollokHighlightRules, TextHighlightRules);
 
 exports.WollokHighlightRules = WollokHighlightRules;
+
+
+export {};

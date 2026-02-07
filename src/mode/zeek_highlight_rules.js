@@ -373,3 +373,6 @@ ZeekHighlightRules.metaData = {
 oop.inherits(ZeekHighlightRules, TextHighlightRules);
 
 exports.ZeekHighlightRules = ZeekHighlightRules;
+
+
+export {};

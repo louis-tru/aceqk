@@ -17,3 +17,6 @@ oop.inherits(Mode, TextMode);
     this.$id = "ace/mode/space";
 }).call(Mode.prototype);
 exports.Mode = Mode;
+
+
+export {};

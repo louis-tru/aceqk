@@ -2,7 +2,7 @@
 
 import * as lang from "../lib/lang";
 import {EventEmitter} from "../lib/event_emitter";
-import {Lines,LayerConfig, Cell, CellElement} from "./lines";
+import {Lines,LayerConfig, Cell as CellBase} from "./lines";
 import type { EditSession } from "../edit_session";
 import config from "../config";
 import {View, Box, Morph, Label} from "quark";
@@ -11,6 +11,17 @@ import type {Delta, IRange} from "../range";
 import type { Editor } from "../editor";
 
 const nls = config.nls;
+
+export type CellElement = Box & {
+	data: Dict;
+	textNode: Label & {data: Dict};
+	foldWidget: Box & {data: Dict};
+	annotationNode: Box & {data: Dict};
+	annotationIconNode: Box & {data: Dict};
+	customWidget?: Box & {data: Dict};
+};
+
+export type Cell = CellBase<CellElement>;
 
 export type GutterRenderer = {
 	/**
@@ -64,7 +75,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	public $showCursorMarker: boolean | null | string;
 	public element: Morph;
 	public $annotations: (Annotation | null)[] = [];
-	public $lines: Lines;
+	public $lines: Lines<CellElement>;
 	private gutterWidth = 0;
 	readonly session: EditSession;
 	private config: LayerConfig;
@@ -81,6 +92,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		super();
 		this.$showCursorMarker = null;
 		// this.element = dom.createElement("div");
+		// ace_layer ace_gutter-layer
 		this.element = new Morph(parentEl.window);
 		this.element.class = ["ace_layer", "ace_gutter-layer"];
 		this.element.style.layout = 'free'; // absolute positioning of children
@@ -257,12 +269,14 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		var gutterWidth = gutterRenderer 
 			? gutterRenderer.getWidth(session, lastLineText, config)
 			: lastLineText.toString().length * config.characterWidth;
-		
-		var padding = this.$padding || this.$computePadding();
+
+		var padding = /*this.$padding || */ this.$computePadding(); // alyways compute padding
 		gutterWidth += padding.left + padding.right;
+
+		// console.log('gutterWidth:', this.$padding, gutterWidth);
+
 		if (gutterWidth !== this.gutterWidth && !isNaN(gutterWidth)) {
 			this.gutterWidth = gutterWidth;
-			/**@type{any}*/
 			(this.element.parent!).style.width =
 				this.element.style.width = Math.ceil(this.gutterWidth);
 			this._signal("changeGutterWidth", gutterWidth, this);
@@ -319,7 +333,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		if (!this.$highlightElement) {
 			// this.$highlightElement = dom.createElement("div");
 			this.$highlightElement = new Box(this.element.window);
-			this.$highlightElement.class = ["ace_gutter-cursor"];
+			this.$highlightElement.addClass("ace_gutter-cursor");
 			// this.$highlightElement.style.pointerEvents = "none";
 			this.$highlightElement.receive = false;
 			this.element.append(this.$highlightElement);
@@ -412,7 +426,6 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		return fragment;
 	}
 
-
 	/**
 	 * @param {any} cell
 	 * @param {LayerConfig} config
@@ -485,8 +498,6 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			var isClosedFold = c == "start" && row == foldStart && row < fold!.end.row;
 			if (isClosedFold) {
 				foldClass += " ace_closed";
-				// var foldAnnotationClass = "";
-				// var annotationInFold = false;
 
 				for (var i = row + 1; i <= fold!.end.row; i++) {
 					if (!this.$annotations[i])
@@ -517,9 +528,8 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			if (foldWidget.class.join(' ') != foldClass)
 				foldWidget.class = foldClass.split(' ');
 
-			// dom.setStyle(foldWidget.style, "height", lineHeight);
-			foldWidget.style.height = lineHeight;
-			// dom.setStyle(foldWidget.style, "display", "inline-block");
+			foldWidget.style.height = 'match'; // lineHeight;
+			foldWidget.style.visible = true; // "inline-block"
 
 			// Set a11y properties.
 			foldWidget.setAttribute("role", "button");
@@ -555,7 +565,6 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			}
 		} else {
 			if (foldWidget) {
-				// dom.setStyle(foldWidget.style, "display", "none");
 				foldWidget.visible = false;
 				foldWidget.setAttribute("tabindex", "0");
 				foldWidget.removeAttribute("role");
@@ -575,12 +584,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			annotationNode.class = ["ace_gutter_annotation"];
 			annotationIconNode.class = [iconClassName, foldAnnotationClass];
 
-			// dom.setStyle(annotationIconNode.style, "height", lineHeight);
-			annotationIconNode.style.height = lineHeight;
-			// dom.setStyle(annotationNode.style, "display", "block");
-			annotationNode.style.visible = true;
-			// dom.setStyle(annotationNode.style, "height", lineHeight);
-			annotationNode.style.height = lineHeight;
+			annotationIconNode.style.height = 'match'; // lineHeight;
+			annotationNode.style.visible = true; // "block"
+			annotationNode.style.height = 'match'; // lineHeight;
 
 			var ariaLabel;
 			switch(foldAnnotationClass) {
@@ -609,12 +615,9 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			else 
 				element.addClass(this.$annotations[row].className.replace(" ", ""));
 
-			// dom.setStyle(annotationIconNode.style, "height", lineHeight);
-			annotationIconNode.style.height = lineHeight;
-			// dom.setStyle(annotationNode.style, "display", "block");
-			annotationNode.style.visible = true;
-			// dom.setStyle(annotationNode.style, "height", lineHeight);
-			annotationNode.style.height = lineHeight;
+			annotationIconNode.style.height = 'match'; // lineHeight;
+			annotationNode.style.visible = true; // "block"
+			annotationNode.style.height =  'match'; // lineHeight;
 			var ariaLabel;
 			switch(this.$annotations[row].className) {
 				case " ace_error":
@@ -642,14 +645,13 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			annotationNode.setAttribute("role", "button");
 		}
 		else {
-			// dom.setStyle(annotationNode.style, "display", "none");
-			annotationNode.style.visible = false;
+			annotationNode.style.visible = false; // "none"
 			annotationNode.removeAttribute("aria-label");
 			annotationNode.removeAttribute("role");
 			annotationNode.setAttribute("tabindex", 0);
 		}
-		if (rowText !== textNode.data) {
-			textNode.data = rowText;
+		if (rowText !== textNode.value) {
+			textNode.value = rowText;
 		} 
 
 		if (element.class.join(' ') != className)
@@ -683,11 +685,6 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	 * @param {boolean} show
 	 */
 	setShowLineNumbers(show: boolean) {
-		/**@type{GutterRenderer}*/
-		// this.$renderer = !show && {
-		// 	getWidth: function() {return 0;},
-		// 	getText: function() {return "";}
-		// };
 		this.$renderer = !show ? {
 			getWidth: function() {return 0;},
 			getText: function() {return "";}
@@ -742,8 +739,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		if (rowCell && rowCell.element) {
 			const foldWidget = rowCell.element.foldWidget;
 			if (foldWidget && this.session.foldWidgets && this.session.foldWidgets[rowCell.row]) {
-				// dom.setStyle(foldWidget.style, "display", "inline-block");
-				foldWidget.visible = true;
+				foldWidget.visible = true; // "inline-block"
 			}
 		}
 	}
@@ -810,13 +806,11 @@ export class Gutter extends EventEmitter<GutterEvents> {
 			customWidget.setAttribute("role", 'button');
 			customWidget.setAttribute("aria-label", label);
 			customWidget.setAttribute("title", title);
-			// dom.setStyle(customWidget.style, "display", "inline-block");
-			customWidget.visible = true;
-			// dom.setStyle(customWidget.style, "height", "inherit");
-			customWidget.style.height = "auto";
+			customWidget.visible = true; // "inline-block"
+			customWidget.style.height = "auto"; // "inherit"
 			
 			if (callbacks&& callbacks.onClick) {
-				customWidget.addEventListener("click", (e) => {
+				customWidget.addEventListener("Click", (e) => {
 					callbacks.onClick!(e, row);
 					e.cancelBubble();
 				});
@@ -848,14 +842,13 @@ export class Gutter extends EventEmitter<GutterEvents> {
 	}
 
 	$computePadding() {
-		if (!this.element.first)
+		if (!this.element.first) {
 			return {left: 0, right: 0};
+		}
 		const first = this.element.first as Box;
 		this.$padding = {left: 0, right: 0};
-		this.$padding.left = (first.borderLeftWidth || 0)
-			+ (first.paddingLeft || 0) + 1;
-		this.$padding.right = (first.borderRightWidth || 0)
-			+ (first.paddingRight || 0);
+		this.$padding.left = (first.borderLeftWidth || 0) + (first.paddingLeft || 19) + 1;
+		this.$padding.right = (first.borderRightWidth || 0) + (first.paddingRight || 6);
 		return this.$padding;
 	}
 
@@ -866,9 +859,15 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		var padding = this.$padding || this.$computePadding();
 		var pos = this.element.position;
 		var size = this.element.clientSize;
-		if (point.x < padding.left + pos.x)
+		var rect = {
+			left: pos.x,
+			right: pos.x + size.x,
+			top: pos.y,
+			bottom: pos.y + size.y
+		}
+		if (point.x < padding.left + rect.left)
 			return "markers";
-		if (this.$showFoldWidgets && point.x > pos.x + size.x - padding.right)
+		if (this.$showFoldWidgets && point.x > rect.right - padding.right)
 			return "foldWidgets";
 	}
 }
@@ -876,7 +875,7 @@ export class Gutter extends EventEmitter<GutterEvents> {
 function onCreateCell(element: CellElement) {
 	// var textNode = document.createTextNode('');
 	var textNode = new Label(element.window);
-	// element.appendChild(textNode);
+	textNode.style.align = 'end';
 	element.append(textNode);
 	element.textNode = textNode;
 
@@ -894,6 +893,29 @@ function onCreateCell(element: CellElement) {
 	var annotationIconNode = new Box(element.window);
 	annotationNode.append(annotationIconNode);
 	element.annotationIconNode = annotationIconNode;
-	
+
+	/*
+		<text class="ace_gutter">
+			<morph class="ace_layer ace_gutter-layer">
+
+				<box class="ace_gutter-cell">
+					<label></label>
+					<box class="ace_fold-widget"></box>
+					<box class="ace_gutter_annotation">
+						<box class="ace_error_fold icon"></box>
+					</box>
+				</box>
+
+				<box class="ace_gutter-cell">
+					<label></label>
+					<box class="ace_fold-widget"></box>
+					<box class="ace_gutter_annotation">
+						<box class="ace_error_fold icon"></box>
+					</box>
+				</box>
+
+			</morph>
+		</text>
+	*/
 	return element;
 }

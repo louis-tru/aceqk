@@ -108,3 +108,6 @@ var plsqlHighlightRules = function() {
 oop.inherits(plsqlHighlightRules, TextHighlightRules);
 
 exports.plsqlHighlightRules = plsqlHighlightRules;
+
+
+export {};

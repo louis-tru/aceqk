@@ -123,3 +123,6 @@ module.exports = {
 if (typeof module !== "undefined" && module === require.main) {
     require("asyncjs").test.testcase(module.exports).exec();
 }
+
+
+export {};

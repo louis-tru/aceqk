@@ -204,3 +204,6 @@ var XmlHighlightRules = function(normalize) {
 oop.inherits(XmlHighlightRules, TextHighlightRules);
 
 exports.XmlHighlightRules = XmlHighlightRules;
+
+
+export {};

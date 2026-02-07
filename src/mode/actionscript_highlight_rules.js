@@ -107,3 +107,6 @@ ActionScriptHighlightRules.metaData = { fileTypes: [ 'as' ],
 oop.inherits(ActionScriptHighlightRules, TextHighlightRules);
 
 exports.ActionScriptHighlightRules = ActionScriptHighlightRules;
+
+
+export {};

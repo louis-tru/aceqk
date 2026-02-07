@@ -22,3 +22,6 @@ oop.inherits(Mode, tsMode);
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

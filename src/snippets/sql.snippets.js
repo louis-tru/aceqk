@@ -25,3 +25,6 @@ snippet seq
 snippet s*
 	select * from \${1:table}
 `;
+
+
+export {};

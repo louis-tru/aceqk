@@ -19,3 +19,6 @@ snippet =rpc
 	= render :partial => '\${1:partial}', :collection => @\$1
 
 `;
+
+
+export {};

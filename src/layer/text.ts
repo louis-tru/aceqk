@@ -175,16 +175,14 @@ export class Text extends EventEmitter<TextEvents> {
 		for (var i = 1; i < tabSize + 1; i++) {
 			if (this.showTabs) {
 				// var span = this.dom.createElement("span");
-				var span = new Label(this.element.window);
+				var span = this.createTextNode(lang.stringRepeat(this.TAB_CHAR, i));
 				span.class = ["ace_invisible", "ace_invisible_tab"];
 				// span.textContent = lang.stringRepeat(this.TAB_CHAR, i);
-				span.value = lang.stringRepeat(this.TAB_CHAR, i);
 				tabStr.push(span);
 			} else {
 				// tabStr.push(this.dom.createTextNode(lang.stringRepeat(" ", i), this.element));
-				var label = new Label(this.element.window);
+				var label = this.createTextNode(lang.stringRepeat(" ", i));
 				// label.textContent = lang.stringRepeat(" ", i);
-				label.value = lang.stringRepeat(" ", i);
 				tabStr.push(label);
 			}
 		}
@@ -202,17 +200,15 @@ export class Text extends EventEmitter<TextEvents> {
 				: spaceContent;
 
 			// var span = this.dom.createElement("span");
-			var span = new Label(this.element.window);
+			var span = this.createTextNode(spaceContent);
 			span.class = (className + spaceClass).split(" ");
 			// span.textContent = spaceContent;
-			span.value = spaceContent;
 			this.$tabStrings[" "] = span;
 
 			// var span = this.dom.createElement("span");
-			var span = new Label(this.element.window);
+			var span = this.createTextNode(tabContent);
 			span.class = (className + tabClass).split(" ");
 			// span.textContent = tabContent;
-			span.value = tabContent;
 			this.$tabStrings["\t"] = span;
 		}
 	}
@@ -362,9 +358,7 @@ export class Text extends EventEmitter<TextEvents> {
 				break;
 
 			var line = this.$lines.createCell(row, config, this.session);
-
 			var lineEl = line.element;
-			lineEl.removeAllChild(); // clear previous content
 			lineEl.style.height = this.$lines.computeLineHeight(row, config, this.session);
 			lineEl.style.marginTop = this.$lines.computeLineTop(row, config, this.session);
 
@@ -405,11 +399,28 @@ export class Text extends EventEmitter<TextEvents> {
 	public createTextNode(text: string): Label & {"charCount"?: number} {
 		var label = new Label(this.element.window);
 		label.value = text;
+		label.aa = false;
 		return label;
 	}
 
 	private cloneTextNode(label: Label, deep?: boolean): Label & {"charCount"?: number} {
 		var newLabel = new Label(this.element.window);
+		var classList = label.class;
+		if (classList.length)
+			newLabel.class = classList;
+		newLabel.value = label.value;
+		newLabel.aa = false;
+		return newLabel;
+	}
+
+	private cloneTextView(label: Label, deep?: boolean): TextView & {"charCount"?: number} {
+		var newLabel = new TextView(this.element.window);
+		var classList = label.class;
+		if (classList.length)
+			newLabel.class = classList;
+		newLabel.value = label.value;
+		newLabel.style.height = '100%';
+		newLabel.aa = false;
 		return newLabel;
 	}
 
@@ -441,66 +452,81 @@ export class Text extends EventEmitter<TextEvents> {
 
 			if (tab) {
 				var tabSize = self.session.getScreenTabSize(screenColumn + m.index);
-				var text = this.cloneTextNode(self.$tabStrings[tabSize], true);
+				var text = this.cloneTextView(self.$tabStrings[tabSize], true);
 				text["charCount"] = 1;
 				valueFragment.push(text);
 				screenColumn += tabSize - 1;
 			} else if (simpleSpace) {
 				if (self.showSpaces) {
 					// var span = this.dom.createElement("span");
-					var span = new Label(this.element.window);
+					var span = this.createTextNode(lang.stringRepeat(self.SPACE_CHAR, simpleSpace.length));
 					span.class = ["ace_invisible", "ace_invisible_space"];
-					span.value = lang.stringRepeat(self.SPACE_CHAR, simpleSpace.length);
+					// span.value = lang.stringRepeat(self.SPACE_CHAR, simpleSpace.length);
 					valueFragment.push(span);
 				} else {
 					valueFragment.push(this.createTextNode(simpleSpace));
 				}
 			} else if (controlCharacter) {
 				// var span = this.dom.createElement("span");
-				var span = new Label(this.element.window);
+				var span = this.createTextNode(lang.stringRepeat(self.SPACE_CHAR, controlCharacter.length));
 				span.class = ["ace_invisible", "ace_invisible_space", "ace_invalid"];
-				span.value = lang.stringRepeat(self.SPACE_CHAR, controlCharacter.length);
+				// span.value = lang.stringRepeat(self.SPACE_CHAR, controlCharacter.length);
 				valueFragment.push(span);
 			} else if (cjkSpace) {
 				// U+3000 is both invisible AND full-width, so must be handled uniquely
 				screenColumn += 1;
 
 				// var span = this.dom.createElement("span");
-				let span = new TextView(this.element.window); // Text node to allow setting width
-				span.style.width = (self.config.characterWidth * 2);
-				span.class = self.showSpaces ? ["ace_cjk", "ace_invisible", "ace_invisible_space"] : ["ace_cjk"];
+				let span = new TextView(this.element.window); // Text view to allow setting width
+				span.style.align = 'middle';
+				span.style.width = self.config.characterWidth * 2;
 				span.value = self.showSpaces ? self.SPACE_CHAR : cjkSpace;
+				span.aa = false;
+				span.class = self.showSpaces ? ["ace_cjk", "ace_invisible", "ace_invisible_space"] : ["ace_cjk"];
 				valueFragment.push(span);
 			} else if (cjk) {
 				screenColumn += 1;
 				// var span = this.dom.createElement("span");
-				let span = new TextView(this.element.window); // Text node to allow setting width
-				span.style.width = (self.config.characterWidth * 2);
-				span.class = ["ace_cjk"];
+				let span = new TextView(this.element.window); // Text view to allow setting width
+				span.style.align = 'middle';
+				span.style.width = self.config.characterWidth * 2;
 				span.value = cjk;
+				span.aa = false;
+				span.addClass("ace_cjk");
 				valueFragment.push(span);
 			}
 		}
 
-		valueFragment.push(this.createTextNode(i ? value.slice(i) : value));
+		var lastValue = i ? value.slice(i) : value;
+		if (lastValue.length) {
+			valueFragment.push(this.createTextNode(lastValue));
+		}
+
 		if (!isTextToken(token.type)) {
 			let classes = "ace_" + token.type.replace(/\./g, " ace_");
 			// let span = this.dom.createElement("span");
-			let span = new TextView(this.element.window);
-			if (token.type == "fold"){
+			let span: View;
+			if (token.type == "fold") {
+				// Use block view to allow setting width
+				span = new Box(this.element.window);
 				span.style.width = (token.value.length * this.config.characterWidth);
-				span.data.title = nls("inline-fold.closed.title", "Unfold code");
+				span.style.height = '100%';
+				span.style.layout = 'free';
+				let fold = new Box(this.element.window);
+				fold.class = classes.split(" ");
+				fold.setAttribute("title", nls("inline-fold.closed.title", "Unfold code"));
+				// valueFragment.forEach(e=>fold.append(e));
+				span.append(fold);
+			} else {
+				span = new Label(this.element.window);
+				// span.style.height = '100%';
+				valueFragment.forEach(e=>span.append(e));
+				span.class = classes.split(" ");
 			}
-			span.class = classes.split(" ");
-			valueFragment.forEach(function(child) {
-				span.append(child);
-			});
 			parent.append(span);
 		}
 		else {
-			valueFragment.forEach(function(child) {
-				parent.append(child);
-			});
+			valueFragment.forEach(e => parent.append(e));
 		}
 
 		return screenColumn + value.length;
@@ -514,13 +540,13 @@ export class Text extends EventEmitter<TextEvents> {
 			cols -= cols % this.tabSize!;
 			var count = cols/this.tabSize!;
 			for (var i=0; i<count; i++) {
-				parent.append(this.cloneTextNode(this.$tabStrings[" "]!, true));
+				parent.append(this.cloneTextView(this.$tabStrings[" "]!, true));
 			}
 			this.$highlightIndentGuide();
 			return value.substring(cols);
 		} else if (value[0] == "\t") {
 			for (var i=0; i<cols; i++) {
-				parent.append(this.cloneTextNode(this.$tabStrings["\t"]!, true));
+				parent.append(this.cloneTextView(this.$tabStrings["\t"]!, true));
 			}
 			this.$highlightIndentGuide();
 			return value.substring(cols);
@@ -585,14 +611,7 @@ export class Text extends EventEmitter<TextEvents> {
 	}
 
 	$clearActiveIndentGuide(e?: any) {
-		var activeIndentGuides: View[] = [];
-		var v = this.element.first;
-		while (v) {
-			if (v.cssclass.has("ace_indent-guide-active"))
-			activeIndentGuides.push(v);
-			v = v.next;
-		}
-		// var activeIndentGuides = this.element.querySelectorAll(".ace_indent-guide-active");
+		var activeIndentGuides = this.element.querySelectorAllForClass("ace_indent-guide-active");
 		for (var i = 0; i < activeIndentGuides.length; i++) {
 			activeIndentGuides[i].removeClass("ace_indent-guide-active");
 		}
@@ -739,9 +758,9 @@ export class Text extends EventEmitter<TextEvents> {
 			value.slice(0, this.MAX_LINE_LENGTH - screenColumn));
 
 		// var overflowEl = this.dom.createElement("span");
-		var overflowEl = new Label(parent.window);
+		var overflowEl = this.createTextNode(hide ? "<hide>" : "<click to see more...>");
 		overflowEl.class = ["ace_inline_button", "ace_keyword ace_toggle_wrap"];
-		overflowEl.value = hide ? "<hide>" : "<click to see more...>";
+		// overflowEl.value = hide ? "<hide>" : "<click to see more...>";
 
 		parent.append(overflowEl);
 	}
@@ -781,9 +800,9 @@ export class Text extends EventEmitter<TextEvents> {
 				row = foldLine.end.row;
 
 			// var invisibleEl = this.dom.createElement("span");
-			var invisibleEl = new Label(this.element.window);
+			var invisibleEl = this.createTextNode(row == this.session.getLength() - 1 ? this.EOF_CHAR : this.EOL_CHAR);
 			invisibleEl.class = ["ace_invisible","ace_invisible_eol"];
-			invisibleEl.value = row == this.session.getLength() - 1 ? this.EOF_CHAR : this.EOL_CHAR;
+			// invisibleEl.value = row == this.session.getLength() - 1 ? this.EOF_CHAR : this.EOL_CHAR;
 
 			lastLineEl.append(invisibleEl);
 		}

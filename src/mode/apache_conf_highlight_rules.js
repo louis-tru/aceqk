@@ -197,3 +197,6 @@ ApacheConfHighlightRules.metaData = { fileTypes:
 oop.inherits(ApacheConfHighlightRules, TextHighlightRules);
 
 exports.ApacheConfHighlightRules = ApacheConfHighlightRules;
+
+
+export {};

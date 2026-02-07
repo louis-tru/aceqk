@@ -84,3 +84,5 @@ function tokenizeCsv(line, state, options) {
     return { tokens: result, state: inString ? "string-" + column : "start" };
 
 }
+
+export {};

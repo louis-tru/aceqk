@@ -139,3 +139,6 @@ NSISHighlightRules.metaData = {
 oop.inherits(NSISHighlightRules, TextHighlightRules);
 
 exports.NSISHighlightRules = NSISHighlightRules;
+
+
+export {};

@@ -74,3 +74,6 @@ var DiffHighlightRules = function() {
 oop.inherits(DiffHighlightRules, TextHighlightRules);
 
 exports.DiffHighlightRules = DiffHighlightRules;
+
+
+export {};

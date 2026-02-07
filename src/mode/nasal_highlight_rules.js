@@ -357,3 +357,5 @@ NasalHighlightRules.metaData = {
 oop.inherits(NasalHighlightRules, TextHighlightRules);
 
 exports.NasalHighlightRules = NasalHighlightRules;
+
+export {};

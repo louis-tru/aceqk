@@ -120,3 +120,5 @@ var AstroHighlightRules = function () {
 
 oop.inherits(AstroHighlightRules, HtmlHighlightRules);
 exports.AstroHighlightRules = AstroHighlightRules;
+
+export {};

@@ -47,3 +47,6 @@ var glslHighlightRules = function() {
 oop.inherits(glslHighlightRules, c_cppHighlightRules);
 
 exports.glslHighlightRules = glslHighlightRules;
+
+
+export {};

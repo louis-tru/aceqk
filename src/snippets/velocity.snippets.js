@@ -27,3 +27,6 @@ snippet #import
 snippet #set
 	#set ( \$\${1:var} = \${0} )
 `;
+
+
+export {};

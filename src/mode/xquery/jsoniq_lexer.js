@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 module.exports = (function outer (modules, cache, entry) {
     var previousRequire = typeof require == "function" && require;
     function newRequire(name, jumped){
@@ -4467,3 +4467,5 @@ exports.Lexer = function(Tokenizer, Rules) {
 },{}]},{},["/node_modules/xqlint/lib/lexers/jsoniq_lexer.js"]);
 
 });
+
+export {};

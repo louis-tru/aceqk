@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./jsp.snippets");
 exports.scope = "jsp";
+
+
+export {};

@@ -122,3 +122,6 @@ RobotHighlightRules.metadata = {
 oop.inherits(RobotHighlightRules, TextHighlightRules);
 
 exports.RobotHighlightRules = RobotHighlightRules;
+
+
+export {};

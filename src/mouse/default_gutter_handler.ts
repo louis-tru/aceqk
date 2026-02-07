@@ -256,7 +256,7 @@ export class GutterTooltip extends HoverTooltip {
 		var gutterCell = this.$findCellByRow(range.start.row);
 		if (!gutterCell) return;
 		var el = gutterCell && gutterCell.element;
-		var anchorEl = el && (el.querySelectorForClass(".ace_gutter_annotation"));
+		var anchorEl = el && (el.querySelectorForClass("ace_gutter_annotation"));
 		if (!anchorEl) return;
 		var pos = anchorEl.position;
 		var size = anchorEl.clientSize;

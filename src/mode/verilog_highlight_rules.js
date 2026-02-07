@@ -79,3 +79,6 @@ var keywords = "always|and|assign|automatic|begin|buf|bufif0|bufif1|case|casex|c
 oop.inherits(VerilogHighlightRules, TextHighlightRules);
 
 exports.VerilogHighlightRules = VerilogHighlightRules;
+
+
+export {};

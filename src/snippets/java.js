@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./java.snippets");
 exports.scope = "java";
+
+
+export {};

@@ -141,3 +141,6 @@
     oop.inherits(scryptHighlightRules, TextHighlightRules);
 
     exports.scryptHighlightRules = scryptHighlightRules;
+
+
+export {};

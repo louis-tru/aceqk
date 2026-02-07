@@ -156,3 +156,6 @@ var LuaHighlightRules = function() {
 oop.inherits(LuaHighlightRules, TextHighlightRules);
 
 exports.LuaHighlightRules = LuaHighlightRules;
+
+
+export {};

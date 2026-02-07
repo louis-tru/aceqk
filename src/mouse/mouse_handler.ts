@@ -173,7 +173,7 @@ export class MouseHandler {
 		var self = this;
 		var continueCapture = true;
 
-		var onMouseMove = function(e: UIMouseEvent) {
+		var onMouseMove = function(e?: UIMouseEvent) {
 			if (!e) return;
 			// if editor is loaded inside iframe, and mouseup event is outside
 			// we won't recieve it, so we cancel on first mousemove without button
@@ -191,7 +191,7 @@ export class MouseHandler {
 			editor.off("beforeEndOperation", onOperationEnd);
 			continueCapture = false;
 			if (editor.session) onCaptureUpdate();
-			(self as any)[self.state + "End"] && (self as any)[self.state + "End"](e);
+			(self as any)[self.state + "End"] && (self as any)[self.state + "End"]();
 			self.state = "";
 			self.isMousePressed = renderer.$isMousePressed = false;
 			if (renderer.$keepTextAreaAtCursor)
@@ -224,7 +224,7 @@ export class MouseHandler {
 			if (editor.curOp!.command!.name && editor!.curOp!.selectionChanged) {
 				(self as any)[self.state + "End"] && (self as any)[self.state + "End"]();
 				self.state = "";
-				self.releaseMouse({} as any);
+				self.releaseMouse(null as any);
 			}
 		};
 
@@ -248,8 +248,10 @@ export class MouseHandler {
 		this.editor.on("nativecontextmenu", stop);
 	}
 	destroy() {
-		if (this.releaseMouse) this.releaseMouse({} as any);
-		if (this.$tooltip) this.$tooltip.destroy();
+		if (this.releaseMouse)
+			this.releaseMouse(null as any);
+		if (this.$tooltip)
+			this.$tooltip.destroy();
 	}
 }
 

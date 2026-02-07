@@ -107,3 +107,6 @@ var scadHighlightRules = function() {
 oop.inherits(scadHighlightRules, TextHighlightRules);
 
 exports.scadHighlightRules = scadHighlightRules;
+
+
+export {};

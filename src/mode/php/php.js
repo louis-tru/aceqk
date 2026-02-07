@@ -2530,3 +2530,6 @@ define(function (require, exports, module) {
 
 	exports.PHP = PHP;
 });
+
+
+export {};

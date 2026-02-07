@@ -137,3 +137,6 @@ var FSharpHighlightRules = function () {
 oop.inherits(FSharpHighlightRules, TextHighlightRules);
 
 exports.FSharpHighlightRules = FSharpHighlightRules;
+
+
+export {};

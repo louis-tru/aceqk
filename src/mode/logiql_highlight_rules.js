@@ -85,3 +85,6 @@ var LogiQLHighlightRules = function() {
 oop.inherits(LogiQLHighlightRules, TextHighlightRules);
 
 exports.LogiQLHighlightRules = LogiQLHighlightRules;
+
+
+export {};

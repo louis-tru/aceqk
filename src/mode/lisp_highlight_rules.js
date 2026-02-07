@@ -84,3 +84,6 @@ var LispHighlightRules = function() {
 oop.inherits(LispHighlightRules, TextHighlightRules);
 
 exports.LispHighlightRules = LispHighlightRules;
+
+
+export {};

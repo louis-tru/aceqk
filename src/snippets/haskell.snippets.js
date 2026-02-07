@@ -81,3 +81,6 @@ snippet where
 	where
 		\${1:fn} = \${2:undefined}
 `;
+
+
+export {};

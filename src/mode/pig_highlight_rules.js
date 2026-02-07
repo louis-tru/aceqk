@@ -144,3 +144,6 @@ PigHighlightRules.metaData = {
 oop.inherits(PigHighlightRules, TextHighlightRules);
 
 exports.PigHighlightRules = PigHighlightRules;
+
+
+export {};

@@ -282,3 +282,6 @@ var JavaHighlightRules = function() {
 oop.inherits(JavaHighlightRules, TextHighlightRules);
 
 exports.JavaHighlightRules = JavaHighlightRules;
+
+
+export {};

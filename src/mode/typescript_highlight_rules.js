@@ -41,3 +41,6 @@ var TypeScriptHighlightRules = function (options) {
 oop.inherits(TypeScriptHighlightRules, JavaScriptHighlightRules);
 
 exports.TypeScriptHighlightRules = TypeScriptHighlightRules;
+
+
+export {};

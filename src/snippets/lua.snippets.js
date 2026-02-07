@@ -20,3 +20,6 @@ snippet fori
 	   \${4:-- body}
 	end
 `;
+
+
+export {};

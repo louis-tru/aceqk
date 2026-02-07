@@ -560,3 +560,6 @@ MediaWikiHighlightRules.metaData = {
 oop.inherits(MediaWikiHighlightRules, TextHighlightRules);
 
 exports.MediaWikiHighlightRules = MediaWikiHighlightRules;
+
+
+export {};

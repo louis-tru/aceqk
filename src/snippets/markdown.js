@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./markdown.snippets");
 exports.scope = "markdown";
+
+
+export {};

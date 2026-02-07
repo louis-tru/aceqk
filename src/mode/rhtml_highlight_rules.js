@@ -63,3 +63,6 @@ var RHtmlHighlightRules = function() {
 oop.inherits(RHtmlHighlightRules, TextHighlightRules);
 
 exports.RHtmlHighlightRules = RHtmlHighlightRules;
+
+
+export {};

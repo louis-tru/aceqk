@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./haskell.snippets");
 exports.scope = "haskell";
+
+
+export {};

@@ -90,3 +90,6 @@ var MixalHighlightRules = function() {
 oop.inherits(MixalHighlightRules, TextHighlightRules);
 
 exports.MixalHighlightRules = MixalHighlightRules;
+
+
+export {};

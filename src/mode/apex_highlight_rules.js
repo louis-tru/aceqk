@@ -226,3 +226,6 @@ var ApexHighlightRules = function() {
 oop.inherits(ApexHighlightRules, TextHighlightRules);
 
 exports.ApexHighlightRules = ApexHighlightRules;
+
+
+export {};

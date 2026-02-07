@@ -91,3 +91,6 @@ var CirruHighlightRules = function() {
 oop.inherits(CirruHighlightRules, TextHighlightRules);
 
 exports.CirruHighlightRules = CirruHighlightRules;
+
+
+export {};

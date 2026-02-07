@@ -172,3 +172,6 @@ var PHPLaravelBladeHighlightRules = function() {
 oop.inherits(PHPLaravelBladeHighlightRules, PhpHighlightRules);
 
 exports.PHPLaravelBladeHighlightRules = PHPLaravelBladeHighlightRules;
+
+
+export {};

@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./python.snippets");
 exports.scope = "python";
+
+
+export {};

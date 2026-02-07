@@ -268,3 +268,6 @@ var GobstonesHighlightRules = function() {
 oop.inherits(GobstonesHighlightRules, TextHighlightRules);
 
 exports.GobstonesHighlightRules = GobstonesHighlightRules;
+
+
+export {};

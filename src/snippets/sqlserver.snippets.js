@@ -68,3 +68,6 @@ snippet createfn
 		
 	END
 	GO`;
+
+
+export {};

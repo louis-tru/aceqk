@@ -102,3 +102,6 @@ oop.inherits(FoldMode, CFoldMode);
     };
 
 }).call(FoldMode.prototype);
+
+
+export {};

@@ -9,3 +9,6 @@ snippet synth
 	</CsScore>
 	</CsoundSynthesizer>
 `;
+
+
+export {};

@@ -199,3 +199,6 @@ var FortranHighlightRules = function() {
 oop.inherits(FortranHighlightRules, TextHighlightRules);
 
 exports.FortranHighlightRules = FortranHighlightRules;
+
+
+export {};

@@ -130,3 +130,6 @@ ForthHighlightRules.metaData = { fileTypes: [ 'frt', 'fs', 'ldr', 'fth', '4th' ]
 oop.inherits(ForthHighlightRules, TextHighlightRules);
 
 exports.ForthHighlightRules = ForthHighlightRules;
+
+
+export {};

@@ -34,7 +34,7 @@
 
 require("amd-loader");
 
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 var assert = require("../test/assertions");
@@ -57,7 +57,7 @@ module.exports = {
 		// it some kind of id, in this case 'test1'.
 		worker.require.id = 'test1';
 		// Now define out module
-		worker.define(function(require, exports, module) {
+		worker.define(function(_require, _exports, _module) {
 			var depA = require("depA");
 			var depB = require("depB");
 			assert.equal("dependency A", depA);
@@ -123,3 +123,5 @@ module.exports = {
 if (typeof module !== "undefined" && module === require.main) {
 	require("asyncjs").test.testcase(module.exports).exec();
 }
+
+export {};

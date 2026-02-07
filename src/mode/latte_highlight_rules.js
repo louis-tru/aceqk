@@ -158,3 +158,6 @@ var LatteHighlightRules = function() {
 oop.inherits(LatteHighlightRules, TextHighlightRules);
 
 exports.LatteHighlightRules = LatteHighlightRules;
+
+
+export {};

@@ -11,3 +11,5 @@ var TsxHighlightRules = function () {
 oop.inherits(TsxHighlightRules, TypeScriptHighlightRules);
 
 exports.TsxHighlightRules = TsxHighlightRules;
+
+export {};

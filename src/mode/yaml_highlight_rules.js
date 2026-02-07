@@ -145,3 +145,6 @@ var YamlHighlightRules = function() {
 oop.inherits(YamlHighlightRules, TextHighlightRules);
 
 exports.YamlHighlightRules = YamlHighlightRules;
+
+
+export {};

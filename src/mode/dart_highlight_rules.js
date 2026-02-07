@@ -189,3 +189,6 @@ var DartHighlightRules = function() {
 oop.inherits(DartHighlightRules, TextHighlightRules);
 
 exports.DartHighlightRules = DartHighlightRules;
+
+
+export {};

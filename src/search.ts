@@ -312,6 +312,23 @@ export class Search {
 		return replacement;
 	}
 
+	compatRegExp(pattern: string, flags = ""): RegExp {
+		let src = pattern;
+		flags = flags.replace("u", "");
+
+		// Unicode property 简化
+		src = src.replace(/\\p\{L\}/g, "A-Za-z");
+		src = src.replace(/\\p\{N\}/g, "0-9");
+
+		// lookbehind 单词边界 → 非捕获 + 捕获目标
+		// src = src.replace(
+		// 	/\(\?\<=\^?\|\[\^\\p\{L\}\\p\{N\}_\]\)([^()]+)\(\?\=\[\^\\p\{L\}\\p\{N\}_\]\|\$\)/g,
+		// 	"(?:^|[^A-Za-z0-9_])($1)(?=[^A-Za-z0-9_]|$)"
+		// );
+
+		return new RegExp(src, flags);
+	}
+
 	/**
 	 *
 	 * @param {Partial<SearchOptions>} options
@@ -348,10 +365,13 @@ export class Search {
 			return options.re = this.$assembleMultilineRegExp(needle, modifier);
 
 		try {
-			/**@type {RegExp|false}*/
 			var re: RegExp | false = new RegExp(needle, modifier);
 		} catch(e) {
-			re = false;
+			try {
+				re = this.compatRegExp(needle, modifier);
+			} catch (e) {
+				re = false;
+			}
 		}
 		return options.re = re;
 	}
@@ -608,7 +628,9 @@ function addWordBoundary(needle: string, options: Partial<SearchOptions>) {
 	let supportsLookbehind = lang.supportsLookbehind();
 
 	function wordBoundary(c: string, firstChar = true) {
-		let wordRegExp = supportsLookbehind && options.$supportsUnicodeFlag ? new RegExp("[\\p{L}\\p{N}_]","u") : new RegExp("\\w");
+		//let wordRegExp = supportsLookbehind && options.$supportsUnicodeFlag ? new RegExp("[\\p{L}\\p{N}_]","u") : new RegExp("\\w");
+		// Fallback for browsers that do not support lookbehind with unicode
+		let wordRegExp = supportsLookbehind && options.$supportsUnicodeFlag ? /[a-zA-Z0-9_]/ : /\w/;
 
 		if (wordRegExp.test(c) || options.regExp) {
 			if (supportsLookbehind && options.$supportsUnicodeFlag) {

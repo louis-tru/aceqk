@@ -13,3 +13,6 @@ var FoldMode = exports.FoldMode = function(voidElements, optionalTags) {
 };
 
 oop.inherits(FoldMode, MixedFoldMode);
+
+
+export {};

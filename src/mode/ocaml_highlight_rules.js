@@ -302,3 +302,6 @@ var OcamlHighlightRules = function() {
 oop.inherits(OcamlHighlightRules, TextHighlightRules);
 
 exports.OcamlHighlightRules = OcamlHighlightRules;
+
+
+export {};

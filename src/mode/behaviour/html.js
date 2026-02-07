@@ -13,3 +13,6 @@ var HtmlBehaviour = function () {
 oop.inherits(HtmlBehaviour, XmlBehaviour);
 
 exports.HtmlBehaviour = HtmlBehaviour;
+
+
+export {};

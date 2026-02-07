@@ -201,3 +201,6 @@ var SlimHighlightRules = function() {
 oop.inherits(SlimHighlightRules, TextHighlightRules);
 
 exports.SlimHighlightRules = SlimHighlightRules;
+
+
+export {};

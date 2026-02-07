@@ -159,3 +159,6 @@ JSSMHighlightRules.metaData = {
 oop.inherits(JSSMHighlightRules, TextHighlightRules);
 
 exports.JSSMHighlightRules = JSSMHighlightRules;
+
+
+export {};

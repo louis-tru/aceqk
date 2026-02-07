@@ -269,3 +269,6 @@ var PraatHighlightRules = function() {
 oop.inherits(PraatHighlightRules, TextHighlightRules);
 
 exports.PraatHighlightRules = PraatHighlightRules;
+
+
+export {};

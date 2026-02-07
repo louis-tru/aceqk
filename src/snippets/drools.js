@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./drools.snippets");
 exports.scope = "drools";
+
+
+export {};

@@ -842,3 +842,6 @@ ErlangHighlightRules.metaData = { comment: 'The recognition of function definiti
 oop.inherits(ErlangHighlightRules, TextHighlightRules);
 
 exports.ErlangHighlightRules = ErlangHighlightRules;
+
+
+export {};

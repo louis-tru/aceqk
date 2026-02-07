@@ -80,3 +80,6 @@ IoHighlightRules.metaData = { fileTypes: [ 'io' ],
 oop.inherits(IoHighlightRules, TextHighlightRules);
 
 exports.IoHighlightRules = IoHighlightRules;
+
+
+export {};

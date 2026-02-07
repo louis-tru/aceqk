@@ -105,3 +105,6 @@ var AppleScriptHighlightRules = function() {
 oop.inherits(AppleScriptHighlightRules, TextHighlightRules);
 
 exports.AppleScriptHighlightRules = AppleScriptHighlightRules;
+
+
+export {};

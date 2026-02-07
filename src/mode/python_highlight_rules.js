@@ -395,3 +395,6 @@ var PythonHighlightRules = function() {
 oop.inherits(PythonHighlightRules, TextHighlightRules);
 
 exports.PythonHighlightRules = PythonHighlightRules;
+
+
+export {};

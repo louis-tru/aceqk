@@ -23,3 +23,6 @@ VisualforceMode.prototype.emmetConfig = {
 };
 
 exports.Mode = VisualforceMode;
+
+
+export {};

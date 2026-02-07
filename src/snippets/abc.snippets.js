@@ -30,3 +30,6 @@ snippet zupfnoter.annotation
 
 
 `;
+
+
+export {};

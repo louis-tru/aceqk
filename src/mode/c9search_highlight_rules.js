@@ -158,3 +158,6 @@ var C9SearchHighlightRules = function() {
 oop.inherits(C9SearchHighlightRules, TextHighlightRules);
 
 exports.C9SearchHighlightRules = C9SearchHighlightRules;
+
+
+export {};

@@ -284,3 +284,6 @@ var ObjectiveCHighlightRules = function() {
 oop.inherits(ObjectiveCHighlightRules, CHighlightRules);
 
 exports.ObjectiveCHighlightRules = ObjectiveCHighlightRules;
+
+
+export {};

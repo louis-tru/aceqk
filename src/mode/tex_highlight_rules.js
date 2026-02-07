@@ -124,3 +124,6 @@ var TexHighlightRules = function(textClass) {
 oop.inherits(TexHighlightRules, TextHighlightRules);
 
 exports.TexHighlightRules = TexHighlightRules;
+
+
+export {};

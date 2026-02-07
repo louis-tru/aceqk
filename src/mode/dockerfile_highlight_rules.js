@@ -23,3 +23,6 @@ var DockerfileHighlightRules = function() {
 oop.inherits(DockerfileHighlightRules, ShHighlightRules);
 
 exports.DockerfileHighlightRules = DockerfileHighlightRules;
+
+
+export {};

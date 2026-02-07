@@ -156,3 +156,6 @@ snippet FlxSprite
 	}
 
 `;
+
+
+export {};

@@ -50,3 +50,6 @@
     oop.inherits(HtmlRubyHighlightRules, HtmlHighlightRules);
 
     exports.HtmlRubyHighlightRules = HtmlRubyHighlightRules;
+
+
+export {};

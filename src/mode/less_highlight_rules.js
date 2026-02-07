@@ -135,3 +135,6 @@ var LessHighlightRules = function() {
 oop.inherits(LessHighlightRules, TextHighlightRules);
 
 exports.LessHighlightRules = LessHighlightRules;
+
+
+export {};

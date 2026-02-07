@@ -89,3 +89,6 @@ AssemblyARM32HighlightRules.metaData = { fileTypes: [ 's' ],
 oop.inherits(AssemblyARM32HighlightRules, TextHighlightRules);
 
 exports.AssemblyARM32HighlightRules = AssemblyARM32HighlightRules;
+
+
+export {};

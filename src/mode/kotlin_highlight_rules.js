@@ -306,3 +306,6 @@ KotlinHighlightRules.metaData = {
 oop.inherits(KotlinHighlightRules, TextHighlightRules);
 
 exports.KotlinHighlightRules = KotlinHighlightRules;
+
+
+export {};

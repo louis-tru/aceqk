@@ -294,3 +294,6 @@
     oop.inherits(IonHighlightRules, TextHighlightRules);
 
     exports.IonHighlightRules = IonHighlightRules;
+
+
+export {};

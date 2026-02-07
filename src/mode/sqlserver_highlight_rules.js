@@ -206,3 +206,6 @@ var SqlServerHighlightRules = function() {
 oop.inherits(SqlServerHighlightRules, TextHighlightRules);
 
 exports.SqlHighlightRules = SqlServerHighlightRules;
+
+
+export {};

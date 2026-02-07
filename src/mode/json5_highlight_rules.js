@@ -57,3 +57,6 @@ var Json5HighlightRules = function() {
 oop.inherits(Json5HighlightRules, JsonHighlightRules);
 
 exports.Json5HighlightRules = Json5HighlightRules;
+
+
+export {};

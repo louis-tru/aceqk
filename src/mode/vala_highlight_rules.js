@@ -423,3 +423,6 @@ ValaHighlightRules.metaData = {
 oop.inherits(ValaHighlightRules, TextHighlightRules);
 
 exports.ValaHighlightRules = ValaHighlightRules;
+
+
+export {};

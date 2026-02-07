@@ -31,3 +31,6 @@ snippet enum
 		\${2:enum_siblings}
 	}
 `;
+
+
+export {};

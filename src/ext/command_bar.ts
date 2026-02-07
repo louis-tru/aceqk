@@ -589,7 +589,7 @@ export class CommandBarTooltip extends EventEmitter<CommandBarEvents> {
 				if (isOnTooltip) {
 					domCssFn(el, "ace_selected");
 				} else {
-					el = el.querySelectorForClass("." + VALUE_CLASS_NAME) as Text;
+					el = el.querySelectorForClass(VALUE_CLASS_NAME) as Text;
 					domCssFn(el, "ace_checkmark");
 				}
 			}
@@ -681,6 +681,7 @@ dom.importCss({
 	align: 'end', // right align
 },
 
+// .${KEYBINDING_CLASS_NAME} div
 [`.${KEYBINDING_CLASS_NAME} .div`]: {
 	// display: inline-block;
 	minWidth: 8,
@@ -718,7 +719,7 @@ dom.importCss({
 	backgroundColor: '#575757',
 },
 
-// .ace_checkmark::before {
+'.ace_checkmark:before': {
 // 	content: '✓';
-// }
+}
 }, "commandbar.css", false);

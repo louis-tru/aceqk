@@ -63,3 +63,6 @@ BatchFileHighlightRules.metaData = { name: 'Batch File',
 oop.inherits(BatchFileHighlightRules, TextHighlightRules);
 
 exports.BatchFileHighlightRules = BatchFileHighlightRules;
+
+
+export {};

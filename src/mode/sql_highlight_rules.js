@@ -81,3 +81,6 @@ var SqlHighlightRules = function() {
 oop.inherits(SqlHighlightRules, TextHighlightRules);
 
 exports.SqlHighlightRules = SqlHighlightRules;
+
+
+export {};

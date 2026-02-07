@@ -84,3 +84,6 @@ var SchemeHighlightRules = function() {
 oop.inherits(SchemeHighlightRules, TextHighlightRules);
 
 exports.SchemeHighlightRules = SchemeHighlightRules;
+
+
+export {};

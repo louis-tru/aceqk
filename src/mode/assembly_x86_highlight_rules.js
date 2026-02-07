@@ -80,3 +80,6 @@ AssemblyX86HighlightRules.metaData = { fileTypes: [ 'asm' ],
 oop.inherits(AssemblyX86HighlightRules, TextHighlightRules);
 
 exports.AssemblyX86HighlightRules = AssemblyX86HighlightRules;
+
+
+export {};

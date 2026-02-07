@@ -44,3 +44,6 @@ var SassHighlightRules = function() {
 oop.inherits(SassHighlightRules, ScssHighlightRules);
 
 exports.SassHighlightRules = SassHighlightRules;
+
+
+export {};

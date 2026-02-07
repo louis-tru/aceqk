@@ -93,3 +93,6 @@ var MysqlHighlightRules = function() {
 oop.inherits(MysqlHighlightRules, TextHighlightRules);
 
 exports.MysqlHighlightRules = MysqlHighlightRules;
+
+
+export {};

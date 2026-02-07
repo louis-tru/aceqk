@@ -101,3 +101,6 @@ var VisualforceHighlightRules = function() {
 oop.inherits(VisualforceHighlightRules, HtmlHighlightRules);
 
 exports.VisualforceHighlightRules = VisualforceHighlightRules;
+
+
+export {};

@@ -324,3 +324,6 @@ PrismaHighlightRules.metaData = {
 oop.inherits(PrismaHighlightRules, TextHighlightRules);
 
 exports.PrismaHighlightRules = PrismaHighlightRules;
+
+
+export {};

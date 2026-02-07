@@ -132,3 +132,6 @@ var TwigHighlightRules = function() {
 oop.inherits(TwigHighlightRules, TextHighlightRules);
 
 exports.TwigHighlightRules = TwigHighlightRules;
+
+
+export {};

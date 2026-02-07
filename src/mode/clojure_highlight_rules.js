@@ -206,3 +206,6 @@ var ClojureHighlightRules = function() {
 oop.inherits(ClojureHighlightRules, TextHighlightRules);
 
 exports.ClojureHighlightRules = ClojureHighlightRules;
+
+
+export {};

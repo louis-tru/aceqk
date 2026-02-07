@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 
 /*
  * DOM Level 2
@@ -1135,3 +1135,6 @@ try{
 
 return DOMImplementation;
 });
+
+
+export {};

@@ -3,6 +3,14 @@ import {View} from "quark";
 import { KeyEvent, UIEvent,GestureEvent } from "quark/event";
 import { KeyboardCode } from "quark/keyboard";
 
+declare global {
+	function define(fun: (require: any, exports: any, module: any) => void): void;
+}
+
+globalThis.define = function(fun) {
+	fun(require, module.exports, module);
+}
+
 declare module "quark/view" {
 	// Extend Quark View to support attributes
 	export interface View {
@@ -40,12 +48,13 @@ View.prototype.setAttribute = function(this: View, key: string, val: any) {
 };
 
 View.prototype.getAttribute = function(this: View, key: string) {
-	return this.data ? this.data[key]: undefined;
+	// return this.data ? this.data[key]: undefined;
+	return (this as any)[key];
 };
 
 View.prototype.removeAttribute = function(this: View, key: string) {
-	if (this.data) delete this.data[key];
-	// delete (this as any)[key];
+	// if (this.data) delete this.data[key];
+	delete (this as any)[key];
 };
 
 View.prototype.querySelectorAllForClass = function(this: View, selector: string) {
@@ -193,7 +202,7 @@ function querySelectorForAttributeImpl(element: View, attr: string, value: strin
 
 export function querySelectorAllForClass(element: View, selector: string) {
 	var results: View[] = [];
-	querySelectorForClassImpl(element, selector.substring(1), results, 0xffffffff);
+	querySelectorForClassImpl(element, selector, results, 0xffffffff);
 	return results;
 }
 

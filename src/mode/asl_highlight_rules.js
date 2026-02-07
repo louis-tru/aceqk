@@ -200,3 +200,6 @@
     oop.inherits(ASLHighlightRules, TextHighlightRules);
 
     exports.ASLHighlightRules = ASLHighlightRules;
+
+
+export {};

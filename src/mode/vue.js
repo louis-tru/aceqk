@@ -36,3 +36,6 @@ oop.inherits(Mode, HTMLMode);
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

@@ -99,3 +99,6 @@ MIPSHighlightRules.metaData = {
 oop.inherits(MIPSHighlightRules, TextHighlightRules);
 
 exports.MIPSHighlightRules = MIPSHighlightRules;
+
+
+export {};

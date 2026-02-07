@@ -351,3 +351,6 @@ var RakuHighlightRules = function() {
 oop.inherits(RakuHighlightRules, TextHighlightRules);
 
 exports.RakuHighlightRules = RakuHighlightRules;
+
+
+export {};

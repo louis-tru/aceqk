@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 /* global exports:true, module:true, require:true, define:true, global:true */
 
 (function (root, name, factory) {
@@ -2695,3 +2695,5 @@ define(function(require, exports, module) {
 /* vim: set sw=2 ts=2 et tw=79 : */
 
 });
+
+export {};

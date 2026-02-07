@@ -171,3 +171,6 @@ oop.inherits(FoldMode, HtmlFoldMode);
     };
 
 }).call(FoldMode.prototype);
+
+
+export {};

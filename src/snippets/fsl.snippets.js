@@ -8,3 +8,6 @@ module.exports = `snippet header
 	fsl_version      : 1.0.0;
 	start_states     : [];
 `;
+
+
+export {};

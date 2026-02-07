@@ -125,3 +125,6 @@ JsDocCommentHighlightRules.getEndRule = function (start) {
 
 
 exports.JsDocCommentHighlightRules = JsDocCommentHighlightRules;
+
+
+export {};

@@ -2040,3 +2040,6 @@ var CsoundOrchestraHighlightRules = function(embeddedRulePrefix) {
 oop.inherits(CsoundOrchestraHighlightRules, CsoundPreprocessorHighlightRules);
 
 exports.CsoundOrchestraHighlightRules = CsoundOrchestraHighlightRules;
+
+
+export {};

@@ -212,3 +212,6 @@ HaskellHighlightRules.metaData = { fileTypes: [ 'hs' ],
 oop.inherits(HaskellHighlightRules, TextHighlightRules);
 
 exports.HaskellHighlightRules = HaskellHighlightRules;
+
+
+export {};

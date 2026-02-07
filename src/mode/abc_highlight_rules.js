@@ -109,3 +109,6 @@
     oop.inherits(ABCHighlightRules, TextHighlightRules);
 
     exports.ABCHighlightRules = ABCHighlightRules;
+
+
+export {};

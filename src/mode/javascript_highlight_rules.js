@@ -572,3 +572,6 @@ function comments(next) {
     ];
 }
 exports.JavaScriptHighlightRules = JavaScriptHighlightRules;
+
+
+export {};

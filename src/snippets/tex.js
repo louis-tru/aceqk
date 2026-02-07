@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./tex.snippets");
 exports.scope = "tex";
+
+
+export {};

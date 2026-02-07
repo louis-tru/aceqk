@@ -295,3 +295,6 @@ oop.inherits(CsoundPreprocessorHighlightRules, TextHighlightRules);
 }).call(CsoundPreprocessorHighlightRules.prototype);
 
 exports.CsoundPreprocessorHighlightRules = CsoundPreprocessorHighlightRules;
+
+
+export {};

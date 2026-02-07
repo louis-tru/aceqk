@@ -29,3 +29,6 @@ snippet fn
 	fn\$1. \${2:footnote}
 	
 `;
+
+
+export {};

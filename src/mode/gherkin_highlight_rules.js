@@ -115,3 +115,6 @@ var GherkinHighlightRules = function() {
 oop.inherits(GherkinHighlightRules, TextHighlightRules);
 
 exports.GherkinHighlightRules = GherkinHighlightRules;
+
+
+export {};

@@ -90,7 +90,10 @@ export class TextInput {
 		event.addCommandKeyListener(this.text, (e, hashId, keyCode) => {
 			// ignore command events during composition as they will
 			// either be handled by ime itself or fired again after ime end
-			if (this.inComposition) return;
+			if (this.inComposition) {
+				// console.log("---- Command ignored during composition: hashId=", hashId, "keyCode=", keyCode);
+				return;
+			}
 			host.onCommandKey(e, hashId, keyCode);
 		}, host);
 		event.addListener(this.text, "InputInsert", e=>this.onInputInsert(e as InputEvent), host);
@@ -143,6 +146,7 @@ export class TextInput {
 	}
 
 	onCompositionEnd(e?: InputEvent) {
+
 		if (!this.host.onCompositionEnd || this.host.$readOnly)
 			return;
 		if (this.commandMode)
@@ -171,6 +175,8 @@ export class TextInput {
 		// 	if (e.inputType == "historyUndo") return this.host.execCommand("undo");
 		// 	if (e.inputType == "historyRedo") return this.host.execCommand("redo");
 		// }
+		if (e.input == '\t')
+			return; // ignore tabs, handled by keydown
 		this.host.onTextInput(e.input);
 	}
 

@@ -60,3 +60,6 @@ async.plugin({
         })
     }    
 })
+
+
+export {};

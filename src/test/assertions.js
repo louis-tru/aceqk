@@ -45,3 +45,6 @@ function serializeDom(node) {
 }
 
 module.exports = assert;
+
+
+export {};

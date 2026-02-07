@@ -131,3 +131,6 @@ var PerlHighlightRules = function() {
 oop.inherits(PerlHighlightRules, TextHighlightRules);
 
 exports.PerlHighlightRules = PerlHighlightRules;
+
+
+export {};

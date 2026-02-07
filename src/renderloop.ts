@@ -1,6 +1,7 @@
 "use strict";
 
 import qk, { Window } from "quark";
+import util from "quark/util";
 
 type OnRender = (changes: number) => void;
 
@@ -46,7 +47,7 @@ export class RenderLoop {
 	schedule(change: number = 0) {
 		this.changes = this.changes | change;
 		if (this.changes && !this.pending) {
-			this.window.nextFrame(this._flush);
+			this.window.nextFrame(this._flush); // too slow
 			this.pending = true;
 		}
 	}

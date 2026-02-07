@@ -11,3 +11,6 @@ var CsvHighlightRules = function() {
 oop.inherits(CsvHighlightRules, TextHighlightRules);
 
 exports.CsvHighlightRules = CsvHighlightRules;
+
+
+export {};

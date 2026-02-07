@@ -93,3 +93,6 @@ function getMatchedFoldRange(session, regex, match, row) {
         return new Range(startRow, startColumn, endRow, endColumn);
     }
 }
+
+
+export {};

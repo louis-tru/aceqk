@@ -150,3 +150,5 @@ var FlixHighlightRules = function() {
 oop.inherits(FlixHighlightRules, TextHighlightRules);
 
 exports.FlixHighlightRules = FlixHighlightRules;
+
+export {};

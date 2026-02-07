@@ -187,3 +187,6 @@ var MarkdownHighlightRules = function() {
 oop.inherits(MarkdownHighlightRules, TextHighlightRules);
 
 exports.MarkdownHighlightRules = MarkdownHighlightRules;
+
+
+export {};

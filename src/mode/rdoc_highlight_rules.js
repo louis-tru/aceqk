@@ -116,3 +116,6 @@ var RDocHighlightRules = function() {
 oop.inherits(RDocHighlightRules, TextHighlightRules);
 
 exports.RDocHighlightRules = RDocHighlightRules;
+
+
+export {};

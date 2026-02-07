@@ -52,3 +52,6 @@ var SpaceHighlightRules = function() {
 oop.inherits(SpaceHighlightRules, TextHighlightRules);
 
 exports.SpaceHighlightRules = SpaceHighlightRules;
+
+
+export {};

@@ -296,3 +296,6 @@
     oop.inherits(PartiqlHighlightRules, TextHighlightRules);
 
     exports.PartiqlHighlightRules = PartiqlHighlightRules;
+
+
+export {};

@@ -25,3 +25,6 @@ ApexMode.prototype.blockComment = {
 };
 
 exports.Mode = ApexMode;
+
+
+export {};

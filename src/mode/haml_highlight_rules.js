@@ -141,3 +141,6 @@ var HamlHighlightRules = function() {
 oop.inherits(HamlHighlightRules, HtmlHighlightRules);
 
 exports.HamlHighlightRules = HamlHighlightRules;
+
+
+export {};

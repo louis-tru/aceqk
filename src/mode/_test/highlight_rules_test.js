@@ -357,3 +357,6 @@ else if (/\d+/.test(arg))
     test(parseInt(process.argv[2],10) || 0);
 else
     testMode(arg, -1);
+
+
+export {};

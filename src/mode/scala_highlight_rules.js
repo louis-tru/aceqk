@@ -161,3 +161,6 @@ var ScalaHighlightRules = function() {
 oop.inherits(ScalaHighlightRules, TextHighlightRules);
 
 exports.ScalaHighlightRules = ScalaHighlightRules;
+
+
+export {};

@@ -232,3 +232,6 @@ require(selectedTests, function() {
 			console.log(node.innerText);
 		});
 });
+
+
+export {};

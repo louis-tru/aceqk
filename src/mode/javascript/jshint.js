@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 module.exports = (function outer (modules, cache, entry) {
     var previousRequire = typeof require == "function" && require;
     function newRequire(name, jumped){
@@ -19280,3 +19280,5 @@ arguments[4]["/node_modules/assert/node_modules/util/util.js"][0].apply(exports,
 },{"./support/isBuffer":"/node_modules/util/support/isBufferBrowser.js","_process":"/node_modules/process/browser.js","inherits":"/node_modules/util/node_modules/inherits/inherits_browser.js"}]},{},["/../../../jshint/src/jshint.js"]);
 
 });
+
+export {}

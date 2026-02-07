@@ -183,3 +183,6 @@ var NimHighlightRules = function () {
 oop.inherits(NimHighlightRules, TextHighlightRules);
 
 exports.NimHighlightRules = NimHighlightRules;
+
+
+export {};

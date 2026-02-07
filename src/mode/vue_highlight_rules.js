@@ -198,3 +198,6 @@ var VueHighlightRules = function (options) {
 oop.inherits(VueHighlightRules, HtmlHighlightRules);
 
 exports.VueHighlightRules = VueHighlightRules;
+
+
+export {};

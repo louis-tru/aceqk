@@ -173,3 +173,6 @@ var VelocityHighlightRules = function() {
 oop.inherits(VelocityHighlightRules, TextHighlightRules);
 
 exports.VelocityHighlightRules = VelocityHighlightRules;
+
+
+export {};

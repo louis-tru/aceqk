@@ -189,3 +189,6 @@ var sacHighlightRules = function() {
 oop.inherits(sacHighlightRules, TextHighlightRules);
 
 exports.sacHighlightRules = sacHighlightRules;
+
+
+export {};

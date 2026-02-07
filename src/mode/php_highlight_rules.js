@@ -1073,3 +1073,6 @@ oop.inherits(PhpHighlightRules, HtmlHighlightRules);
 
 exports.PhpHighlightRules = PhpHighlightRules;
 exports.PhpLangHighlightRules = PhpLangHighlightRules;
+
+
+export {};

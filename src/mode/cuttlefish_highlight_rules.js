@@ -34,3 +34,6 @@ CuttlefishHighlightRules.metaData = {
 oop.inherits(CuttlefishHighlightRules, TextHighlightRules);
 
 exports.CuttlefishHighlightRules = CuttlefishHighlightRules;
+
+
+export {};

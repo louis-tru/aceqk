@@ -77,3 +77,6 @@ var RazorCompletions = function() {
 }).call(RazorCompletions.prototype);
 
 exports.RazorCompletions = RazorCompletions;
+
+
+export {};

@@ -536,3 +536,6 @@ var PowershellHighlightRules = function() {
 oop.inherits(PowershellHighlightRules, TextHighlightRules);
 
 exports.PowershellHighlightRules = PowershellHighlightRules;
+
+
+export {};

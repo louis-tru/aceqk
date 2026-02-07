@@ -274,3 +274,6 @@ function Token(token, rgx, mix) {
         onMatch: onMatch
     };
 }
+
+
+export {};

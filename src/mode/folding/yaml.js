@@ -106,3 +106,6 @@ oop.inherits(FoldMode, CoffeeFoldMode);
     };
 
 }).call(FoldMode.prototype);
+
+
+export {};

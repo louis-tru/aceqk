@@ -51,3 +51,6 @@ var PropertiesHighlightRules = function() {
 oop.inherits(PropertiesHighlightRules, TextHighlightRules);
 
 exports.PropertiesHighlightRules = PropertiesHighlightRules;
+
+
+export {};

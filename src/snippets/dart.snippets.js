@@ -82,3 +82,6 @@ snippet tryf
 	} finally {
 	}
 `;
+
+
+export {};

@@ -446,3 +446,6 @@ ZigHighlightRules.metaData = {
 oop.inherits(ZigHighlightRules, TextHighlightRules);
 
 exports.ZigHighlightRules = ZigHighlightRules;
+
+
+export {};

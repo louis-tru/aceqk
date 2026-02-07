@@ -59,3 +59,6 @@ var keywords = "abort|else|new|return|abs|elsif|not|reverse|abstract|end|null|ac
 oop.inherits(AdaHighlightRules, TextHighlightRules);
 
 exports.AdaHighlightRules = AdaHighlightRules;
+
+
+export {};

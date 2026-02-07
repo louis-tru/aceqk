@@ -159,3 +159,6 @@ var FtlHighlightRules = function() {
 oop.inherits(FtlHighlightRules, HtmlHighlightRules);
 
 exports.FtlHighlightRules = FtlHighlightRules;
+
+
+export {};

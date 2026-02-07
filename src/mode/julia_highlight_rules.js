@@ -136,3 +136,6 @@ JuliaHighlightRules.metaData = { fileTypes: [ 'jl' ],
 oop.inherits(JuliaHighlightRules, TextHighlightRules);
 
 exports.JuliaHighlightRules = JuliaHighlightRules;
+
+
+export {};

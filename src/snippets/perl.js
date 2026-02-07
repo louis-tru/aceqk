@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./perl.snippets");
 exports.scope = "perl";
+
+
+export {};

@@ -182,3 +182,5 @@ var BibTeXHighlightRules = function() {
 oop.inherits(BibTeXHighlightRules, TextHighlightRules);
 
 exports.BibTeXHighlightRules = BibTeXHighlightRules;
+
+export {};

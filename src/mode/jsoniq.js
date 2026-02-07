@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 var WorkerClient = require("../worker/worker_client").WorkerClient;
@@ -173,3 +173,6 @@ oop.inherits(Mode, TextMode);
 
 exports.Mode = Mode;
 });
+
+
+export {};

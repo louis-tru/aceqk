@@ -196,7 +196,7 @@ export class AcePopup extends Editor {
 					popupRowElement.setAttribute("aria-label", ariaLabel);
 				}
 
-				const highlightedSpans = popupRowElement.querySelectorAllForClass(".ace_completion-highlight");
+				const highlightedSpans = popupRowElement.querySelectorAllForClass("ace_completion-highlight");
 				highlightedSpans.forEach(span => {
 					span.setAttribute("role", "mark");
 				});
@@ -538,7 +538,7 @@ dom.importCss({
 		itemsAlign: 'center',
 	},
 	// '.ace_autocomplete .ace_line > *': {
-	'.ace_autocomplete .ace_line .stars': {
+	'.ace_autocomplete .ace_line > .stars': {
 		minWidth: 0,
 		maxWidth: 'auto',
 		// flex: 0 0 auto;
@@ -553,7 +553,7 @@ dom.importCss({
 	'.ace_autocomplete .ace_completion-spacer': {
 		weight: 1
 	},
-	// '.ace_autocomplete.ace_loading:after': {
+	'.ace_autocomplete.ace_loading:after': {
 		// content: "";
 		// position: absolute;
 		// top: 0px;
@@ -564,7 +564,7 @@ dom.importCss({
 		// animation: ace_progress 3s infinite linear;
 		// animation-delay: 300ms;
 		// transform: translateX(-100%) scaleX(1);
-	// },
+	},
 	// @keyframes ace_progress {
 	// 	0% { transform: translateX(-100%) scaleX(1) }
 	// 	50% { transform: translateX(625%) scaleX(2) } 

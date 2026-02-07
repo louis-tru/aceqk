@@ -84,3 +84,6 @@ var VHDLHighlightRules = function() {
 oop.inherits(VHDLHighlightRules, TextHighlightRules);
 
 exports.VHDLHighlightRules = VHDLHighlightRules;
+
+
+export {};

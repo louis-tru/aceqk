@@ -189,3 +189,6 @@ snippet frac
 	\\frac{\${1:num}}{\${2:denom}}
 snippet sum
 	\\sum^{\${1:n}}_{\${2:i=1}}{\${3}}`;
+
+
+export {};

@@ -2,3 +2,6 @@
     
     exports.snippetText = require("./edifact.snippets");
     exports.scope = "edifact";
+
+
+export {};

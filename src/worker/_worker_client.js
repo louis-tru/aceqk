@@ -7,3 +7,6 @@ WorkerClient = function() {
 };
 
 exports.WorkerClient = WorkerClient;
+
+
+export {};

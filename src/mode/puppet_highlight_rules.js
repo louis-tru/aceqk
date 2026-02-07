@@ -146,3 +146,6 @@ var PuppetHighlightRules = function () {
 oop.inherits(PuppetHighlightRules, TextHighlightRules);
 
 exports.PuppetHighlightRules = PuppetHighlightRules;
+
+
+export {};

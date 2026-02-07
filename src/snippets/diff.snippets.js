@@ -10,3 +10,6 @@ snippet header DEP-3 style header
 	Applied-Upstream: \${9:upstream version|url|commit}
 
 `;
+
+
+export {};

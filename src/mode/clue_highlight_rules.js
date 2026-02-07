@@ -199,3 +199,6 @@ ClueHighlightRules.metaData = {
 oop.inherits(ClueHighlightRules, TextHighlightRules);
 
 exports.ClueHighlightRules = ClueHighlightRules;
+
+
+export {};

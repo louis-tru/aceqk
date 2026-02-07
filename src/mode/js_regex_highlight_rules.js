@@ -90,3 +90,6 @@ var JsRegexHighlightRules = function() {
 oop.inherits(JsRegexHighlightRules, TextHighlightRules);
 
 exports.JsRegexHighlightRules = JsRegexHighlightRules;
+
+
+export {};

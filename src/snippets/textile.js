@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./textile.snippets");
 exports.scope = "textile";
+
+
+export {};

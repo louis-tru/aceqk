@@ -120,3 +120,6 @@ var NginxHighlightRules = function () {
 oop.inherits(NginxHighlightRules, TextHighlightRules);
 
 exports.NginxHighlightRules = NginxHighlightRules;
+
+
+export {};

@@ -204,3 +204,6 @@ PrologHighlightRules.metaData = { fileTypes: [ 'plg', 'prolog' ],
 oop.inherits(PrologHighlightRules, TextHighlightRules);
 
 exports.PrologHighlightRules = PrologHighlightRules;
+
+
+export {};

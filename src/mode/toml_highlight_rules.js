@@ -68,3 +68,6 @@ var TomlHighlightRules = function() {
 oop.inherits(TomlHighlightRules, TextHighlightRules);
 
 exports.TomlHighlightRules = TomlHighlightRules;
+
+
+export {};

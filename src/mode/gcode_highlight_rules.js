@@ -60,3 +60,6 @@
     oop.inherits(GcodeHighlightRules, TextHighlightRules);
 
     exports.GcodeHighlightRules = GcodeHighlightRules;
+
+
+export {};

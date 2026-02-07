@@ -191,21 +191,23 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.container.addClass('ace_editor');
 		this.container.style.layout = 'free'; // Use absolute free layout for all children
 
-		this.setTheme(theme||'');
+		this.container.onClick.on(e => {
+			e.cancelDefault(); // prevent cancel focusing the textarea on click
+		});
 
 		this.$gutter = new Text(window);
 		this.$gutter.style.layout = 'free';
-		this.$gutter.class = ["ace_gutter"];
-		this.$gutter.data = {'aria-hidden': true};
+		this.$gutter.addClass("ace_gutter");
+		this.$gutter.setAttribute('aria-hidden', true);
 		this.container.append(this.$gutter);
 
 		this.scroller = new Text(window);
-		this.scroller.class = ["ace_scroller"];
+		this.scroller.addClass("ace_scroller");
 		this.scroller.style = { layout: 'free', width: 'match', height: 'match', align: 'end' };
 		this.container.append(this.scroller);
 
 		this.content = new Morph(window);
-		this.content.class = ["ace_content"];
+		this.content.addClass("ace_content");
 		this.content.style.layout = 'free'; // absolute free layout
 		this.scroller.append(this.content);
 
@@ -241,6 +243,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.$loop = new RenderLoop(this.$renderChanges.bind(this), window);
 		this.$loop.schedule(this.CHANGE_FULL);
 
+		this.setTheme(theme||'');
 		this.updateCharacterSize();
 		this.setPadding(4);
 		this.$addResizeObserver();
@@ -539,7 +542,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 * @param {number} width
 	 * @internal
 	 */
-	onGutterResize(width: number) {
+	onGutterResize(width?: number) {
 		var gutterWidth = this.$showGutter ? width : 0;
 		if (gutterWidth != this.gutterWidth)
 			this.$changes |= this.$updateCachedSize(true, gutterWidth, this.$size.width, this.$size.height);
@@ -2082,14 +2085,12 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	 **/
 	setTheme(theme: string | Theme, cb?: () => void) {
 		var _self = this;
-		/**@type {any}*/
 		this.$themeId = theme;
 		_self._emit('themeChange',{theme}, this);
 
 		if (!theme || typeof theme == "string") {
 			var moduleName = theme || this.$options.theme.initialValue; // default theme
-			// config.loadModule(["theme", moduleName], afterLoad);
-			import(moduleName).then(afterLoad);
+			config.loadModule(["theme", moduleName], afterLoad);
 		} else {
 			afterLoad(theme);
 		}
@@ -2311,8 +2312,8 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
 		}
 	},
 	showGutter: {
-		set: function(show: boolean) {
-			this.$gutter.visibile = show;
+		set: function(this: VirtualRenderer, show: boolean) {
+			this.$gutter.visible = show;
 			this.$loop.schedule(this.CHANGE_FULL);
 			this.onGutterResize();
 		},
@@ -2434,7 +2435,7 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
 	theme: {
 		set: function(this: VirtualRenderer, val: string) { this.setTheme(val); },
 		get: function(this: any) { return this.$themeId || this.theme; },
-		initialValue: "./theme/textmate",
+		initialValue: "ace/theme/textmate",
 		handlesSet: true
 	},
 	hasCssTransforms: {

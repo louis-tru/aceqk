@@ -102,3 +102,6 @@ var EiffelHighlightRules = function() {
 oop.inherits(EiffelHighlightRules, TextHighlightRules);
 
 exports.EiffelHighlightRules = EiffelHighlightRules;
+
+
+export {};

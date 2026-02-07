@@ -133,3 +133,6 @@ var ElmHighlightRules = function() {
 oop.inherits(ElmHighlightRules, TextHighlightRules);
 
 exports.ElmHighlightRules = ElmHighlightRules;
+
+
+export {};

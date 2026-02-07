@@ -186,3 +186,6 @@ var PrqlHighlightRules = function() {
 oop.inherits(PrqlHighlightRules, TextHighlightRules);
 
 exports.PrqlHighlightRules = PrqlHighlightRules;
+
+
+export {};

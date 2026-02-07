@@ -8,3 +8,6 @@ description if
 scope maze
 	-> IF \${2:**} THEN %\${3:L} ELSE %\${4:R}
 `;
+
+
+export {};

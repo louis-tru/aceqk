@@ -25,3 +25,6 @@ var CurlyHighlightRules = function() {
 oop.inherits(CurlyHighlightRules, HtmlHighlightRules);
 
 exports.CurlyHighlightRules = CurlyHighlightRules;
+
+
+export {};

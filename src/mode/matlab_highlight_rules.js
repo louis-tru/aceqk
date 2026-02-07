@@ -228,3 +228,6 @@ var keywords = (
 oop.inherits(MatlabHighlightRules, TextHighlightRules);
 
 exports.MatlabHighlightRules = MatlabHighlightRules;
+
+
+export {};

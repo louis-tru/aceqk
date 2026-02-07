@@ -99,3 +99,6 @@ var MELHighlightRules = function() {
 oop.inherits(MELHighlightRules, TextHighlightRules);
 
 exports.MELHighlightRules = MELHighlightRules;
+
+
+export {};

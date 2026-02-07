@@ -58,3 +58,6 @@ var TextileHighlightRules = function() {
 oop.inherits(TextileHighlightRules, TextHighlightRules);
 
 exports.TextileHighlightRules = TextileHighlightRules;
+
+
+export {};

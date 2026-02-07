@@ -121,7 +121,7 @@ dom.importCss({
 	backgroundColor: "rgb(181, 213, 255)",
 },
 ".ace-tm.ace_multiselect .ace_selection.ace_start": {
-	boxShadow: "0 0 3 #fff",
+	// boxShadow: "0 0 3 #fff",
 },
 ".ace-tm .ace_marker-layer .ace_step": {
 	backgroundColor: "rgb(252, 255, 0)",
@@ -150,10 +150,10 @@ dom.importCss({
 },
 
 ".ace-tm .ace_indent-guide": {
-	// background: "url("data:image/png",base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;
+	background: "image('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==', 1 auto, x=end, repeatY)",
 },
 
 ".ace-tm .ace_indent-guide-active": {
-	// background: "url("data:image/png",base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAAZSURBVHjaYvj///9/hivKyv8BAAAA//8DACLqBhbvk+/eAAAAAElFTkSuQmCC") right repeat-y;
+	background: "image('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAAZSURBVHjaYvj///9/hivKyv8BAAAA//8DACLqBhbvk+/eAAAAAElFTkSuQmCC', 1 auto, x=end, repeatY)",
 },
-});
+}, "textmate.css", true);

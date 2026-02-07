@@ -168,3 +168,6 @@ oop.inherits(SwiftHighlightRules, TextHighlightRules);
 
 exports.HighlightRules = SwiftHighlightRules;
 exports.SwiftHighlightRules = SwiftHighlightRules;
+
+
+export {};

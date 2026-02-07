@@ -193,3 +193,6 @@ var c_cppHighlightRules = function(extraKeywords) {
 oop.inherits(c_cppHighlightRules, TextHighlightRules);
 
 exports.c_cppHighlightRules = c_cppHighlightRules;
+
+
+export {};

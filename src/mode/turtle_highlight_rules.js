@@ -132,3 +132,6 @@ TurtleHighlightRules.metaData = {
 oop.inherits(TurtleHighlightRules, TextHighlightRules);
 
 exports.TurtleHighlightRules = TurtleHighlightRules;
+
+
+export {};

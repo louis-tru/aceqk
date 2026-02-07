@@ -109,3 +109,6 @@ oop.inherits(Mode, TextMode);
     this.snippetFileId = "ace/snippets/snippets";
 }).call(Mode.prototype);
 exports.Mode = Mode;
+
+
+export {};

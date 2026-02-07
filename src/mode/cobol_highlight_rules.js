@@ -66,3 +66,6 @@ var keywords = "ACCEPT|MERGE|SUM|ADD||MESSAGE|TABLE|ADVANCING|MODE|TAPE|" +
 oop.inherits(CobolHighlightRules, TextHighlightRules);
 
 exports.CobolHighlightRules = CobolHighlightRules;
+
+
+export {};

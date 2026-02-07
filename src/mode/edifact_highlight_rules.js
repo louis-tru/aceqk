@@ -87,3 +87,6 @@
     oop.inherits(EdifactHighlightRules, TextHighlightRules);
     
     exports.EdifactHighlightRules = EdifactHighlightRules;
+
+
+export {};

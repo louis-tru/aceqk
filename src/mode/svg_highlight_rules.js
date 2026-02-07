@@ -15,3 +15,6 @@ var SvgHighlightRules = function() {
 oop.inherits(SvgHighlightRules, XmlHighlightRules);
 
 exports.SvgHighlightRules = SvgHighlightRules;
+
+
+export {};

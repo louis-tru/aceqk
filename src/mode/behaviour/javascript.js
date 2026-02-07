@@ -28,3 +28,6 @@ var JavaScriptBehaviour = function () {
 oop.inherits(JavaScriptBehaviour, CstyleBehaviour);
 
 exports.JavaScriptBehaviour = JavaScriptBehaviour;
+
+
+export {};

@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./diff.snippets");
 exports.scope = "diff";
+
+
+export {};

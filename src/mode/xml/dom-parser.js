@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 	'use strict';
 
 	var XMLReader = require('./sax'),
@@ -258,3 +258,6 @@ return {
 	 };
 });
 
+
+
+export {};

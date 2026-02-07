@@ -325,3 +325,6 @@ var HtmlCompletions = function() {
 }).call(HtmlCompletions.prototype);
 
 exports.HtmlCompletions = HtmlCompletions;
+
+
+export {};

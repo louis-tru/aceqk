@@ -8,3 +8,4 @@ project/ios/*.xcodeproj/project.xcworkspace
 aceqk1.gyp
 package-lock.json
 node_modules
+build

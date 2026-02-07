@@ -98,3 +98,6 @@ snippet uc
 snippet trim
 	\${fn:trim(\${1:string})}
 `;
+
+
+export {};

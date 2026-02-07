@@ -40,3 +40,6 @@ var MatchingParensOutdent = function() {};
 }).call(MatchingParensOutdent.prototype);
 
 exports.MatchingParensOutdent = MatchingParensOutdent;
+
+
+export {};

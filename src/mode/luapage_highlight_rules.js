@@ -45,3 +45,6 @@ var LuaPageHighlightRules = function() {
 oop.inherits(LuaPageHighlightRules, HtmlHighlightRules);
 
 exports.LuaPageHighlightRules = LuaPageHighlightRules;
+
+
+export {};

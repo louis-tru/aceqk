@@ -1,6 +1,6 @@
 "use strict";
 
-import * as oop from "../lib/oop";
+import util from 'quark/util';
 import {MultiHashHandler,Command,BindingCmd,Platform} from "../keyboard/hash_handler";
 import {EventEmitter} from "../lib/event_emitter";
 import type { Editor } from "../editor";
@@ -174,4 +174,4 @@ export class CommandManager extends MultiHashHandler {
 	}
 
 }
-oop.implement(CommandManager.prototype, EventEmitter);
+util.extendClass(CommandManager, EventEmitter);

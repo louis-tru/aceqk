@@ -180,3 +180,6 @@ MockRenderer.prototype.getHighlightIndentGuides = function() {
 
 MockRenderer.prototype.setHighlightIndentGuides = function() {
 };
+
+
+export {};

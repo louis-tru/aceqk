@@ -44,3 +44,6 @@ DocCommentHighlightRules.getEndRule = function (start) {
 
 
 exports.DocCommentHighlightRules = DocCommentHighlightRules;
+
+
+export {};

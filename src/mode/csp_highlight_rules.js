@@ -36,3 +36,6 @@
     oop.inherits(CspHighlightRules, TextHighlightRules);
 
     exports.CspHighlightRules = CspHighlightRules;
+
+
+export {};

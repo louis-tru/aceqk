@@ -187,3 +187,6 @@ HjsonHighlightRules.metaData = {
 oop.inherits(HjsonHighlightRules, TextHighlightRules);
 
 exports.HjsonHighlightRules = HjsonHighlightRules;
+
+
+export {};

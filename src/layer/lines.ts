@@ -1,6 +1,6 @@
 "use strict";
 
-import { Box, Label, Morph } from "quark";
+import { Box, Label, Morph, Text } from "quark";
 import type { EditSession } from "../edit_session";
 
 export interface LayerConfig {
@@ -18,22 +18,13 @@ export interface LayerConfig {
 	gutterOffset: number
 }
 
-export type CellElement = Box & {
-	data: Dict;
-	textNode: Label & {data: Dict};
-	foldWidget: Box & {data: Dict};
-	annotationNode: Box & {data: Dict};
-	annotationIconNode: Box & {data: Dict};
-	customWidget?: Box & {data: Dict};
-};
-
-export interface Cell<El extends Box = CellElement> {
+export interface Cell<El extends Box = Box> {
 	element: El;
 	text: string;
 	row: number;
 }
 
-export class Lines<El extends Box = CellElement> {
+export class Lines<El extends Box = Box> {
 	private element: Morph;
 	public canvasHeight: number;
 	public cells: Cell<El>[] = [];
@@ -48,14 +39,16 @@ export class Lines<El extends Box = CellElement> {
 		this.element = element;
 		this.canvasHeight = canvasHeight || 500000;
 		this.element.style.height = this.canvasHeight * 2;
+		this.element.style.origin = 0;
 	}
 
 	/**
 	 * @param {LayerConfig} config
 	 */
 	moveContainer(config: LayerConfig) {
-		this.element.y = -((config.firstRowScreen * config.lineHeight) % this.canvasHeight) - config.offset * this.$offsetCoefficient;
-		// this.element.marginTop = -((config.firstRowScreen * config.lineHeight) % this.canvasHeight) - config.offset * this.$offsetCoefficient;
+		// this.element.y = -((config.firstRowScreen * config.lineHeight) % this.canvasHeight) - config.offset * this.$offsetCoefficient;
+		this.element.marginTop = -((config.firstRowScreen * config.lineHeight) % this.canvasHeight) - config.offset * this.$offsetCoefficient;
+		// console.log("move container", this.element.marginTop);
 	}
 
 	/**
@@ -143,9 +136,10 @@ export class Lines<El extends Box = CellElement> {
 	$cacheCell(cell?: Cell<El>) {
 		if (!cell)
 			return;
-		// cell.element.remove();
 		cell.element.visible = false; // hide the element instead of removing it from DOM
-		this.cellCache.push(cell);
+		cell.element.removeAllChild(); // clear all child views
+		cell.element.remove(); // remove from DOM
+		this.cellCache.push(cell); // add to cache
 	}
 
 	createCell(row: number, config: LayerConfig, session: EditSession): Cell<Box>;
@@ -155,11 +149,6 @@ export class Lines<El extends Box = CellElement> {
 		if (!cell) {
 			// var element = dom.createElement("div");
 			var element = new Box(this.element.window) as El;
-			if (initElement)
-				initElement(element);
-
-			this.element.append(element);
-
 			cell = {
 				element,
 				text: "",
@@ -169,7 +158,11 @@ export class Lines<El extends Box = CellElement> {
 		cell.row = row;
 		cell.element.visible = true; // make sure the element is visible
 
+		if (initElement)
+			initElement(cell.element);
+
+		this.element.append(cell.element); // add to DOM
+
 		return cell;
 	}
-	
 }

@@ -18,3 +18,6 @@ oop.inherits(Mode, ShMode);
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

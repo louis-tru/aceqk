@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 function define(f) { module.exports = f() }; define.amd = {};
 /**
  * CoffeeScript Compiler v2.2.1

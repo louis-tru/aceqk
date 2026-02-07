@@ -3,3 +3,6 @@ module.exports = `snippet ifeq
 		\${3:code}
 	endif
 `;
+
+
+export {};

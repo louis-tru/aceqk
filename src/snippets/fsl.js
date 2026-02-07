@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./fsl.snippets");
 exports.scope = "fsl";
+
+
+export {};

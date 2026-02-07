@@ -94,3 +94,6 @@ var CSharpHighlightRules = function() {
 oop.inherits(CSharpHighlightRules, TextHighlightRules);
 
 exports.CSharpHighlightRules = CSharpHighlightRules;
+
+
+export {};

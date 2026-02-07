@@ -168,3 +168,6 @@ var GroovyHighlightRules = function() {
 oop.inherits(GroovyHighlightRules, TextHighlightRules);
 
 exports.GroovyHighlightRules = GroovyHighlightRules;
+
+
+export {};

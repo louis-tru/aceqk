@@ -51,3 +51,6 @@ oop.inherits(YamlWorker, Mirror);
 }).call(YamlWorker.prototype);
 
 });
+
+
+export {};

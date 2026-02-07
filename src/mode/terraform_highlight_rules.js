@@ -178,3 +178,6 @@ var TerraformHighlightRules = function () {
 oop.inherits(TerraformHighlightRules, TextHighlightRules);
 
 exports.TerraformHighlightRules = TerraformHighlightRules;
+
+
+export {};

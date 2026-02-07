@@ -218,3 +218,6 @@ RustHighlightRules.metaData = { fileTypes: [ 'rs', 'rc' ],
 oop.inherits(RustHighlightRules, TextHighlightRules);
 
 exports.RustHighlightRules = RustHighlightRules;
+
+
+export {};

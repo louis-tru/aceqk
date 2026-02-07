@@ -105,3 +105,6 @@ SmartyHighlightRules.metaData = { fileTypes: [ 'tpl' ],
 oop.inherits(SmartyHighlightRules, HtmlHighlightRules);
 
 exports.SmartyHighlightRules = SmartyHighlightRules;
+
+
+export {};

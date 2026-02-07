@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 var Document = require("../document").Document;
@@ -72,3 +72,6 @@ var Mirror = exports.Mirror = function(sender) {
 }).call(Mirror.prototype);
 
 });
+
+
+export {};

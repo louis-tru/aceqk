@@ -160,3 +160,6 @@ var StylusHighlightRules = function() {
 oop.inherits(StylusHighlightRules, TextHighlightRules);
 
 exports.StylusHighlightRules = StylusHighlightRules;
+
+
+export {};

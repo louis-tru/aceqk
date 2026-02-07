@@ -321,3 +321,6 @@ SoyTemplateHighlightRules.metaData = { comment: 'SoyTemplate',
 oop.inherits(SoyTemplateHighlightRules, HtmlHighlightRules);
 
 exports.SoyTemplateHighlightRules = SoyTemplateHighlightRules;
+
+
+export {};

@@ -35,6 +35,7 @@ import config from "../config";
 import {Editor} from "../editor";
 import { Range } from "../range";
 import {Input,Label,Text} from "quark";
+import { LineHeight } from "quark/types";
 
 const nls = config.nls;
 
@@ -69,27 +70,36 @@ export class SearchBox {
 	 * @param {never} [showReplaceForm]
 	 */
 	constructor(editor: Editor, range?: Range, showReplaceForm?: boolean) {
-		this.element = dom.buildDom(["text", {class:"ace_search right"},
-			["label", {action: "hide", class: "ace_searchbtn_close"}],
-			["text", {class: "ace_search_form"},
-				["input", {class: "ace_search_field", placeholder: nls("search-box.find.placeholder", "Search for"), spellcheck: "false"}],
-				["label", {action: "findPrev", class: "ace_searchbtn prev",value: "\u200b"}],
-				["label", {action: "findNext", class: "ace_searchbtn next",value: "\u200b"}],
-				["label", {action: "findAll", class: "ace_searchbtn", title: "Alt-Enter", value: nls("search-box.find-all.text", "All")}]
+		var fontSize = editor.getFontSize();
+		var width = fontSize * 17; // 17em
+		var height = fontSize * 1.8; // 1.8em
+		var padding = [0,fontSize * 0.7]; // 0.7em
+		var iconSize = fontSize * 0.5; // 0.5em
+		this.element = dom.buildDom(["text", {class:"ace_search right", layout: 'free'},
+			['flex', {backgroundColor: '#f000', direction: 'column', crossAlign: 'both'},
+				["text", {class: "ace_search_form"},
+					["input", {class: "ace_search_field", width, height,
+						placeholder: nls("search-box.find.placeholder", "Search for"), spellcheck: "false"}],
+					["box", {action1: "findPrev", class: "ace_searchbtn prev",height,padding,},["morph",{class: "ace_searchbtn-prev-icon", width: iconSize, height: iconSize}]],
+					["box", {action1: "findNext", class: "ace_searchbtn next",height,padding,},["morph",{class: "ace_searchbtn-next-icon", width: iconSize, height: iconSize}]],
+					["text", {action1: "findAll", class: "ace_searchbtn last", height, title: "Alt-Enter", value: nls("search-box.find-all.text", "All")}]
+				],
+				["text", {class: "ace_replace_form"},
+					["input", {class: "ace_search_field", width, height,
+						placeholder: nls("search-box.replace.placeholder", "Replace with"), spellcheck: "false"}],
+					["text", {action1: "replaceAndFindNext", class: "ace_searchbtn",height,value: nls("search-box.replace-next.text", "Replace")}],
+					["text", {action1: "replaceAll", class: "ace_searchbtn last",height, value: nls("search-box.replace-all.text", "All")}]
+				],
+				["box", {class: "ace_search_options", backgroundColor: '#0f00'},
+					["text", {action1: "toggleReplace", class: "ace_button left", title: nls("search-box.toggle-replace.title", "Toggle Replace mode"), padding:[0, 5], value: "+"}],
+					["text", {class: "ace_search_counter"}],
+					["text", {action1: "searchInSelection", class: "ace_button", title: nls("search-box.toggle-in-selection.title", "Search In Selection"), value: "S"}],
+					["text", {action1: "toggleWholeWords", class: "ace_button", title: nls("search-box.toggle-whole-word.title", "Whole Word Search"), value: "\\b"}],
+					["text", {action1: "toggleCaseSensitive", class: "ace_button", title: nls("search-box.toggle-case.title", "CaseSensitive Search"), value: "Aa"}],
+					["text", {action1: "toggleRegexpMode", class: "ace_button", title: nls("search-box.toggle-regexp.title", "RegExp Search"), value: ".*"}],
+				]
 			],
-			["text", {class: "ace_replace_form"},
-				["input", {class: "ace_search_field", placeholder: nls("search-box.replace.placeholder", "Replace with"), spellcheck: "false"}],
-				["label", {action: "replaceAndFindNext", class: "ace_searchbtn",value: nls("search-box.replace-next.text", "Replace")}],
-				["label", {action: "replaceAll", class: "ace_searchbtn", value: nls("search-box.replace-all.text", "All")}]
-			],
-			["text", {class: "ace_search_options"},
-				["label", {action: "toggleReplace", class: "ace_button", title: nls("search-box.toggle-replace.title", "Toggle Replace mode"), style: {marginTop:-2, padding:[0, 5]}, value: "+"}],
-				["label", {class: "ace_search_counter"}],
-				["label", {action: "toggleRegexpMode", class: "ace_button", title: nls("search-box.toggle-regexp.title", "RegExp Search"), value: ".*"}],
-				["label", {action: "toggleCaseSensitive", class: "ace_button", title: nls("search-box.toggle-case.title", "CaseSensitive Search"), value: "Aa"}],
-				["label", {action: "toggleWholeWords", class: "ace_button", title: nls("search-box.toggle-whole-word.title", "Whole Word Search"), value: "\\b"}],
-				["label", {action: "searchInSelection", class: "ace_button", title: nls("search-box.toggle-in-selection.title", "Search In Selection"), value: "S"}]
-			]
+			["box", {action1: "hide", class: "ace_searchbtn_close"}],
 		]);
 
 		this.setSession = this.setSession.bind(this);
@@ -97,7 +107,6 @@ export class SearchBox {
 
 		this.$init();
 		this.setEditor(editor);
-		// dom.importCssString(searchboxCss, "ace_searchbox", editor.container); // moved to searchbox-css.ts
 		import("./searchbox-css"); // load searchbox css
 		event.addListener(this.element, "TouchStart", function(e) { e.cancelBubble(); }, editor);
 	}
@@ -126,16 +135,16 @@ export class SearchBox {
 	 * @param {Text} sb
 	 */
 	$initElements(sb: Text) {
-		this.searchBox = sb.querySelectorForClass(".ace_search_form") as Text;
-		this.replaceBox = sb.querySelectorForClass(".ace_replace_form") as Text;
-		this.searchOption = sb.querySelectorForAttribute("action", "searchInSelection") as Label;
-		this.replaceOption = sb.querySelectorForAttribute("action", "toggleReplace") as Label;
-		this.regExpOption = sb.querySelectorForAttribute("action", "toggleRegexpMode") as Label;
-		this.caseSensitiveOption = sb.querySelectorForAttribute("action", "toggleCaseSensitive") as Label;
-		this.wholeWordOption = sb.querySelectorForAttribute("action", "toggleWholeWords") as Label;
-		this.searchInput = this.searchBox.querySelectorForClass(".ace_search_field") as Input;
-		this.replaceInput = this.replaceBox.querySelectorForClass(".ace_search_field") as Input;
-		this.searchCounter = sb.querySelectorForClass(".ace_search_counter") as Text;
+		this.searchBox = sb.querySelectorForClass("ace_search_form") as Text;
+		this.replaceBox = sb.querySelectorForClass("ace_replace_form") as Text;
+		this.searchOption = sb.querySelectorForAttribute("action1", "searchInSelection") as Label;
+		this.replaceOption = sb.querySelectorForAttribute("action1", "toggleReplace") as Label;
+		this.regExpOption = sb.querySelectorForAttribute("action1", "toggleRegexpMode") as Label;
+		this.caseSensitiveOption = sb.querySelectorForAttribute("action1", "toggleCaseSensitive") as Label;
+		this.wholeWordOption = sb.querySelectorForAttribute("action1", "toggleWholeWords") as Label;
+		this.searchInput = this.searchBox.querySelectorForClass("ace_search_field") as Input;
+		this.replaceInput = this.replaceBox.querySelectorForClass("ace_search_field") as Input;
+		this.searchCounter = sb.querySelectorForClass("ace_search_counter") as Text;
 	}
 
 	$init() {
@@ -146,20 +155,22 @@ export class SearchBox {
 		var _this = this;
 		event.addListener(sb, "MouseDown", function(e) {
 			setTimeout(function(){
-				_this.activeInput.focus();
+				if (_this.activeInput)
+					_this.activeInput.focus();
 			}, 0);
 			event.stopPropagation(e);
 		});
 		event.addListener(sb, "Click", function(e) {
 			var t = e.origin;
-			var action = t.getAttribute("action");
+			var action = t.getAttribute("action1");
 			// @ts-ignore
 			if (action && _this[action])
 				// @ts-ignore
 				_this[action]();
 			else if (_this.$searchBarKb.commands[action])
 				_this.$searchBarKb.commands[action].exec!(_this.editor, {self:_this});
-			event.stopPropagation(e);
+			event.stopPropagation(e); // Prevent Ace editor click handler from running
+			event.preventDefault(e); // Prevent focus loss in Quark
 		});
 
 		event.addCommandKeyListener(sb, function(e, hashId, keyCode) {
@@ -355,7 +366,10 @@ export class SearchBox {
 		if (value != undefined)
 			this.searchInput.value = value;
 
-		this.searchInput.focus();
+		this.editor.window.nextFrame(() => {
+			// focus needs to be set after the search box is visible, otherwise it won't work in Quark
+			this.searchInput.focus();
+		});
 		// this.searchInput.select(); // TODO: Quark Input has no select method
 
 		this.editor.keyBinding.addKeyboardHandler(this.$closeSearchBarKb);

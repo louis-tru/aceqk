@@ -164,3 +164,6 @@ var NunjucksHighlightRules = function() {
 oop.inherits(NunjucksHighlightRules, TextHighlightRules);
 
 exports.NunjucksHighlightRules = NunjucksHighlightRules;
+
+
+export {};

@@ -52,3 +52,6 @@ var ColdfusionHighlightRules = function() {
 oop.inherits(ColdfusionHighlightRules, HtmlHighlightRules);
 
 exports.ColdfusionHighlightRules = ColdfusionHighlightRules;
+
+
+export {};

@@ -272,3 +272,6 @@ var LiquidHighlightRules = function () {
 oop.inherits(LiquidHighlightRules, TextHighlightRules);
 
 exports.LiquidHighlightRules = LiquidHighlightRules;
+
+
+export {};

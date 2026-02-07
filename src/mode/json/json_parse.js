@@ -50,7 +50,7 @@
     hasOwnProperty, message, n, name, push, r, t, text
 */
 
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 // This is a function that can parse a JSON text, producing a JavaScript
@@ -346,3 +346,6 @@ define(function(require, exports, module) {
         }({'': result}, '') : result;
     };
 });
+
+
+export {};

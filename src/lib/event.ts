@@ -4,6 +4,7 @@ import type {KeyEvent, UIEvent,MouseEvent} from 'quark/event';
 import type {View, Window} from 'quark';
 import * as useragent from "./env";
 import {Vec2} from "quark/types";
+import {KeyboardCode} from 'quark/keyboard';
 
 export function getModifierHash(e: KeyEvent) {
 	return 0 | (e.ctrl ? 1 : 0) | (e.alt ? 2 : 0) | (e.shift ? 4 : 0) | (e.command ? 8 : 0);
@@ -300,11 +301,11 @@ export function getButton(e: KeyEvent): number {
 	// if (e.type == "contextmenu" || (useragent.isMac && (e.ctrl && !e.alt && !e.shift)))
 	// 	return 2;
 	switch (e.keycode) {
-		case keys.MOUSE_LEFT:
+		case KeyboardCode.MOUSE_LEFT:
 			return 0;
-		case keys.MOUSE_CENTER:
+		case KeyboardCode.MOUSE_CENTER:
 			return 1;
-		case keys.MOUSE_RIGHT:
+		case KeyboardCode.MOUSE_RIGHT:
 			return 2;
 		default:
 			return -1;

@@ -68,3 +68,6 @@ var HandlebarsHighlightRules = function() {
 oop.inherits(HandlebarsHighlightRules, HtmlHighlightRules);
 
 exports.HandlebarsHighlightRules = HandlebarsHighlightRules;
+
+
+export {};

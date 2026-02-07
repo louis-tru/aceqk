@@ -72,24 +72,28 @@ export class Marker {
 
 	/**
 	 * @param {string} className
-	 * @param {StyleSheets} css
+	 * @param {StyleSheets} style
 	 */
-	elt(className: string, css: StyleSheets) {
-		/**@type {any}*/
+	elt(className: string, style: StyleSheets, extraStyle?: StyleSheets) {
 		var childNodes = this.element.childNodes;
-		var x = this.i != -1 && childNodes[this.i];
+		var x = this.i != -1 && childNodes[this.i], x1: Box;
 		if (!x) {
 			// x = document.createElement("div");
-			x = new Box(this.element.window);
+			x = new Box(this.element.window); // outer box
+			x1 = new Box(this.element.window); // inner box for applying class
+			x.append(x1);
 			this.element.append(x);
 			childNodes.push(x); // also add to childNodes array
 			this.i = -1;
 		} else {
+			x1 = x.first! as Box;
 			this.i++;
 		}
-		// x.style.cssText = css;
-		Object.assign(x.style, css);
-		x.class = className.split(" ");
+		x.style = style;
+		if (extraStyle) {
+			x1.style = extraStyle;
+		}
+		x1.class = ('ace_marker_item ' + className).split(" ");
 	}
 
 	private config?: LayerConfig;
@@ -130,7 +134,7 @@ export class Marker {
 				else
 					this.drawMultiLineMarker(html, range, marker.clazz, config);
 			} else {
-				this.drawSingleLineMarker(html, range, marker.clazz + " ace_start" + " ace_br15", config);
+				this.drawSingleLineMarker(html, range, "ace_start ace_br15 " + marker.clazz, config);
 			}
 		}
 		if (this.i !=-1) {
@@ -207,19 +211,19 @@ export class Marker {
 				{
 					width: 'match',
 					height: height,
-					marginRight: padding,
 					marginTop: top,
 					marginLeft: left,
-					...extraStyle,
-				}
+					marginRight: padding,
+				},
+				extraStyle
 			);
 		}
 		// from start of the last line to the selection end
 		if (this.session.$bidiHandler.isBidiRow(range.end.row)) {
-			 var range1 = range.clone();
-			 range1.start.row = range1.end.row;
-			 range1.start.column = 0;
-			 this.drawBidiSingleLineMarker(stringBuilder, range1, clazz + " ace_br12", config, void 0, extraStyle);
+			var range1 = range.clone();
+			range1.start.row = range1.end.row;
+			range1.start.column = 0;
+			this.drawBidiSingleLineMarker(stringBuilder, range1, clazz + " ace_br12", config, void 0, extraStyle);
 		} else {
 			top = this.$getTop(range.end.row, config);
 			var width = range.end.column * config.characterWidth;
@@ -227,12 +231,12 @@ export class Marker {
 			this.elt(
 				clazz + " ace_br12",
 				{
-					"height": height,
-					"width": width,
-					"marginTop": top,
-					"marginLeft": padding,
-					...extraStyle
-				}
+					height: height,
+					width: width,
+					marginTop: top,
+					marginLeft: padding,
+					marginRight: 0,
+				}, extraStyle
 			);
 		}
 		// all the complete lines
@@ -248,11 +252,10 @@ export class Marker {
 			{
 				width: 'match',
 				height: height,
-				marginRight: padding,
 				marginTop: top,
 				marginLeft: padding,
-				...extraStyle
-			}
+				marginRight: padding,
+			}, extraStyle
 		);
 	}
 
@@ -281,8 +284,8 @@ export class Marker {
 				width: width,
 				marginTop: top,
 				marginLeft: left,
-				...extraStyle
-			}
+				marginRight: 0,
+			}, extraStyle
 		);
 	}
 
@@ -307,8 +310,9 @@ export class Marker {
 					width: (selection.width + (extraLength || 0)),
 					marginTop: top,
 					marginLeft: (padding + selection.left),
-					...extraStyle,
-				}
+					marginRight: 0,
+				},
+				extraStyle
 			);
 		});
 	}
@@ -334,8 +338,7 @@ export class Marker {
 				marginTop: top,
 				marginLeft: 0,
 				marginRight: 0,
-				...extraStyle
-			}
+			}, extraStyle
 		);
 	}
 
@@ -358,8 +361,7 @@ export class Marker {
 				marginTop: top,
 				marginLeft: 0,
 				marginRight: 0,
-				...extraStyle
-			}
+			}, extraStyle
 		);
 	}
 

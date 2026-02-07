@@ -141,3 +141,6 @@ var TclHighlightRules = function() {
 oop.inherits(TclHighlightRules, TextHighlightRules);
 
 exports.TclHighlightRules = TclHighlightRules;
+
+
+export {};

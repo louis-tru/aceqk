@@ -50,3 +50,6 @@
     oop.inherits(HtmlElixirHighlightRules, HtmlHighlightRules);
 
     exports.HtmlElixirHighlightRules = HtmlElixirHighlightRules;
+
+
+export {};

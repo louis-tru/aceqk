@@ -93,3 +93,6 @@ var HaxeHighlightRules = function() {
 oop.inherits(HaxeHighlightRules, TextHighlightRules);
 
 exports.HaxeHighlightRules = HaxeHighlightRules;
+
+
+export {};

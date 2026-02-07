@@ -114,3 +114,6 @@
     oop.inherits(NixHighlightRules, TextHighlightRules);
 
     exports.NixHighlightRules = NixHighlightRules;
+
+
+export {};

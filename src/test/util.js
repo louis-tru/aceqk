@@ -8,3 +8,5 @@ function isNodeEnvironment() {
 module.exports = {
     isNodeEnvironment
 };
+
+export {};

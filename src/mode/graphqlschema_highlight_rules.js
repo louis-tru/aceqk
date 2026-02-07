@@ -40,3 +40,6 @@ var GraphQLSchemaHighlightRules = function() {
 oop.inherits(GraphQLSchemaHighlightRules, TextHighlightRules);
 
 exports.GraphQLSchemaHighlightRules = GraphQLSchemaHighlightRules;
+
+
+export {};

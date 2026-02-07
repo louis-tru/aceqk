@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./rst.snippets");
 exports.scope = "rst";
+
+
+export {};

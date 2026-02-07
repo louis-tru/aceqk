@@ -275,3 +275,6 @@ define(function (require, exports, module) {
 	exports.WorkerClient = WorkerClient;
 	exports.createWorker = createWorker;
 });
+
+
+export {};

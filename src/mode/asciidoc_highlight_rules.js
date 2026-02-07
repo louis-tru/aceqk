@@ -200,3 +200,6 @@ var AsciidocHighlightRules = function() {
 oop.inherits(AsciidocHighlightRules, TextHighlightRules);
 
 exports.AsciidocHighlightRules = AsciidocHighlightRules;
+
+
+export {};

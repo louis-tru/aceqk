@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./robot.snippets");
 exports.scope = "robot";
+
+
+export {};

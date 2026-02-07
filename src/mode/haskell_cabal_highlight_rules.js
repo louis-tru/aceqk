@@ -36,3 +36,6 @@ var CabalHighlightRules = function() {
 oop.inherits(CabalHighlightRules, TextHighlightRules);
 
 exports.CabalHighlightRules = CabalHighlightRules;
+
+
+export {};

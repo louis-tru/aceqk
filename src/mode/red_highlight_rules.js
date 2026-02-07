@@ -199,3 +199,6 @@ var RedHighlightRules = function() {
 oop.inherits(RedHighlightRules, TextHighlightRules);
 
 exports.RedHighlightRules = RedHighlightRules;
+
+
+export {};

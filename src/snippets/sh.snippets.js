@@ -82,3 +82,6 @@ snippet getopt
 	shift \$((\$OPTIND-1))
 
 `;
+
+
+export {};

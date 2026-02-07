@@ -608,3 +608,6 @@ var RubyHighlightRules = function() {
 oop.inherits(RubyHighlightRules, TextHighlightRules);
 
 exports.RubyHighlightRules = RubyHighlightRules;
+
+
+export {};

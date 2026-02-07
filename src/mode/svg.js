@@ -35,3 +35,6 @@ oop.inherits(Mode, XmlMode);
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

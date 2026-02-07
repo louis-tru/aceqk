@@ -204,3 +204,6 @@
    oop.inherits(RHighlightRules, TextHighlightRules);
 
    exports.RHighlightRules = RHighlightRules;
+
+
+export {};

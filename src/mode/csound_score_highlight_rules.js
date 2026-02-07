@@ -152,3 +152,6 @@ var CsoundScoreHighlightRules = function(embeddedRulePrefix) {
 oop.inherits(CsoundScoreHighlightRules, CsoundPreprocessorHighlightRules);
 
 exports.CsoundScoreHighlightRules = CsoundScoreHighlightRules;
+
+
+export {};

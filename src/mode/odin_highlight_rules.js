@@ -205,3 +205,6 @@ var OdinHighlightRules = function () {
 oop.inherits(OdinHighlightRules, TextHighlightRules);
 
 exports.OdinHighlightRules = OdinHighlightRules;
+
+
+export {};

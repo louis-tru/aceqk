@@ -126,3 +126,6 @@ var LuceneHighlightRules = function() {
 oop.inherits(LuceneHighlightRules, TextHighlightRules);
 
 exports.LuceneHighlightRules = LuceneHighlightRules;
+
+
+export {};

@@ -71,3 +71,6 @@ var MakefileHighlightRules = function() {
 oop.inherits(MakefileHighlightRules, TextHighlightRules);
 
 exports.MakefileHighlightRules = MakefileHighlightRules;
+
+
+export {};

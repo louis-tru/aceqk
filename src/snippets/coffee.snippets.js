@@ -94,3 +94,6 @@ snippet req
 snippet exp
 	\${1:root} = exports ? this
 `;
+
+
+export {};

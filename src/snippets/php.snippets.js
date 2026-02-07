@@ -382,3 +382,6 @@ snippet ifil\\n\\
 snippet ifeil\\n\\
 	<?php if (\${1:true}): ?>\${2:code}<?php else: ?>\${3:code}<?php endif; ?>\${4}
 `;
+
+
+export {};

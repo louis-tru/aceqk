@@ -565,3 +565,6 @@ var MushCodeRules = function() {
 oop.inherits(MushCodeRules, TextHighlightRules);
 
 exports.MushCodeRules = MushCodeRules;
+
+
+export {};

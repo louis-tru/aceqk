@@ -127,3 +127,6 @@ function is(token, type) {
     };
 
 }).call(FoldMode.prototype);
+
+
+export {};

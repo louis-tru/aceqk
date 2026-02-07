@@ -195,3 +195,6 @@ var RedshiftHighlightRules = function() {
 oop.inherits(RedshiftHighlightRules, TextHighlightRules);
 
 exports.RedshiftHighlightRules = RedshiftHighlightRules;
+
+
+export {};

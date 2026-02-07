@@ -32,7 +32,7 @@ if (typeof process !== "undefined") {
     require("amd-loader");
 }
 
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 var assert = require("../../test/assertions");
@@ -87,3 +87,6 @@ module.exports = {
 if (typeof module !== "undefined" && module === require.main) {
     require("asyncjs").test.testcase(module.exports).exec();
 }
+
+
+export {};

@@ -215,3 +215,6 @@ var ShHighlightRules = function() {
 oop.inherits(ShHighlightRules, TextHighlightRules);
 
 exports.ShHighlightRules = ShHighlightRules;
+
+
+export {};

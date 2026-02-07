@@ -21,3 +21,6 @@ oop.inherits(Mode, JSMode);
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

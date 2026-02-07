@@ -8,3 +8,6 @@ snippet msnip
 snippet v
 	{VISUAL}
 `;
+
+
+export {};

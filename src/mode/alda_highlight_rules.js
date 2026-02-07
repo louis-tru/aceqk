@@ -147,3 +147,6 @@
     oop.inherits(AldaHighlightRules, TextHighlightRules);
     
     exports.AldaHighlightRules = AldaHighlightRules;
+
+
+export {};

@@ -287,3 +287,6 @@ SmithyHighlightRules.metaData = {
 oop.inherits(SmithyHighlightRules, TextHighlightRules);
 
 exports.SmithyHighlightRules = SmithyHighlightRules;
+
+
+export {};

@@ -238,3 +238,6 @@ TextHighlightRules = function() {
 }).call(TextHighlightRules.prototype);
 
 exports.TextHighlightRules = TextHighlightRules;
+
+
+export {};

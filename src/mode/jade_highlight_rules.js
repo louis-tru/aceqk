@@ -304,3 +304,6 @@ var JadeHighlightRules = function() {
 oop.inherits(JadeHighlightRules, TextHighlightRules);
 
 exports.JadeHighlightRules = JadeHighlightRules;
+
+
+export {};

@@ -115,3 +115,6 @@ var oop = require("../lib/oop");
     oop.inherits(GolangHighlightRules, TextHighlightRules);
 
     exports.GolangHighlightRules = GolangHighlightRules;
+
+
+export {};

@@ -77,3 +77,6 @@ var HtmlHighlightRules = function() {
 oop.inherits(HtmlHighlightRules, XmlHighlightRules);
 
 exports.HtmlHighlightRules = HtmlHighlightRules;
+
+
+export {};

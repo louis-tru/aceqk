@@ -65,3 +65,6 @@ var CsoundDocumentHighlightRules = function() {
 oop.inherits(CsoundDocumentHighlightRules, TextHighlightRules);
 
 exports.CsoundDocumentHighlightRules = CsoundDocumentHighlightRules;
+
+
+export {};

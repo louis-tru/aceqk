@@ -211,3 +211,6 @@
     oop.inherits(QmlHighlightRules, TextHighlightRules);
 
     exports.QmlHighlightRules = QmlHighlightRules;
+
+
+export {};

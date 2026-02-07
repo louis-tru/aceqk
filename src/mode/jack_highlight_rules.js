@@ -108,3 +108,6 @@ var JackHighlightRules = function() {
 oop.inherits(JackHighlightRules, TextHighlightRules);
 
 exports.JackHighlightRules = JackHighlightRules;
+
+
+export {};

@@ -2984,7 +2984,8 @@ config.defineOptions(Editor.prototype, "editor", {
 			this.$onSelectionChange();
 			this._signal("changeSelectionStyle", style, this);
 		},
-		initialValue: "line"
+		// initialValue: "line"
+		initialValue: "text"
 	},
 	highlightActiveLine: {
 		set: function(this: Editor) {this.$updateHighlightActiveLine();},

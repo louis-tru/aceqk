@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./lsl.snippets");
 exports.scope = "lsl";
+
+
+export {};

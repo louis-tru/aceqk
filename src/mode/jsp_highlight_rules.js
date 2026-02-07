@@ -57,3 +57,6 @@ var JspHighlightRules = function() {
 oop.inherits(JspHighlightRules, HtmlHighlightRules);
 
 exports.JspHighlightRules = JspHighlightRules;
+
+
+export {};

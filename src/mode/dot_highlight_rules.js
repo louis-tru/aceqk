@@ -118,3 +118,6 @@ var DotHighlightRules = function() {
 oop.inherits(DotHighlightRules, TextHighlightRules);
 
 exports.DotHighlightRules = DotHighlightRules;
+
+
+export {};

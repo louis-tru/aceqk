@@ -399,3 +399,6 @@ ElixirHighlightRules.metaData = { comment: 'Textmate bundle for Elixir Programmi
 oop.inherits(ElixirHighlightRules, TextHighlightRules);
 
 exports.ElixirHighlightRules = ElixirHighlightRules;
+
+
+export {};

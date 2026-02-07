@@ -27,3 +27,6 @@ GitignoreHighlightRules.metaData = {
 oop.inherits(GitignoreHighlightRules, TextHighlightRules);
 
 exports.GitignoreHighlightRules = GitignoreHighlightRules;
+
+
+export {};

@@ -1703,3 +1703,6 @@ snippet docs (función con parámetros)
 		@TIPO: \${6:...}
 	*/
 `;
+
+
+export {};

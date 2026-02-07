@@ -141,3 +141,6 @@
        this.snippetFileId = "ace/snippets/r";
    }).call(Mode.prototype);
    exports.Mode = Mode;
+
+
+export {};

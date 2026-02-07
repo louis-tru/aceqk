@@ -91,3 +91,6 @@ snippet ns
 snippet nsc
 	namespace current
 `;
+
+
+export {};

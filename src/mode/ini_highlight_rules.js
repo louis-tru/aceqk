@@ -78,3 +78,6 @@ IniHighlightRules.metaData = {
 oop.inherits(IniHighlightRules, TextHighlightRules);
 
 exports.IniHighlightRules = IniHighlightRules;
+
+
+export {};

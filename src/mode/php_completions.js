@@ -10456,3 +10456,6 @@ var PhpCompletions = function() {
 }).call(PhpCompletions.prototype);
 
 exports.PhpCompletions = PhpCompletions;
+
+
+export {};

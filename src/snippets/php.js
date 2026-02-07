@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./php.snippets");
 exports.scope = "php";
+
+
+export {};

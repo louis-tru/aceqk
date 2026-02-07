@@ -46,3 +46,6 @@ snippet while
 		\${2:/* statements */}
 	od
 `;
+
+
+export {};

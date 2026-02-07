@@ -97,3 +97,6 @@ var PascalHighlightRules = function() {
 oop.inherits(PascalHighlightRules, TextHighlightRules);
 
 exports.PascalHighlightRules = PascalHighlightRules;
+
+
+export {};

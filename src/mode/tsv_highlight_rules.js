@@ -11,3 +11,6 @@ var TsvHighlightRules = function() {
 oop.inherits(TsvHighlightRules, TextHighlightRules);
 
 exports.TsvHighlightRules = TsvHighlightRules;
+
+
+export {};

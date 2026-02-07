@@ -23,6 +23,7 @@ dom.importCss({
 		// top: 0,
 		zIndex: 99,
 		whiteSpace: 'normal',
+		cursor: 'default',
 	},
 
 	'.ace_search.left': {
@@ -40,11 +41,11 @@ dom.importCss({
 
 	'.ace_search_form, .ace_replace_form': {
 		marginTop: 0,
-		marginBottom: 4,
+		marginBottom: 2,
 		marginLeft: 0,
 		marginRight: 20,
 		// overflow: 'hidden',
-		lineHeight: 2.01, // 1.9
+		// lineHeight: 2.01, // 1.9
 	},
 
 	'.ace_replace_form': {
@@ -74,7 +75,7 @@ dom.importCss({
 		paddingBottom: 0,
 		fontSize: 'inherit',
 		margin: 0,
-		// lineHeight: 'inherit',
+		lineHeight: 1, // 'inherit',
 		// minWidth: '17em',
 		// minHeight: '1.8em',
 		// textVerticalAlign: 'top',
@@ -94,52 +95,64 @@ dom.importCss({
 		paddingRight: 6,
 		backgroundColor: '#fff',
 		borderRightWidth: 0,
-		borderLeftColor: '#dcdcdc',
+		borderLeftWidth: 0,
+		// borderLeftColor: '#dcdcdc',
 		cursor: 'pointer',
 		margin: 0,
+		marginLeft: 1,
 		// position: 'relative',
 		textColor: '#666',
+		// height: '1.8em',
+		lineHeight: 1,
 	},
 
 	// '.ace_searchbtn:last-child': {
-	// 	borderTopRightRadius: 3,
-	// 	borderBottomRightRadius: 3,
-	// 	borderRightWidth: 1,
-	// },
+	'.ace_searchbtn.last': {
+		borderTopRightRadius: 3,
+		borderBottomRightRadius: 3,
+		borderRightWidth: 1,
+	},
 	// '.ace_searchbtn:disabled': {
-	// 	backgroundColor: '#0000',
-	// 	cursor: 'normal',
-	// },
+	'.ace_searchbtn.disabled': {
+		backgroundColor: '#0000',
+		cursor: 'normal',
+	},
 
 	'.ace_searchbtn:hover': {
 		backgroundColor: '#eef1f6',
 	},
 
+	'.ace_searchbtn:active': {
+		backgroundColor: '#e9ecf1',
+	},
+
 	'.ace_searchbtn.prev, .ace_searchbtn.next': {
 		// paddingLeft: '0.7em',
-		// paddingRight: '0.7em',
+		// paddingRight:'0.7em',
+		layout: 'free',
 	},
-	// .ace_searchbtn.prev:after, .ace_searchbtn.next:after {
-	// 	content: "";
-	// 	border: solid 2px #888;
-	// 	width: 0.5em;
-	// 	height: 0.5em;
-	// 	border-width:  2px 0 0 2px;
-	// 	display:inline-block;
-	// 	transform: rotate(-45deg);
-	// }
-	// .ace_searchbtn.next:after {
-	// 	border-width: 0 2px 2px 0 ;
-	// }
+	// '.ace_searchbtn.prev:after, .ace_searchbtn.next:after': {
+	'.ace_searchbtn-prev-icon, .ace_searchbtn-next-icon': {
+		// content: "";
+		border: '2 #888',
+		// width: '0.5em',
+		// height: '0.5em',
+		borderWidth:  [2, 0, 0, 2],
+		// display:inline-block;
+		rotateZ: -45,
+		align: 'centerMiddle',
+		receive: false,
+	},
+	// '.ace_searchbtn.next:after': {
+	'.ace_searchbtn-next-icon': {
+		borderWidth:  [0, 2, 2, 0],
+	},
 	/* -------------------------------------------------------------
 	* Close button
 	* ---------------------------------------------------------- */
 
 	'.ace_searchbtn_close': {
-		// background:
-		// 	'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAAZ0lEQVR42u2SUQrAMAhDvazn8OjZBilCkYVVxiis8H4CT0VrAJb4WHT3C5xU2a2IQZXJjiQIRMdkEoJ5Q2yMqpfDIo+XY4k6h+YXOyKqTIj5REaxloNAd0xiKmAtsTHqW8sR2W5f7gCu5nWFUpVjZwAAAABJRU5ErkJggg==)',
-		// backgroundRepeat: 'no-repeat',
-		// backgroundPosition: '50% 0%',
+		background: 'image("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAAZ0lEQVR42u2SUQrAMAhDvazn8OjZBilCkYVVxiis8H4CT0VrAJb4WHT3C5xU2a2IQZXJjiQIRMdkEoJ5Q2yMqpfDIo+XY4k6h+YXOyKqTIj5REaxloNAd0xiKmAtsTHqW8sR2W5f7gCu5nWFUpVjZwAAAABJRU5ErkJggg==", 100%, no-repeat)',
 		borderRadius: 7,
 		borderWidth: 0,
 		textColor: '#656565',
@@ -148,15 +161,16 @@ dom.importCss({
 		padding: 0,
 		width: 14,
 		height: 14,
-		marginTop: 9,
-		marginRight: 7,
+		marginTop: 5,
+		marginRight: 1,
 		align: 'end',
 		// position: 'absolute',
+		backgroundColor: '#0000',
 	},
 
 	'.ace_searchbtn_close:hover': {
+		background: 'image("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAAZ0lEQVR42u2SUQrAMAhDvazn8OjZBilCkYVVxiis8H4CT0VrAJb4WHT3C5xU2a2IQZXJjiQIRMdkEoJ5Q2yMqpfDIo+XY4k6h+YXOyKqTIj5REaxloNAd0xiKmAtsTHqW8sR2W5f7gCu5nWFUpVjZwAAAABJRU5ErkJggg==", 100%, no-repeat, y=100%)',
 		backgroundColor: '#656565',
-		// backgroundPosition: '50% 100%',
 		textColor: '#fff',
 	},
 
@@ -172,8 +186,13 @@ dom.importCss({
 		borderColor: 'rgba(100,100,100,0.23)',
 		borderWidth: 1,
 		padding: 1,
-		// boxSizing: 'border-box',
+		// boxSizing: 'borderBox',
 		textColor: '#000',
+		align: 'end',
+	},
+
+	'.ace_button.left': {
+		align: 'start',
 	},
 
 	'.ace_button:hover': {
@@ -195,7 +214,7 @@ dom.importCss({
 	* ---------------------------------------------------------- */
 
 	'.ace_search_options': {
-		marginBottom: 3,
+		marginBottom: 2,
 		textAlign: 'right',
 		// clear: 'both',
 	},

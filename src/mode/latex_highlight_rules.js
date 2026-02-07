@@ -100,3 +100,6 @@ var LatexHighlightRules = function() {
 oop.inherits(LatexHighlightRules, TextHighlightRules);
 
 exports.LatexHighlightRules = LatexHighlightRules;
+
+
+export {};

@@ -79,3 +79,6 @@
   oop.inherits(AqlHighlightRules, TextHighlightRules);
 
   exports.AqlHighlightRules = AqlHighlightRules;
+
+
+export {};

@@ -86,3 +86,6 @@ FSLHighlightRules.metaData = {
 oop.inherits(FSLHighlightRules, TextHighlightRules);
 
 exports.FSLHighlightRules = FSLHighlightRules;
+
+
+export {};

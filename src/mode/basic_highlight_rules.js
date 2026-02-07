@@ -65,3 +65,6 @@ var BasicHighlightRules = function () {
 oop.inherits(BasicHighlightRules, TextHighlightRules);
 
 exports.BasicHighlightRules = BasicHighlightRules;
+
+
+export {};

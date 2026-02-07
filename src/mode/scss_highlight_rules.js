@@ -168,3 +168,6 @@ var ScssHighlightRules = function() {
 oop.inherits(ScssHighlightRules, TextHighlightRules);
 
 exports.ScssHighlightRules = ScssHighlightRules;
+
+
+export {};

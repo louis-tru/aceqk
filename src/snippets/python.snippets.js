@@ -157,3 +157,6 @@ snippet getopt
 		elif option in ("-v", "--verbose"):
 			verbose = argument
 `;
+
+
+export {};

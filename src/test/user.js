@@ -185,3 +185,6 @@ function type() {
 }
 
 exports.type = type;
+
+
+export {};

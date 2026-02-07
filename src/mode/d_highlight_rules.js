@@ -300,3 +300,6 @@ DHighlightRules.metaData = {
 oop.inherits(DHighlightRules, TextHighlightRules);
 
 exports.DHighlightRules = DHighlightRules;
+
+
+export {};

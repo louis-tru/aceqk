@@ -179,3 +179,6 @@ var LogtalkHighlightRules = function() {
 oop.inherits(LogtalkHighlightRules, TextHighlightRules);
 
 exports.LogtalkHighlightRules = LogtalkHighlightRules;
+
+
+export {};

@@ -100,3 +100,6 @@ var AbapHighlightRules = function() {
 oop.inherits(AbapHighlightRules, TextHighlightRules);
 
 exports.AbapHighlightRules = AbapHighlightRules;
+
+
+export {};

@@ -12,3 +12,5 @@ var JsxHighlightRules = function () {
 oop.inherits(JsxHighlightRules, JavaScriptHighlightRules);
 
 exports.JsxHighlightRules = JsxHighlightRules;
+
+export {};

@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./lua.snippets");
 exports.scope = "lua";
+
+
+export {};

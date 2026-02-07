@@ -156,3 +156,6 @@ oop.inherits(RazorHighlightRules, HtmlHighlightRules);
 
 exports.RazorHighlightRules = RazorHighlightRules;
 exports.RazorLangHighlightRules = RazorLangHighlightRules;
+
+
+export {};

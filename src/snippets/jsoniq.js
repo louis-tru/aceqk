@@ -2,3 +2,6 @@
 
 exports.snippetText = require("./jsoniq.snippets");
 exports.scope = "jsoniq";
+
+
+export {};

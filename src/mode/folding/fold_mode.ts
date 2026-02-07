@@ -20,7 +20,9 @@ export interface FoldMode {
 	closingBracketBlock(session: EditSession, bracket: string, row: number, column: number, typeRe?: RegExp): Range | undefined;
 }
 
-export class FoldMode {};
+export declare class FoldMode {}
+
+exports.FoldMode = function(){};
 
 (function(this: FoldMode) {
 
@@ -105,4 +107,4 @@ export class FoldMode {};
 
 		return  Range.fromPoints(start, end);
 	};
-}).call(FoldMode.prototype);
+}).call(exports.FoldMode.prototype);

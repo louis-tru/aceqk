@@ -18,3 +18,6 @@ snippet declare
 	end
 
 `;
+
+
+export {};

@@ -466,3 +466,6 @@ CstyleBehaviour["clearMaybeInsertedClosing"] = function() {
 oop.inherits(CstyleBehaviour, Behaviour);
 
 exports.CstyleBehaviour = CstyleBehaviour;
+
+
+export {};

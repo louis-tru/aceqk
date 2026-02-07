@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 // configure module loading in ace-builds to remain backwards compatible
@@ -89,3 +89,6 @@ function deHyphenate(str) {
 	return str.replace(/-(.)/g, function(m, m1) { return m1.toUpperCase(); });
 }
 });
+
+
+export {};

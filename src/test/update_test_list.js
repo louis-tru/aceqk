@@ -29,3 +29,6 @@ var updatedData = data.replace(
 // Write the updated content back to the file
 fs.writeFileSync(allBrowserFilePath, updatedData, "utf8");
 console.log("Updated testNames array in all_browser.js successfully.");
+
+
+export {};

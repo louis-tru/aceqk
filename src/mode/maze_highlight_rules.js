@@ -119,3 +119,6 @@ MazeHighlightRules.metaData = {
 oop.inherits(MazeHighlightRules, TextHighlightRules);
 
 exports.MazeHighlightRules = MazeHighlightRules;
+
+
+export {};

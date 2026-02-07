@@ -2476,3 +2476,5 @@ class DiffProvider {
 }
 
 exports.DiffProvider = DiffProvider;
+
+export {};

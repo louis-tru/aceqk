@@ -28,7 +28,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function(_require, _exports, _module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -94,3 +94,6 @@ oop.inherits(Worker, Mirror);
 }).call(Worker.prototype);
 
 });
+
+
+export {};

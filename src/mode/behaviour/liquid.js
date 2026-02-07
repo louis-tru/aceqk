@@ -87,3 +87,6 @@
     oop.inherits(LiquidBehaviour, Behaviour);
 
     exports.LiquidBehaviour = LiquidBehaviour;
+
+
+export {};

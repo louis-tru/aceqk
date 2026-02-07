@@ -227,3 +227,6 @@ var DroolsHighlightRules = function() {
 oop.inherits(DroolsHighlightRules, TextHighlightRules);
 
 exports.DroolsHighlightRules = DroolsHighlightRules;
+
+
+export {};

@@ -193,3 +193,6 @@ var VBScriptHighlightRules = function() {
 oop.inherits(VBScriptHighlightRules, TextHighlightRules);
 
 exports.VBScriptHighlightRules = VBScriptHighlightRules;
+
+
+export {};

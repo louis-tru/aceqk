@@ -63,3 +63,6 @@ var indenter = /(?:[({[=:]|[-=]>|\b(?:else|try|with))\s*$/;
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
+
+
+export {};

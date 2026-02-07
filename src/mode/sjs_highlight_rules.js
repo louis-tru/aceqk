@@ -199,3 +199,6 @@ var SJSHighlightRules = function() {
 oop.inherits(SJSHighlightRules, TextHighlightRules);
 
 exports.SJSHighlightRules = SJSHighlightRules;
+
+
+export {};

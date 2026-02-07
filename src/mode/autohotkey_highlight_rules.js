@@ -75,3 +75,6 @@ AutoHotKeyHighlightRules.metaData = { name: 'AutoHotKey',
 oop.inherits(AutoHotKeyHighlightRules, TextHighlightRules);
 
 exports.AutoHotKeyHighlightRules = AutoHotKeyHighlightRules;
+
+
+export {};
