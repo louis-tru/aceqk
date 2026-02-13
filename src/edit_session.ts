@@ -225,7 +225,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 	public mergeUndoDeltas: boolean = false;
 	private $informUndoManager?: ReturnType<typeof lang.delayedCall>;
 
-	private $annotations: Annotation[] = [];
+	public $annotations: Annotation[] = [];
 	public $mode: SyntaxMode;
 	public $modeId: string = "";
 	public $scrollLeft: number = 0;
@@ -1537,7 +1537,7 @@ export class EditSession extends EventEmitter<EditSessionEvents> {
 			return isUndo ? delta.action !== "insert" : delta.action === "insert";
 		}
 
-		var range: Range = new Range(0, 0, 0, 0);
+		var range!: Range;
 		var point: Point;
 
 		for (var i = 0; i < deltas.length; i++) {

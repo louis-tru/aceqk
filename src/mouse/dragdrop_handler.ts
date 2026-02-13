@@ -401,9 +401,9 @@ export class DragdropHandler {
 		if (/*useragent.isIE && */this.state == "dragReady") {
 			// IE does not handle [draggable] attribute set after mousedown
 			var distance = calcDistance(this.mousedownEvent!.x, this.mousedownEvent!.y, this.x, this.y);
-			if (distance > 3)
-				// @ts-ignore
-				target.dragDrop();
+			// if (distance > 3)
+				//// @ts-ignore
+				// target.dragDrop();
 		}
 		if (this.state === "dragWait") {
 			var distance = calcDistance(this.mousedownEvent!.x, this.mousedownEvent!.y, this.x, this.y);

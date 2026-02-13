@@ -14,6 +14,7 @@ import type {Range} from "../range";
 import type {GutterTooltip} from "./default_gutter_handler";
 import { CursorStyle } from "quark/types";
 import type {OptionsProvider} from "../lib/app_config";
+import {View} from 'quark';
 
 export interface MouseHandlerOptions {
 	scrollSpeed: number;
@@ -59,7 +60,7 @@ export class MouseHandler {
 
 		new DefaultHandlers(this);
 		new DefaultGutterHandler(this);
-		new DragdropHandler(this);
+		// new DragdropHandler(this);
 
 		var focusEditor = function(e?: any) {
 			// because we have to call event.preventDefault() any window on ie and iframes
@@ -75,14 +76,17 @@ export class MouseHandler {
 			});
 		};
 
-		var mouseTarget = editor.renderer.getMouseEventTarget();
+		var mouseTarget = editor.renderer.getMouseEventTarget() as View;
+		if (editor.renderer.scrollBarV) {
+			mouseTarget = editor.renderer.scrollBarV.element;
+		}
 		event.addListener(mouseTarget, "Click", this.onMouseEvent.bind(this, "click"), editor);
 		event.addListener(mouseTarget, "MouseMove", this.onMouseMove.bind(this, "mousemove"), editor);
 		event.addMultiMouseDownListener([
 			mouseTarget,
-			editor.renderer.scrollBarV && editor.renderer.scrollBarV.inner,
-			editor.renderer.scrollBarH && editor.renderer.scrollBarH.inner,
-			editor.textInput && editor.textInput.getElement()
+			// editor.renderer.scrollBarV && editor.renderer.scrollBarV.inner,
+			// editor.renderer.scrollBarH && editor.renderer.scrollBarH.inner,
+			// editor.textInput && editor.textInput.getElement()
 		].filter(Boolean), [400, 300, 250], this.onMouseEvent.bind(this), editor);
 		event.addMouseWheelListener(editor.container, this.onMouseWheel.bind(this, "mousewheel"), editor);
 
@@ -137,12 +141,12 @@ export class MouseHandler {
 	 * @param {any} name
 	 * @param {{ wheelX: number; wheelY: number; }} e
 	 */
-	onMouseWheel(name: string, e: UIMouseEvent) {
+	onMouseWheel(name: string, e: UIMouseEvent & {wheelX: number, wheelY: number}) {
 		var mouseEvent = new MouseEvent(e, this.editor);
 		////@ts-expect-error TODO: couldn't find this property init in the ace codebase
-		mouseEvent.speed = this.$scrollSpeed * 2;
-		mouseEvent.wheelX = e.delta.x;
-		mouseEvent.wheelY = e.delta.y;
+		mouseEvent.speed = this.$scrollSpeed;
+		mouseEvent.wheelX = e.wheelX;
+		mouseEvent.wheelY = e.wheelY;
 
 		this.editor._emit(name as any, mouseEvent, this.editor);
 	}

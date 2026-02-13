@@ -7,7 +7,8 @@ import {Gutter as GutterLayer} from "./layer/gutter";
 import {Marker as MarkerLayer} from "./layer/marker";
 import {Text as TextLayer} from "./layer/text";
 import {Cursor as CursorLayer} from "./layer/cursor";
-import {HScrollBar,VScrollBar} from "./scrollbar";
+import {HScrollBar,VScrollBar, IScrollBar} from "./scrollbar";
+import {HScrollBar as HScrollBarCustom, VScrollBar as VScrollBarCustom} from "./scrollbar_custom";
 import {RenderLoop} from "./renderloop";
 import {FontMetrics} from "./layer/font_metrics";
 import {EventEmitter} from "./lib/event_emitter";
@@ -22,6 +23,8 @@ import type {Annotation} from "./layer/gutter";
 import type { Theme } from './theme';
 import type { EditSession } from './ace';
 import './css/editor-css';
+import { Decorator } from './layer/decorators';
+import { ScrollDiffDecorator } from './ext/diff/scroll_diff_decorator';
 
 export type Composition = {
 	markerRange: Range;
@@ -114,13 +117,14 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public $cursorLayer: CursorLayer;
 	private $horizScroll = false;
 	private $vScroll = false;
-	public scrollBar: VScrollBar;
-	public scrollBarV: VScrollBar;
-	public scrollBarH: HScrollBar;
+	public scrollBar: IScrollBar;
+	public scrollBarV: IScrollBar;
+	public scrollBarH: IScrollBar;
 	public scrollTop = 0;
 	public scrollLeft = 0;
 	public cursorPos = { row : 0, column : 0 };
 	private $fontMetrics: FontMetrics;
+	private $customScrollbar?: boolean;
 
 	public $size = {
 		width: 0,
@@ -497,7 +501,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			if (this.$horizScroll)
 				size.scrollerHeight -= this.scrollBarH.getHeight();
 
-			this.scrollBarV.setHeight(size.scrollerHeight);
+			this.scrollBarV.setHeight(size.scrollerHeight, this.$computeScrollHeight());
 
 			changes = changes | this.CHANGE_SCROLL;
 		}
@@ -523,6 +527,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			this.scroller.style.marginLeft = gutterWidth + this.margin.left;
 			this.scroller.style.marginRight = right;
 			this.scroller.style.marginBottom = this.scrollBarH.getHeight();
+			// this.scroller.style.backgroundColor = '#f00';
 
 			if (this.session && this.session.getUseWrapMode() && this.adjustWrapLimit() || force) {
 				changes |= this.CHANGE_FULL;
@@ -954,20 +959,23 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.setOption("vScrollBarAlwaysVisible", alwaysVisible);
 	}
 
-	/**
-
-	 */
-	$updateScrollBarV() {
+	private $computeScrollHeight() {
 		var scrollHeight = this.layerConfig.maxHeight;
 		var scrollerHeight = this.$size.scrollerHeight;
 		if (!this.$maxLines && this.$scrollPastEnd) {
 			scrollHeight -= (scrollerHeight - this.lineHeight) * this.$scrollPastEnd;
 			if (this.scrollTop > scrollHeight - scrollerHeight) {
 				scrollHeight = this.scrollTop + scrollerHeight;
-				this.scrollBarV.scrollTop = -1;
 			}
 		}
-		this.scrollBarV.setScrollHeight(scrollHeight + this.scrollMargin.v);
+		return scrollHeight + this.scrollMargin.v;
+	}
+
+	/**
+	 */
+	$updateScrollBarV() {
+		var scrollHeight = this.$computeScrollHeight();
+		this.scrollBarV.setScrollHeight(scrollHeight);
 		this.scrollBarV.setScrollTop(this.scrollTop + this.scrollMargin.top);
 	}
 	$updateScrollBarH() {
@@ -1015,11 +1023,11 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		var config = this.layerConfig;
 		// text, scrolling and resize changes can cause the view port size to change
 		if (changes & this.CHANGE_FULL ||
-			changes & this.CHANGE_SIZE ||
-			changes & this.CHANGE_TEXT ||
-			changes & this.CHANGE_LINES ||
-			changes & this.CHANGE_SCROLL ||
-			changes & this.CHANGE_H_SCROLL
+				changes & this.CHANGE_SIZE ||
+				changes & this.CHANGE_TEXT ||
+				changes & this.CHANGE_LINES ||
+				changes & this.CHANGE_SCROLL ||
+				changes & this.CHANGE_H_SCROLL
 		) {
 			changes |= this.$computeLayerConfig() | this.$loop.clear();
 			// If a change is made offscreen and wrapMode is on, then the onscreen
@@ -1032,7 +1040,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 				if (st > 0) {
 					// this check is needed as a workaround for the documentToScreenRow returning -1 if document.length == 0
 					this.scrollTop = st;
-					changes = changes | this.CHANGE_SCROLL;
+					changes |= this.CHANGE_SCROLL;
 					changes |= this.$computeLayerConfig() | this.$loop.clear();
 				}
 			}
@@ -1063,6 +1071,9 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			this.$textLayer.update(config);
 			if (this.$showGutter)
 				this.$gutterLayer.update(config);
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 			this.$markerBack.update(config);
 			this.$markerFront.update(config);
 			this.$cursorLayer.update(config);
@@ -1085,6 +1096,9 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 				else
 					this.$gutterLayer.scrollLines(config);
 			}
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 			this.$markerBack.update(config);
 			this.$markerFront.update(config);
 			this.$cursorLayer.update(config);
@@ -1098,18 +1112,30 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			this.$textLayer.update(config);
 			if (this.$showGutter)
 				this.$gutterLayer.update(config);
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 		}
 		else if (changes & this.CHANGE_LINES) {
 			if (this.$updateLines() || (changes & this.CHANGE_GUTTER) && this.$showGutter)
 				this.$gutterLayer.update(config);
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 		}
 		else if (changes & this.CHANGE_TEXT || changes & this.CHANGE_GUTTER) {
 			if (this.$showGutter)
 				this.$gutterLayer.update(config);
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 		}
 		else if (changes & this.CHANGE_CURSOR) {
 			if (this.$highlightGutterLine)
 				this.$gutterLayer.updateLineHighlight(/*config*/);
+			if (this.$customScrollbar) {
+				this.$scrollDecorator!.$updateDecorators(config);
+			}
 		}
 
 		if (changes & this.CHANGE_CURSOR) {
@@ -1246,6 +1272,21 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			offset = this.scrollTop - firstRowScreen * lineHeight;
 		}
 
+		this.layerConfig = {
+			width : longestLine,
+			padding : this.$padding,
+			firstRow : firstRow,
+			firstRowScreen: firstRowScreen,
+			lastRow : lastRow,
+			lineHeight : lineHeight,
+			characterWidth : this.characterWidth,
+			minHeight : minHeight,
+			maxHeight : maxHeight, // needed in $updateScrollBarV
+			offset : offset,
+			gutterOffset : lineHeight ? Math.max(0, Math.ceil((offset + size.height - size.scrollerHeight) / lineHeight)) : 0,
+			height : this.$size.scrollerHeight
+		};
+
 		var changes = 0;
 		if (this.layerConfig.width != longestLine || hScrollChanged)
 			changes = this.CHANGE_H_SCROLL;
@@ -1258,20 +1299,8 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 				longestLine = this.$getLongestLine();
 		}
 
-		this.layerConfig = {
-			width : longestLine,
-			padding : this.$padding,
-			firstRow : firstRow,
-			firstRowScreen: firstRowScreen,
-			lastRow : lastRow,
-			lineHeight : lineHeight,
-			characterWidth : this.characterWidth,
-			minHeight : minHeight,
-			maxHeight : maxHeight,
-			offset : offset,
-			gutterOffset : lineHeight ? Math.max(0, Math.ceil((offset + size.height - size.scrollerHeight) / lineHeight)) : 0,
-			height : this.$size.scrollerHeight
-		};
+		// update width in case it changed after updating scrollbar visibility
+		this.layerConfig.width = longestLine;
 
 		if (this.session.$bidiHandler)
 			this.session.$bidiHandler.setContentWidth(longestLine - this.$padding);
@@ -1650,6 +1679,7 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		// scrollbar sends us event with same scrollTop. ignore it
 		if (this.scrollTop !== scrollTop) {
 			this.$loop.schedule(this.CHANGE_SCROLL);
+			// this.scrollBarV.scrollTop = scrollTop;
 			this.scrollTop = scrollTop;
 		}
 	}
@@ -2210,6 +2240,49 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.setOption("useResizeObserver", false);
 	}
 
+	$scrollDecorator?: Decorator;
+
+	/**
+	 *
+	 * @param {boolean} [val]
+	 */
+	$updateCustomScrollbar(val?: boolean) {
+		var _self = this;
+		this.$horizScroll = this.$vScroll = false;
+		this.scrollBarV.element.remove();
+		this.scrollBarH.element.remove();
+		if (val === true) {
+			this.scrollBarV = new VScrollBarCustom(this.container, this);
+			this.scrollBarH = new HScrollBarCustom(this.container, this);
+			this.scrollBarV.setHeight(this.$size.scrollerHeight);
+			this.scrollBarH.setWidth(this.$size.scrollerWidth);
+
+			this.scrollBarV.addEventListener("scroll", function (e) {
+				if (!_self.$scrollAnimation) _self.session.setScrollTop(e.data - _self.scrollMargin.top);
+			});
+			this.scrollBarH.addEventListener("scroll", function (e) {
+				if (!_self.$scrollAnimation) _self.session.setScrollLeft(e.data - _self.scrollMargin.left);
+			});
+			if (!this.$scrollDecorator) {
+				this.$scrollDecorator = new Decorator(this.scrollBarV, this);
+				this.$scrollDecorator.$updateDecorators();
+			} else {
+				this.$scrollDecorator.setScrollBarV(this.scrollBarV);
+				this.$scrollDecorator.$updateDecorators();
+			}
+		}
+		else {
+			this.scrollBarV = new VScrollBar(this.container, this);
+			this.scrollBarH = new HScrollBar(this.container, this);
+			this.scrollBarV.addEventListener("scroll", function (e) {
+				if (!_self.$scrollAnimation) _self.session.setScrollTop(e.data - _self.scrollMargin.top);
+			});
+			this.scrollBarH.addEventListener("scroll", function (e) {
+				if (!_self.$scrollAnimation) _self.session.setScrollLeft(e.data - _self.scrollMargin.left);
+			});
+		}
+	}
+
 	$addResizeObserver() {
 		// if (!window.ResizeObserver || this.$resizeObserver)
 		// 	return;
@@ -2431,6 +2504,12 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
 			this.$gutterLayer.$fixedWidth = !!val;
 			this.$loop.schedule(this.CHANGE_GUTTER);
 		}
+	},
+	customScrollbar: {
+		set: function(this: VirtualRenderer, val: boolean) {
+			this.$updateCustomScrollbar(val);
+		},
+		initialValue: false
 	},
 	theme: {
 		set: function(this: VirtualRenderer, val: string) { this.setTheme(val); },

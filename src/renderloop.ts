@@ -16,13 +16,14 @@ export class RenderLoop {
 	private $recursionLimit: number;
 	private _flush: () => void;
 	
-	constructor(onRender: OnRender, win?: Window) {
+	constructor(onRender: OnRender, win: Window) {
 		this.onRender = onRender;
 		this.pending = false;
 		this.changes = 0;
 		this.$recursionLimit = 2;
-		this.window = win || qk.app.activeWindow!;
+		this.window = win;
 		var _self = this;
+		// var time = 0;
 		this._flush = function () {
 			_self.pending = false;
 			var changes = _self.changes;
@@ -30,7 +31,14 @@ export class RenderLoop {
 			if (changes) {
 				// event.blockIdle(100);
 				_self.changes = 0;
+				// var now = Date.now();
+				// var delta = now - time;
+				// time = now;
+				// if (delta > 20)
+				// 	console.log("flush render loop, delta: " + delta);
+				// console.time("render loop");
 				_self.onRender(changes);
+				// console.timeEnd("render loop");
 			}
 
 			if (_self.changes) {
@@ -47,8 +55,9 @@ export class RenderLoop {
 	schedule(change: number = 0) {
 		this.changes = this.changes | change;
 		if (this.changes && !this.pending) {
-			this.window.nextFrame(this._flush); // too slow
 			this.pending = true;
+			// this.window.nextFrame(this._flush); // too slow
+			util.nextTick(() => this._flush()); // very fast, call after current call stack ended
 		}
 	}
 

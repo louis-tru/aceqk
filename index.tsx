@@ -5,14 +5,15 @@ import {newRect} from 'quark/types';
 
 const app = new Application();
 
-const dom = new Window({frame: newRect(0,0, 1000, 400)})
-	.render(<text width="match" height="match" fontSize={12} />);
+const win = new Window({frame: newRect(0,0, 1000, 400)});
+const dom = win.render(<text width="match" height="match" fontSize={12} />);
 const editor = ace.edit(dom as Text);
 editor.session.setMode('ace/mode/typescript');
 editor.session.setTabSize(2);
 // editor.session.setValue(`aa林`);
+// editor.renderer.setOption("customScrollbar", true);
 
-editor.session.setValue(`if (!isTextToken(token.type)) {
+const code = `if (!isTextToken(token.type)) {
 	let classes = "ace_" + token.type.replace(/\./g, " ace_");
 	// let span = this.dom.createElement("span");
 	let span: View;
@@ -38,7 +39,11 @@ else {
 	valueFragment.forEach(function(child) {
 		parent.append(child);
 	});
-}`);
+}
+
+`;
+
+editor.session.setValue(code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code);
 
 // new Window({frame: newRect(0,0, 1000, 400)}).render(
 // 	// <text width="match" height="match" fontSize={12}>
@@ -52,3 +57,10 @@ else {
 // 		</box>
 // 	// </text>
 // );
+
+
+win.onChange.on(()=>{
+	editor.resize();
+});
+
+win.debugMode = true;

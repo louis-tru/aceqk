@@ -3,7 +3,7 @@
 import * as useragent from "../lib/env";
 import {nls} from "../config";
 import * as clipboard from "../clipboard";
-import {View,InputSink} from "quark";
+import qk,{View,InputSink} from "quark";
 import type {Editor} from "../editor";
 import type {InputEvent} from 'quark/event';
 import * as event from "../lib/event";
@@ -80,9 +80,12 @@ export class TextInput {
 			parentNode.onKeyDown.on((e) => {
 				if (useragent.macOS ? !e.command: !e.ctrl) return;
 				switch (e.keycode) {
-					case 67: this.onCopy(e); break; // C
-					case 86: this.onPaste(e); break; // V
-					case 88: this.onCut(e); break;  // X
+					case 67:
+						this.onCopy(e); break; // C
+					case 86:
+						this.onPaste(e); break; // V
+					case 88:
+						this.onCut(e); break;  // X
 				}
 			});
 		}
@@ -219,22 +222,12 @@ export class TextInput {
 	}
 
 	handleClipboardData(e: ClipboardEvent, data?: string): string | boolean {
-		// var clipboardData = e.clipboardData || window["clipboardData"];
-		// if (!clipboardData)
-		// 	return false;
-		// try {
-		// 	if (data) {
-		// 		return clipboardData.setData("text/plain", data) !== false;
-		// 	}
-		// 	else {
-		// 		return clipboardData.getData("text/plain");
-		// 	}
-		// } catch (err) {
-		// 	console.error(err);
-		// 	return false;
-		// }
-		// TODO: implement clipboard handling
-		return false;
+		if (data) {
+			qk.app.clipboard.setText(data);
+			return true;
+		} else {
+			return qk.app.clipboard.getText();
+		}
 	}
 
 	/**

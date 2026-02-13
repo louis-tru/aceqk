@@ -29,7 +29,6 @@ export class InlineDiffView extends BaseDiffView {
 	markerLayer: Renderer["$markerBack"];
 	gutterLayer: Renderer["$gutterLayer"];
 	cursorLayer: Renderer["$cursorLayer"];
-	otherEditor: Editor;
 	otherSession: EditSession;
 	showSideA: boolean;
 	othertextInput: Editor["textInput"];

@@ -1,6 +1,6 @@
 
 import keys,{$codeToKeyCode} from "./keys";
-import type {KeyEvent, UIEvent,MouseEvent} from 'quark/event';
+import {KeyEvent,UIEvent,MouseEvent,WheelDeltaMode} from 'quark/event';
 import type {View, Window} from 'quark';
 import * as useragent from "./env";
 import {Vec2} from "quark/types";
@@ -266,29 +266,16 @@ export function addMultiMouseDownListener(
  * @param callback
  * @param [destroyer]
  */
-export function addMouseWheelListener(el: View, callback: (e: MouseEvent) => void, destroyer?: { $toDestroy: EventListener[] }) {
-	addListener(el, "MouseWheel",  function(e: MouseEvent & {wheelX?: number, wheelY?: number}) {
-		// var factor = 0.15;
-		// workaround for firefox changing deltaMode based on which property is accessed first
-		// var deltaX = e.deltaX || 0;
-		// var deltaY = e.deltaY || 0;
-		// switch (e.deltaMode) {
-		// 	case e.DOM_DELTA_PIXEL:
-		// 		e.wheelX = deltaX * factor;
-		// 		e.wheelY = deltaY * factor;
-		// 		break;
-		// 	case e.DOM_DELTA_LINE:
-		// 		var linePixels = 15;
-		// 		e.wheelX = deltaX * linePixels;
-		// 		e.wheelY = deltaY * linePixels;
-		// 		break;
-		// 	case e.DOM_DELTA_PAGE:
-		// 		var pagePixels = 150;
-		// 		e.wheelX = deltaX * pagePixels;
-		// 		e.wheelY = deltaY * pagePixels;
-		// 		break;
-		// }
-		callback(e); // Quark normalizes wheel delta to pixels
+export function addMouseWheelListener(el: View, callback: (e: MouseEvent & {wheelX: number, wheelY: number}) => void, destroyer?: { $toDestroy: EventListener[] }) {
+	addListener(el, "MouseWheel",  function(e: MouseEvent & {wheelX: number, wheelY: number}) {
+		if (e.deltaMode == WheelDeltaMode.Pixel) {
+			e.wheelX = e.delta.x * 0.3;
+			e.wheelY = e.delta.y * 0.3;
+		} else {
+			e.wheelX = e.delta.x * 0.5;
+			e.wheelY = e.delta.y * 0.5;
+		}
+		callback(e);
 	}, destroyer);
 };
 

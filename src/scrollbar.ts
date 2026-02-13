@@ -15,14 +15,37 @@ export interface ScrollbarEvents {
 	"scroll": (e: { data: number }, emitter: Scrollbar) => void;
 }
 
+export interface IScrollBar extends EventEmitter<ScrollbarEvents> {
+	element: View;
+	scrollTop: number;
+	scrollLeft: number;
+	scrollHeight: number;
+	scrollWidth: number;
+	width: number;
+	setVisible(isVisible: boolean): void;
+	setHeight(height: number, scrollHeight?: number): void;
+	setWidth(width: number): void;
+	getWidth(): number;
+	getHeight(): number;
+	setScrollHeight(height: number): void;
+	setScrollWidth(width: number): void;
+	setScrollTop(scrollTop: number): void;
+	setScrollLeft(scrollLeft: number): void;
+}
+
 /**
  * An abstract class representing a native scrollbar control.
  **/
-export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
+export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> implements IScrollBar {
 	public element: Scroll;
-	public inner: Box;
-	protected skipEvent: boolean;
-	public isVisible: boolean;
+	public scrollTop: number = 0;
+	public scrollLeft: number = 0;
+	public scrollHeight: number = 0;
+	public scrollWidth: number = 0;
+	public width: number = 0;
+	protected inner: Box;
+	protected skipEvent: number;
+	protected isVisible: boolean;
 	protected coeff: number;
 
 	/**
@@ -38,15 +61,16 @@ export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
 
 		// this.inner = dom.createElement("div");
 		this.inner = new Box(parent.window);
-		this.inner.class = ["ace_scrollbar-inner"];
+		this.inner.addClass("ace_scrollbar-inner");
 		this.element.append(this.inner);
 
 		parent.append(this.element);
 
 		this.setVisible(false);
-		this.skipEvent = false;
+		this.skipEvent = 0;
 
 		this.element.onScroll.on(this.onScroll.bind(this));
+		this.element.onMouseWheel.on(e => e.cancelBubble());
 		// this.element.onMouseDown.on(e => e.cancelDefault());
 	}
 
@@ -56,6 +80,15 @@ export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
 		this.coeff = 1;
 	}
 
+	setHeight(height: number): void {}
+	setWidth(width: number): void {}
+	getWidth(): number { return 0 }
+	getHeight(): number { return 0 }
+	setScrollHeight(height: number): void {}
+	setScrollWidth(width: number): void {}
+	setScrollTop(scrollTop: number): void {}
+	setScrollLeft(scrollLeft: number): void {}
+
 	protected abstract onScroll(e: UIEvent): void;
 }
 
@@ -63,9 +96,6 @@ export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> {
  * Represents a vertical scroll bar.
  **/
 export class VScrollBar extends Scrollbar {
-	public scrollTop: number;
-	public scrollHeight: number;
-	public width: number;
 	private $minWidth: number;
 
 	/**
@@ -77,11 +107,11 @@ export class VScrollBar extends Scrollbar {
 		super(parent, '-v');
 		this.scrollTop = 0;
 		this.scrollHeight = 0;
-		this.width = SCROLLBAR_SIZE;
-		this.element.style.width = SCROLLBAR_SIZE;
+		this.width = 0;//SCROLLBAR_SIZE;
+		//this.element.style.width = SCROLLBAR_SIZE;
+		this.element.style.width = '90%';
 		this.inner.style.width = SCROLLBAR_SIZE;
 		this.element.style.height = 'match';
-		this.element.style.align = 'end'; // right align
 	}
 
 	/**
@@ -91,7 +121,7 @@ export class VScrollBar extends Scrollbar {
 	 **/
 
 	protected onScroll() {
-		if (!this.skipEvent) {
+		if (!this.skipEvent && this.element.scrollTop != this.scrollTop) {
 			this.scrollTop = this.element.scrollTop;
 			if (this.coeff != 1) {
 				var h = this.element.clientSize.y / this.scrollHeight;
@@ -99,7 +129,7 @@ export class VScrollBar extends Scrollbar {
 			}
 			this._emit("scroll", {data: this.scrollTop}, this);
 		}
-		this.skipEvent = false;
+		this.skipEvent = Math.max(0, this.skipEvent - 1);
 	}
 
 	/**
@@ -130,7 +160,7 @@ export class VScrollBar extends Scrollbar {
 	 * @param {Number} height The new scroll height
 	 **/
 	setScrollHeight(height: number) {
-		this.scrollHeight = height;
+		this.scrollHeight = height >>> 0;
 		if (height > MAX_SCROLL_H) {
 			this.coeff = MAX_SCROLL_H / height;
 			height = MAX_SCROLL_H;
@@ -148,7 +178,7 @@ export class VScrollBar extends Scrollbar {
 		// on chrome 17+ for small zoom levels after calling this function
 		// this.element.scrollTop != scrollTop which makes page to scroll up.
 		if (this.scrollTop != scrollTop) {
-			this.skipEvent = true;
+			this.skipEvent = 2;
 			this.scrollTop = scrollTop;
 			this.element.scrollTop = scrollTop * this.coeff;
 		}
@@ -159,7 +189,6 @@ export class VScrollBar extends Scrollbar {
  * Represents a horisontal scroll bar.
  **/
 export class HScrollBar extends Scrollbar {
-	public scrollLeft: number;
 	public height: number;
 	/**
 	 * Creates a new `HScrollBar`. `parent` is the owner of the scroll bar.
@@ -169,11 +198,10 @@ export class HScrollBar extends Scrollbar {
 	constructor(parent: View, renderer: VirtualRenderer) {
 		super(parent, '-h');
 		this.scrollLeft = 0;
-		this.height = SCROLLBAR_SIZE;
+		this.height = 0;//SCROLLBAR_SIZE;
 		this.inner.style.height = SCROLLBAR_SIZE;
 		this.element.style.height = SCROLLBAR_SIZE;
 		this.element.style.width = 'match';
-		this.element.style.align = 'bottom'; // boottom align
 		this.element.style.marginRight = SCROLLBAR_SIZE;
 	}
 
@@ -183,11 +211,11 @@ export class HScrollBar extends Scrollbar {
 	 * @internal
 	 **/
 	protected onScroll() {
-		if (!this.skipEvent) {
+		if (!this.skipEvent && this.element.scrollLeft != this.scrollLeft) {
 			this.scrollLeft = this.element.scrollLeft;
 			this._emit("scroll", {data: this.scrollLeft}, this);
 		}
-		this.skipEvent = false;
+		this.skipEvent = Math.max(0, this.skipEvent - 1);
 	}
 
 	/**
@@ -228,10 +256,11 @@ export class HScrollBar extends Scrollbar {
 	 * @param {Number} scrollLeft The new scroll left
 	 **/
 	setScrollLeft(scrollLeft: number) {
+		scrollLeft = scrollLeft >>> 0;
 		// on chrome 17+ for small zoom levels after calling this function
 		// this.element.scrollTop != scrollTop which makes page to scroll up.
 		if (this.scrollLeft != scrollLeft) {
-			this.skipEvent = true;
+			this.skipEvent = 2;
 			this.scrollLeft = this.element.scrollLeft = scrollLeft;
 		}
 	}

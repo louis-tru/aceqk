@@ -152,12 +152,12 @@ export class BaseDiffView {
 		this.savedOptionsB = diffModel.editorB && diffModel.editorB.getOptions(diffEditorOptions);
 
 		if (!this.inlineDiffEditor || diffModel.inline === "a") {
-			this.editorA = diffModel.editorA || this.$setupModel(diffModel.sessionA, diffModel.valueA);
+			this.editorA = (diffModel.editorA || this.$setupModel(diffModel.sessionA, diffModel.valueA)) as EditorExt;
 			this.container && this.container.append(this.editorA.container);
 			this.editorA.setOptions(diffEditorOptions);
 		}
 		if (!this.inlineDiffEditor || diffModel.inline === "b") {
-			this.editorB = diffModel.editorB || this.$setupModel(diffModel.sessionB, diffModel.valueB);
+			this.editorB = (diffModel.editorB || this.$setupModel(diffModel.sessionB, diffModel.valueB)) as EditorExt;
 			this.container && this.container.append(this.editorB.container);
 			this.editorB.setOptions(diffEditorOptions);
 		}
@@ -168,7 +168,7 @@ export class BaseDiffView {
 			var cloneOptions = this.activeEditor.getOptions();
 			cloneOptions.readOnly = true;
 			delete cloneOptions.mode;
-			this.otherEditor = new Editor(new Renderer(null), undefined, cloneOptions);
+			this.otherEditor = new Editor(new Renderer(null), undefined, cloneOptions) as EditorExt;
 			if (this.showSideA) {
 				this.editorB = this.otherEditor;
 			} else {
