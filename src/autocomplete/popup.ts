@@ -373,7 +373,7 @@ export class AcePopup extends Editor {
 			}
 
 			var el = this.container;
-			var scrollBarSize = this.renderer.scrollBar.width || 10;
+			var scrollBarSize = this.renderer.scrollBar.getWidth() || 10;
 			var screenHeight = this.window.size.height - scrollBarSize;
 			var screenWidth = this.window.size.width - scrollBarSize;
 			var renderer = this.renderer;

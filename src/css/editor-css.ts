@@ -210,52 +210,29 @@ dom.importCss({
 },
 
 '.ace_scrollbar': {
-// 	contain: strict;
-// 	position: absolute;
-// 	right: 0;
-// 	bottom: 0;
 	zIndex: 6,
 	align: 'rightBottom',
 	cursor: 'text',
-	layout: 'free',
-	backgroundColor: '#f004',
 },
 
 '.ace_scrollbar-inner': {
-	// 	position: absolute;
-	// 	left: 0;
-	// 	top: 0;
 	cursor: 'default',
-	backgroundColor: '#0f04',
-	align: 'end',
 },
 
-// '.ace_scrollbar-inner:normal': {
-// 	backgroundColor: '#0002'
-// },
-
-// '.ace_scrollbar-inner:hover': {
-// 	backgroundColor: '#0004'
-// },
-
-// '.ace_scrollbar-inner:active': {
-// 	backgroundColor: '#0006'
-// },
-
 '.ace_scrollbar-v':{
-// 	overflow-x: hidden;
-// 	overflow-y: scroll;
-// 	top: 0;
 },
 
 '.ace_scrollbar-h': {
-// 	overflow-x: scroll;
-// 	overflow-y: hidden;
-// 	left: 0;
+},
+
+'.ace_scrollbar-driver': {
+},
+
+'.ace_scrollbar-driver .ace_scrollbar-inner': {
+	cursor: 'text',
 },
 
 '.ace_print-margin': {
-// 	position: absolute;
 	height: '100%',
 },
 

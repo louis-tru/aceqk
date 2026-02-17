@@ -187,7 +187,7 @@ export class Decorator {
 		this.maxHeight = config.maxHeight!;
 		this.lineHeight = config.lineHeight!;
 		this.canvasHeight = config.height!;
-		this.canvasWidth = this.scrollbarV.width || this.canvasWidth;
+		this.canvasWidth = this.scrollbarV.getWidth() || this.canvasWidth;
 
 		this.setZoneWidth();
 

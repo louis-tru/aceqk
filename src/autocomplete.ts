@@ -795,7 +795,7 @@ export class Autocomplete {
 
 		var targetWidth = 400;
 		var targetHeight = 300;
-		var scrollBarSize = popup.renderer.scrollBar.width || 10;
+		var scrollBarSize = popup.renderer.scrollBar.getWidth() || 10;
 		var window = this.window;
 		var winSize = window.size;
 

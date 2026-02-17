@@ -7,7 +7,7 @@ import {Gutter as GutterLayer} from "./layer/gutter";
 import {Marker as MarkerLayer} from "./layer/marker";
 import {Text as TextLayer} from "./layer/text";
 import {Cursor as CursorLayer} from "./layer/cursor";
-import {HScrollBar,VScrollBar, IScrollBar} from "./scrollbar";
+import {HScrollBar,VScrollBar, IScrollBar,ScrollDriver} from "./scrollbar";
 import {HScrollBar as HScrollBarCustom, VScrollBar as VScrollBarCustom} from "./scrollbar_custom";
 import {RenderLoop} from "./renderloop";
 import {FontMetrics} from "./layer/font_metrics";
@@ -117,7 +117,6 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public $cursorLayer: CursorLayer;
 	private $horizScroll = false;
 	private $vScroll = false;
-	public scrollBar: IScrollBar;
 	public scrollBarV: IScrollBar;
 	public scrollBarH: IScrollBar;
 	public scrollTop = 0;
@@ -125,6 +124,10 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 	public cursorPos = { row : 0, column : 0 };
 	private $fontMetrics: FontMetrics;
 	private $customScrollbar?: boolean;
+
+	get scrollBar() {
+		return this.scrollBarV;
+	}
 
 	public $size = {
 		width: 0,
@@ -224,9 +227,11 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.$markerFront = new MarkerLayer(this.content);
 		this.$cursorLayer = new CursorLayer(this.content);
 
-		this.scrollBar =
-		this.scrollBarV = new VScrollBar(this.container, this);
-		this.scrollBarH = new HScrollBar(this.container, this);
+		const driver = new ScrollDriver(this.container, this);
+		// this.scrollBarV = new VScrollBar(this.container, this);
+		// this.scrollBarH = new HScrollBar(this.container, this);
+		this.scrollBarV = driver.vertical;
+		this.scrollBarH = driver.horizontal;
 		this.scrollBarV.on("scroll", function(e) {
 			if (!_self.$scrollAnimation)
 				_self.session.setScrollTop(e.data - _self.scrollMargin.top);
@@ -2272,8 +2277,11 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 			}
 		}
 		else {
-			this.scrollBarV = new VScrollBar(this.container, this);
-			this.scrollBarH = new HScrollBar(this.container, this);
+			const driver = new ScrollDriver(this.container, this);
+			// this.scrollBarV = new VScrollBar(this.container, this);
+			// this.scrollBarH = new HScrollBar(this.container, this);
+			this.scrollBarV = driver.vertical;
+			this.scrollBarH = driver.horizontal;
 			this.scrollBarV.addEventListener("scroll", function (e) {
 				if (!_self.$scrollAnimation) _self.session.setScrollTop(e.data - _self.scrollMargin.top);
 			});
