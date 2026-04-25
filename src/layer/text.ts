@@ -359,6 +359,7 @@ export class Text extends EventEmitter<TextEvents> {
 
 			var line = this.$lines.createCell(row, config, this.session);
 			var lineEl = line.element;
+			lineEl.removeAllChild(); // clear all child views
 			lineEl.style.height = this.$lines.computeLineHeight(row, config, this.session);
 			lineEl.style.marginTop = this.$lines.computeLineTop(row, config, this.session);
 

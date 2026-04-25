@@ -9,6 +9,7 @@ import * as lang from "./lib/lang";
 import type { Delta } from "./range";
 import type { Editor } from "./editor";
 import type { EditSession } from "./edit_session";
+import type { FontMetrics } from "./layer/font_metrics";
 
 var bidiRE = /[\u0590-\u05f4\u0600-\u06ff\u0700-\u08ac\u202B]/;
 
@@ -33,7 +34,7 @@ export class BidiHandler {
 	EOF = "\xB6";
 	RLE = "\u202B";
 	contentWidth = 0;
-	fontMetrics: any = null;
+	fontMetrics: FontMetrics | null = null;
 	rtlLineOffset = 0;
 	wrapOffset = 0;
 	isMoveLeftOperation = false;
@@ -160,8 +161,8 @@ export class BidiHandler {
 		});
 
 		if (this.isRtlDir) {
-			this.fontMetrics.$main.textContent = (this.line.charAt(this.line.length - 1) == bidiUtil.DOT) ? this.line.substr(0, this.line.length - 1) : this.line;
-			this.rtlLineOffset = this.contentWidth - this.fontMetrics.$main.getBoundingClientRect().width;
+			// this.fontMetrics.$main.textContent = (this.line.charAt(this.line.length - 1) == bidiUtil.DOT) ? this.line.substr(0, this.line.length - 1) : this.line;
+			// this.rtlLineOffset = this.contentWidth - this.fontMetrics.$main.getBoundingClientRect().width;
 		}
 	}
 
@@ -188,7 +189,7 @@ export class BidiHandler {
 	 * @param {Object} fontMetrics metrics
 	 *
 	**/
-	updateCharacterWidths(fontMetrics: any) {
+	updateCharacterWidths(fontMetrics: FontMetrics) {
 		if (this.characterWidth === fontMetrics.$characterSize.width)
 			return;
 

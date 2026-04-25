@@ -137,8 +137,8 @@ export class Lines<El extends Box = Box> {
 		if (!cell)
 			return;
 		cell.element.visible = false; // hide the element instead of removing it from DOM
-		cell.element.removeAllChild(); // clear all child views
-		cell.element.remove(); // remove from DOM
+		// cell.element.removeAllChild(); // clear all child views
+		// cell.element.remove(); // remove from DOM
 		this.cellCache.push(cell); // add to cache
 	}
 
@@ -154,14 +154,12 @@ export class Lines<El extends Box = Box> {
 				text: "",
 				row: row
 			};
+			if (initElement)
+				initElement(cell.element);
+			this.element.append(cell.element); // add to DOM
 		}
 		cell.row = row;
 		cell.element.visible = true; // make sure the element is visible
-
-		if (initElement)
-			initElement(cell.element);
-
-		this.element.append(cell.element); // add to DOM
 
 		return cell;
 	}

@@ -15,6 +15,7 @@ import type {GutterTooltip} from "./default_gutter_handler";
 import { CursorStyle } from "quark/types";
 import type {OptionsProvider} from "../lib/app_config";
 import {View} from 'quark';
+import util from "quark/util";
 
 export interface MouseHandlerOptions {
 	scrollSpeed: number;
@@ -189,13 +190,18 @@ export class MouseHandler {
 			mouseMoveHandler && mouseMoveHandler(e);
 			self.mouseEvent = new MouseEvent(e, self.editor);
 			self.$mouseMoved = true;
+			onCaptureUpdate(); // call update handler on mouse move, so we don't have to wait for nextFrame to update mouse position
 		};
 
 		var onCaptureEnd = function(e: UIMouseEvent) {
 			editor.off("beforeEndOperation", onOperationEnd);
 			continueCapture = false;
-			if (editor.session) onCaptureUpdate();
-			(self as any)[self.state + "End"] && (self as any)[self.state + "End"]();
+			if (editor.session) {
+				onCaptureUpdate();
+			}
+			if ((self as any)[self.state + "End"]) {
+				(self as any)[self.state + "End"]();
+			}
 			self.state = "";
 			self.isMousePressed = renderer.$isMousePressed = false;
 			if (renderer.$keepTextAreaAtCursor)
@@ -206,13 +212,16 @@ export class MouseHandler {
 		};
 
 		var onCaptureUpdate = function() {
-			(self as any)[self.state] && (self as any)[self.state]();
+			if ((self as any)[self.state]) {
+				(self as any)[self.state]();
+			}
 			self.$mouseMoved = false;
 		};
 
 		var onCaptureInterval = function() {
 			if (continueCapture) {
 				onCaptureUpdate();
+				// util.nextTick(onCaptureInterval);
 				event.nextFrame(onCaptureInterval, self.editor.window);
 			}
 		};

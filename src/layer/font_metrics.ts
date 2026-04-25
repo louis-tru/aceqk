@@ -36,6 +36,9 @@ export class FontMetrics extends EventEmitter<FontMetricsEvents> {
 		this.el = new Box(parentEl.window);
 		this.el.style.layout = 'free';
 
+		// this.$main = dom.createElement("div");
+		// this.$setMeasureNodeStyles(this.$main.style);
+
 		// this.$measureNode = dom.createElement("div");
 		this.$measureNode = new Text(parentEl.window);
 		this.$measureNode.style.whiteSpace = "pre"; // prevent wrapping
