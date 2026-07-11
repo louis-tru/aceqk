@@ -57,6 +57,7 @@ export abstract class Scrollbar extends EventEmitter<ScrollbarEvents> implements
 		// this.element = dom.createElement("div");
 		this.element = new Scroll(parent.window);
 		this.element.class = ["ace_scrollbar", "ace_scrollbar" + classSuffix];
+		this.element.clip = false;
 
 		// this.inner = dom.createElement("div");
 		this.inner = new Box(parent.window);

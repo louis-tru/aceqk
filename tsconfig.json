@@ -11,7 +11,7 @@
 		"rootDir": ".",
 		"baseUrl": ".",
 		"declaration": true,
-		"alwaysStrict": false,
+		"alwaysStrict": true,
 		"allowJs": true,
 		"checkJs": false,
 		"strict": true,

@@ -413,7 +413,7 @@ dom.importCss({
 
 // Marker Layer item, common styles for all markers
 '.ace_marker_item': {
-	aa: false, // disable anti-aliasing for markers by default
+	aa: true, // disable anti-aliasing for markers by default
 	borderRadius: 0, // no border radius by default
 	border: '0 #000', // default border to avoid shifting of text
 	width: 'match', // default match full width

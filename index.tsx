@@ -10,7 +10,6 @@ const dom = win.render(<text width="match" height="match" fontSize={12} />);
 const editor = ace.edit(dom as Text);
 editor.session.setMode('ace/mode/typescript');
 editor.session.setTabSize(2);
-// editor.session.setValue(`aa林`);
 // editor.renderer.setOption("customScrollbar", true);
 
 const code = `if (!isTextToken(token.type)) {
@@ -43,7 +42,9 @@ else {
 
 `;
 
-editor.session.setValue(code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code);
+editor.session.setValue(code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code +
+	code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code + code
+);
 
 // new Window({frame: newRect(0,0, 1000, 400)}).render(
 // 	// <text width="match" height="match" fontSize={12}>
@@ -57,7 +58,6 @@ editor.session.setValue(code + code + code + code + code + code + code + code + 
 // 		</box>
 // 	// </text>
 // );
-
 
 win.onChange.on(()=>{
 	editor.resize();
