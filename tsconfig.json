@@ -9,7 +9,6 @@
 		"sourceMap": false,
 		"outDir": "out/build",
 		"rootDir": ".",
-		"baseUrl": ".",
 		"declaration": true,
 		"alwaysStrict": true,
 		"allowJs": true,

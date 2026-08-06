@@ -122,7 +122,7 @@ dom.importCss({
 // 	right: 0;
 // 	bottom: 0;
 // 	left: 0;
-// 	box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0'.4)': inset;
+// 	box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0'.4)' inset;
 // 	pointer-events: none;
 },
 
@@ -558,6 +558,8 @@ dom.importCss({
 	// background-repeat: no-repeat;
 	// background-position: center;
 
+	backgroundColor: '#0000',
+	boxShadow: '0 0 0 #0000',
 	borderRadius: 3,
 	border: '1 #0000',
 	cursor: 'pointer',

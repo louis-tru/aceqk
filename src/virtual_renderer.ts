@@ -228,10 +228,10 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		this.$cursorLayer = new CursorLayer(this.content);
 
 		const driver = new ScrollDriver(this.container, this);
-		// this.scrollBarV = new VScrollBar(this.container, this);
-		// this.scrollBarH = new HScrollBar(this.container, this);
 		this.scrollBarV = driver.vertical;
 		this.scrollBarH = driver.horizontal;
+		// this.scrollBarV = new VScrollBar(this.container, this);
+		// this.scrollBarH = new HScrollBar(this.container, this);
 		this.scrollBarV.on("scroll", function(e) {
 			if (!_self.$scrollAnimation)
 				_self.session.setScrollTop(e.data - _self.scrollMargin.top);
