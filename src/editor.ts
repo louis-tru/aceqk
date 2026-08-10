@@ -553,6 +553,13 @@ export class Editor extends EventEmitter<EditorEvents> {
 	}
 
 	/**
+	 * Sets the size of the editor. This is a convenience method that calls [[VirtualRenderer.onResize]].
+	 */
+	setSize(width: number, height: number) {
+		this.renderer.onResize(false, undefined, width, height);
+	}
+
+	/**
 	 * {:VirtualRenderer.setTheme}
 	 * @param {string | Theme} theme The path to a theme
 	 * @param {() => void} [cb] optional callback called when theme is loaded

@@ -204,7 +204,10 @@ export class Gutter extends EventEmitter<GutterEvents> {
 		
 		var session = this.session;
 		var firstRow = config.firstRow;
-		var lastRow = Math.min(config.lastRow + config.gutterOffset,  // needed to compensate for hor scollbar
+		// Never let invalid transient layout data turn this row loop into an
+		// unbounded one: every comparison with NaN is false.
+		var gutterOffset = Number.isFinite(config.gutterOffset) ? config.gutterOffset : 0;
+		var lastRow = Math.min(config.lastRow + gutterOffset,  // needed to compensate for hor scollbar
 			session.getLength() - 1);
 
 		this.oldLastRow = lastRow;

@@ -3,7 +3,7 @@
 import {TokenIterator} from "../token_iterator";
 import {Point, Range} from "../range";
 import type { EditSession } from "../edit_session";
-import type { Token } from "src/background_tokenizer";
+import type { Token } from "../background_tokenizer";
 
 export interface BracketMatch {
 	findMatchingBracket: (position: Point, chr?: string) => Point | null;

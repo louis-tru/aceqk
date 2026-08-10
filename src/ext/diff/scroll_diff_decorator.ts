@@ -1,4 +1,4 @@
-import type { IScrollBar, VScrollBar } from "src/scrollbar";
+import type { IScrollBar, VScrollBar } from "../../scrollbar";
 import type {VirtualRenderer} from "../../virtual_renderer";
 import type {EditSession} from "../../edit_session";
 import {Decorator,Config} from "../../layer/decorators";

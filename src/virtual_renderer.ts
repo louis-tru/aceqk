@@ -443,6 +443,8 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		var clSize = el.clientSize;
 		if (!height)
 			height = clSize.height; // el.clientHeight || el.scrollHeight;
+		if (!Number.isFinite(height))
+			height = 0;
 		//
 		// NOTE:
 		// ACE uses a 1px height hack here to force browser reflow and unlock autosize.
@@ -459,6 +461,8 @@ export class VirtualRenderer extends EventEmitter<VirtualRendererEvents> {
 		// }
 		if (!width)
 			width = clSize.width; // el.clientWidth || el.scrollWidth;
+		if (!Number.isFinite(width))
+			width = 0;
 		var changes = this.$updateCachedSize(force, gutterWidth, width, height);
 
 		if (this.$resizeTimer) this.$resizeTimer.cancel();

@@ -104,9 +104,11 @@ export class FontMetrics extends EventEmitter<FontMetricsEvents> {
 			height: lsize.y,
 			width: lsize.x / CHAR_COUNT
 		};
-		// Size and width can be null if the editor is not visible or
-		// detached from the document
-		if (size.width === 0 || size.height === 0)
+		// Detached Qk views can report an unconstrained (infinite) layout size.
+		// Do not publish it as a character size: Infinity later produces NaN
+		// viewport rows and can make the renderer's row loops non-terminating.
+		if (!Number.isFinite(size.width) || !Number.isFinite(size.height)
+				|| size.width <= 0 || size.height <= 0)
 			return null;
 		return size;
 	}

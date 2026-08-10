@@ -50,7 +50,7 @@ import type { Anchor } from "../anchor";
 import type { Delta } from "../range";
 import type { VirtualRenderer } from "../virtual_renderer";
 import type { Box } from "quark";
-import { Cell } from "src/layer/lines";
+import { Cell } from "../layer/lines";
 
 config.defineOptions(Editor.prototype, "editor", {
 	rtlText: {

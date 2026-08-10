@@ -9,7 +9,7 @@ import type { Delta, IRange } from "../range";
 import type { FoldMode } from "../mode/folding/fold_mode";
 import {MouseEvent} from "../mouse/mouse_event";
 import type { UIEvent, KeyEvent } from "quark/event";
-import type { Token } from "src/background_tokenizer";
+import type { Token } from "../background_tokenizer";
 
 /**
  * @typedef {import("../edit_session").EditSession & Folding} IFolding

@@ -50,7 +50,7 @@ export class CommandManager extends MultiHashHandler {
 		super(commands, platform);
 		// this.byName = this.commands;
 		this.setDefaultHandler("exec", function(e) {
-			if (!e.args)
+			if (e.args == null)
 				return e.command.exec!(e.editor, {}, e.event, true);
 			return e.command.exec!(e.editor, e.args, e.event, false);
 		});

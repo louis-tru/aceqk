@@ -1,7 +1,7 @@
 
 import { Application,Window,Jsx, Text } from 'quark';
 import * as ace from './src/ace';
-import {newRect} from 'quark/types';
+import {newRect,newColor} from 'quark/types';
 
 const app = new Application();
 
@@ -60,7 +60,7 @@ editor.session.setValue(code + code + code + code + code + code + code + code + 
 // );
 
 win.onChange.on(()=>{
-	editor.resize();
+	editor.setSize(win.size.width, win.size.height);
 });
 
 win.debugMode = true;
