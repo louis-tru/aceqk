@@ -18,7 +18,7 @@ const code = `if (!isTextToken(token.type)) {
 	let span: View;
 	if (token.type == "fold") {
 		// Use block view to allow setting width
-		span = new TextView(this.element.window);
+		span = new TextView(this.element.window);😀😀😂😊🚀❤
 		span.style.height = '100%';
 		span.style.width = (token.value.length * this.config.characterWidth);
 		span.data.title = nls("inline-fold.closed.title", "Unfold code");
