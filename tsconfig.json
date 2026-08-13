@@ -3,9 +3,10 @@
 	"compilerOptions": {
 		"noEmitHelpers": true,
 		"module": "commonjs",
-		"target": "ES2018",
-		"lib": ["ES2018"],
+		"target": "ES2019",
+		"lib": ["ES2019"],
 		"moduleResolution": "node",
+		"ignoreDeprecations": "6.0",
 		"sourceMap": false,
 		"outDir": "out/build",
 		"rootDir": ".",
