@@ -231,13 +231,12 @@ export class Text extends EventEmitter<TextEvents> {
 		var first = Math.max(firstRow, config.firstRow);
 		var last = Math.min(lastRow, config.lastRow);
 
-		var lineElements: View[] = [];//this.element.childNodes;
+		// Cached line views remain attached to the Quark view tree with
+		// visible=false, so walking element.first/next would mix inactive cache
+		// entries into the document-row order. Incremental updates must address
+		// only the active cells maintained by Lines.
+		var lineElements = this.$lines.cells.map(cell => cell.element);
 		var lineElementsIdx = 0;
-		var v = this.element.first;
-		while (v) {
-			lineElements.push(v);
-			v = v.next;
-		}
 
 		for (var row = config.firstRow; row < first; row++) {
 			var foldLine = this.session.getFoldLine(row);
@@ -876,11 +875,11 @@ export class Text extends EventEmitter<TextEvents> {
 	}
 
 	$useLineGroups() {
-		// For the updateLines function to work correctly, it's important that the
-		// child nodes of this.element correspond on a 1-to-1 basis to rows in the
-		// document (as distinct from lines on the screen). For sessions that are
-		// wrapped, this means we need to add a layer to the node hierarchy (tagged
-		// with the class name ace_line_group).
+		// Active entries in $lines.cells correspond one-to-one with document rows
+		// (as distinct from screen lines). For wrapped sessions this requires an
+		// extra node layer tagged with ace_line_group. Cached, inactive views may
+		// remain attached to the Quark tree and are intentionally not part of this
+		// mapping.
 		return this.session.getUseWrapMode();
 	}
 }
